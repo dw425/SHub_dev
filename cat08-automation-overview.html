@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation & RPA | Category 08 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 08 - AUTOMATION VIOLET */
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* VIZ CONTAINERS */
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .viz-svg { width: 100%; height: auto; }
+        
+        /* TOOL CARDS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* CONTROL ROOM */
+        .control-room { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .control-room-header { padding: var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .control-room-icon { font-size: 32px; }
+        .control-room-title h3 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .control-room-title p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .control-room-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .control-room-svg { width: 100%; height: auto; }
+        .control-room-stats { display: flex; justify-content: center; gap: var(--space-xl); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .control-stat { display: flex; align-items: center; gap: var(--space-xs); }
+        .control-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .control-stat-value { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); }
+        
+        /* AGENT + CODE */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* DIVIDER */
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        /* PAGES GRID */
+        .pages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .page-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; color: inherit; transition: all 0.3s; position: relative; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2); }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .page-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-muted); line-height: 1.6; }
+        .page-arrow { position: absolute; top: var(--space-lg); right: var(--space-lg); color: var(--cat-light); opacity: 0; transition: all 0.2s; }
+        .page-card:hover .page-arrow { opacity: 1; transform: translateX(4px); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+            .pages-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .pages-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="#">Categories</a>
+        <span class="sep">/</span>
+        <span class="current">Automation & RPA</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">⚡ Category 08</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat08-automation-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat08-p1-automation-maturity.html"><span class="nav-icon">📊</span> 8.1 Automation Maturity</a></li>
+            <li><a href="cat08-p2-bot-orchestration.html"><span class="nav-icon">🤖</span> 8.2 Bot Orchestration</a></li>
+            <li><a href="cat08-p3-process-mining.html"><span class="nav-icon">⛏️</span> 8.3 Process Mining</a></li>
+            <li><a href="cat08-p4-power-platform.html"><span class="nav-icon">⚡</span> 8.4 Power Platform</a></li>
+            <li><a href="cat08-p5-rpa-platforms.html"><span class="nav-icon">🔧</span> 8.5 RPA Platforms</a></li>
+            <li><a href="cat08-p6-document-processing.html"><span class="nav-icon">📄</span> 8.6 Document Processing</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">⚡ Category 08</span>
+                <h1>Automation & RPA</h1>
+                <p>Eliminate manual work through intelligent process automation, robotic process automation, and AI-powered document processing.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">$13.8B</div><div class="hero-metric-label">RPA Market 2025</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">300%</div><div class="hero-metric-label">Avg ROI Year 1</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">40%</div><div class="hero-metric-label">Tasks Automatable</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Error Reduction</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: AUTOMATION MATURITY -->
+        <section class="module" id="maturity">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Automation Maturity Model</h2>
+                    <p>Five levels from manual processes to fully autonomous operations</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Organizations progress through distinct automation maturity levels, from basic task automation to fully autonomous AI-driven operations. Understanding your current level helps identify the right technologies and strategies for advancement.</p>
+            </div>
+            
+            <!-- Automation Maturity Pyramid -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🔺 Automation Maturity Pyramid</div>
+                    <div class="viz-badge">Assessment</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 400" class="viz-svg">
+                        <defs>
+                            <pattern id="pyramidGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                            <linearGradient id="level5Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#7C3AED"/>
+                                <stop offset="100%" style="stop-color:#A78BFA"/>
+                            </linearGradient>
+                            <linearGradient id="level4Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#8B5CF6"/>
+                                <stop offset="100%" style="stop-color:#A78BFA"/>
+                            </linearGradient>
+                            <linearGradient id="level3Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#06B6D4"/>
+                                <stop offset="100%" style="stop-color:#22D3EE"/>
+                            </linearGradient>
+                            <linearGradient id="level2Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#F59E0B"/>
+                                <stop offset="100%" style="stop-color:#FBBF24"/>
+                            </linearGradient>
+                            <linearGradient id="level1Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#6B7280"/>
+                                <stop offset="100%" style="stop-color:#9CA3AF"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#pyramidGrid)"/>
+                        
+                        <!-- Pyramid center at x=400, each tier is 60px tall -->
+                        <!-- Tier heights: L5=60, L4=60, L3=60, L2=60, L1=60 = 300px total -->
+                        <!-- Starting Y = 40, each tier adds 60px -->
+                        
+                        <!-- Level 5: Autonomous (Top) - Y:40-100, width at base: 120 -->
+                        <polygon points="400,40 340,100 460,100" fill="url(#level5Grad)" stroke="#A78BFA" stroke-width="2"/>
+                        <text x="400" y="75" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">AUTONOMOUS</text>
+                        <text x="400" y="90" text-anchor="middle" fill="#E0D4FA" font-size="8">Self-Optimizing AI</text>
+                        
+                        <!-- Level 4: Intelligent - Y:100-160, width: 120-200 -->
+                        <polygon points="340,100 280,160 520,160 460,100" fill="url(#level4Grad)" stroke="#A78BFA" stroke-width="2"/>
+                        <text x="400" y="135" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">INTELLIGENT</text>
+                        <text x="400" y="150" text-anchor="middle" fill="#E0D4FA" font-size="9">AI + ML Enhanced</text>
+                        
+                        <!-- Level 3: Process - Y:160-220, width: 200-280 -->
+                        <polygon points="280,160 220,220 580,220 520,160" fill="url(#level3Grad)" stroke="#22D3EE" stroke-width="2"/>
+                        <text x="400" y="195" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">PROCESS</text>
+                        <text x="400" y="210" text-anchor="middle" fill="#CFFAFE" font-size="9">End-to-End Workflows</text>
+                        
+                        <!-- Level 2: Task - Y:220-280, width: 280-360 -->
+                        <polygon points="220,220 160,280 640,280 580,220" fill="url(#level2Grad)" stroke="#FBBF24" stroke-width="2"/>
+                        <text x="400" y="255" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">TASK</text>
+                        <text x="400" y="270" text-anchor="middle" fill="#FEF3C7" font-size="9">Single Task Bots</text>
+                        
+                        <!-- Level 1: Manual (Base) - Y:280-340, width: 360-440 -->
+                        <polygon points="160,280 100,340 700,340 640,280" fill="url(#level1Grad)" stroke="#9CA3AF" stroke-width="2"/>
+                        <text x="400" y="315" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">MANUAL</text>
+                        <text x="400" y="330" text-anchor="middle" fill="#E5E7EB" font-size="9">Human-Driven</text>
+                        
+                        <!-- Left side - Technologies (aligned to pyramid tier centers) -->
+                        <!-- L5 center Y = 70 -->
+                        <g transform="translate(30, 55)">
+                            <rect width="120" height="30" rx="4" fill="#1a1a2e" stroke="#7C3AED"/>
+                            <text x="60" y="19" text-anchor="middle" fill="#A78BFA" font-size="8">🧠 AGI / AutoML</text>
+                        </g>
+                        <line x1="150" y1="70" x2="340" y2="70" stroke="#7C3AED" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        
+                        <!-- L4 center Y = 130 -->
+                        <g transform="translate(30, 115)">
+                            <rect width="120" height="30" rx="4" fill="#1a1a2e" stroke="#8B5CF6"/>
+                            <text x="60" y="19" text-anchor="middle" fill="#A78BFA" font-size="8">🤖 AI Agents / LLMs</text>
+                        </g>
+                        <line x1="150" y1="130" x2="310" y2="130" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        
+                        <!-- L3 center Y = 190 -->
+                        <g transform="translate(30, 175)">
+                            <rect width="120" height="30" rx="4" fill="#1a1a2e" stroke="#06B6D4"/>
+                            <text x="60" y="19" text-anchor="middle" fill="#22D3EE" font-size="8">⚡ Power Automate</text>
+                        </g>
+                        <line x1="150" y1="190" x2="250" y2="190" stroke="#06B6D4" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        
+                        <!-- L2 center Y = 250 -->
+                        <g transform="translate(30, 235)">
+                            <rect width="120" height="30" rx="4" fill="#1a1a2e" stroke="#F59E0B"/>
+                            <text x="60" y="19" text-anchor="middle" fill="#FBBF24" font-size="8">🔧 UiPath / AA</text>
+                        </g>
+                        <line x1="150" y1="250" x2="190" y2="250" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        
+                        <!-- L1 center Y = 310 -->
+                        <g transform="translate(30, 295)">
+                            <rect width="120" height="30" rx="4" fill="#1a1a2e" stroke="#6B7280"/>
+                            <text x="60" y="19" text-anchor="middle" fill="#9CA3AF" font-size="8">📋 Excel / Manual</text>
+                        </g>
+                        <line x1="150" y1="310" x2="130" y2="310" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        
+                        <!-- Right side labels (aligned to pyramid tier centers) -->
+                        <!-- L5 center Y = 70 -->
+                        <line x1="460" y1="70" x2="540" y2="70" stroke="#7C3AED" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        <g transform="translate(540, 50)">
+                            <rect width="230" height="40" rx="6" fill="#1a1a2e" stroke="#7C3AED" stroke-width="1"/>
+                            <text x="15" y="17" fill="#A78BFA" font-size="9" font-weight="600">L5: Autonomous</text>
+                            <text x="15" y="32" fill="#6a6a7a" font-size="8">Self-learning, self-healing, continuous optimization</text>
+                        </g>
+                        
+                        <!-- L4 center Y = 130 -->
+                        <line x1="490" y1="130" x2="540" y2="130" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        <g transform="translate(540, 110)">
+                            <rect width="230" height="40" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                            <text x="15" y="17" fill="#A78BFA" font-size="9" font-weight="600">L4: Intelligent Automation</text>
+                            <text x="15" y="32" fill="#6a6a7a" font-size="8">ML models, NLP, computer vision, decision AI</text>
+                        </g>
+                        
+                        <!-- L3 center Y = 190 -->
+                        <line x1="550" y1="190" x2="540" y2="190" stroke="#06B6D4" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        <g transform="translate(540, 170)">
+                            <rect width="230" height="40" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                            <text x="15" y="17" fill="#22D3EE" font-size="9" font-weight="600">L3: Process Automation</text>
+                            <text x="15" y="32" fill="#6a6a7a" font-size="8">Orchestrated workflows, multi-system, exceptions</text>
+                        </g>
+                        
+                        <!-- L2 center Y = 250 -->
+                        <line x1="610" y1="250" x2="540" y2="250" stroke="#F59E0B" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        <g transform="translate(540, 230)">
+                            <rect width="230" height="40" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                            <text x="15" y="17" fill="#FBBF24" font-size="9" font-weight="600">L2: Task Automation</text>
+                            <text x="15" y="32" fill="#6a6a7a" font-size="8">Rule-based bots, single applications, scripting</text>
+                        </g>
+                        
+                        <!-- L1 center Y = 310 -->
+                        <line x1="670" y1="310" x2="540" y2="310" stroke="#6B7280" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+                        <g transform="translate(540, 290)">
+                            <rect width="230" height="40" rx="6" fill="#1a1a2e" stroke="#6B7280" stroke-width="1"/>
+                            <text x="15" y="17" fill="#9CA3AF" font-size="9" font-weight="600">L1: Manual Processes</text>
+                            <text x="15" y="32" fill="#6a6a7a" font-size="8">Spreadsheets, copy-paste, human decision-making</text>
+                        </g>
+                        
+                        <!-- Current position indicator -->
+                        <g transform="translate(400, 360)">
+                            <rect x="-100" y="0" width="200" height="30" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="0" y="19" text-anchor="middle" fill="#A78BFA" font-size="10">📍 Most Enterprises: Level 2-3</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 2: BOT ORCHESTRATION -->
+        <section class="module" id="orchestration">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Bot Orchestration Hub</h2>
+                    <p>Central command for managing attended and unattended automation</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Modern RPA deployments require centralized orchestration to manage bot lifecycles, queue work items, handle exceptions, and coordinate between attended (human-triggered) and unattended (scheduled) automations across the enterprise.</p>
+            </div>
+            
+            <!-- Bot Orchestration Hub - Switchboard Design -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🎛️ Bot Orchestration Switchboard</div>
+                    <div class="viz-badge">Real-time</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 340" class="viz-svg">
+                        <defs>
+                            <pattern id="orchGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <circle cx="15" cy="15" r="1" fill="#1a1a2e"/>
+                            </pattern>
+                            <linearGradient id="panelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1a1a2e"/>
+                                <stop offset="100%" style="stop-color:#12121a"/>
+                            </linearGradient>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#orchGrid)"/>
+                        
+                        <!-- Main Console Frame -->
+                        <rect x="20" y="20" width="760" height="300" rx="12" fill="url(#panelGrad)" stroke="#2a2a3e" stroke-width="2"/>
+                        
+                        <!-- Top Console Bar - Master Controls -->
+                        <rect x="20" y="20" width="760" height="50" rx="12" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                        <text x="50" y="50" fill="#A78BFA" font-size="12" font-weight="600">🎛️ ORCHESTRATOR CONSOLE</text>
+                        
+                        <!-- Master status lights -->
+                        <g transform="translate(250, 35)">
+                            <circle cx="0" cy="10" r="6" fill="#10B981">
+                                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <text x="15" y="14" fill="#34D399" font-size="9">SYSTEM ONLINE</text>
+                        </g>
+                        
+                        <!-- Master metrics -->
+                        <g transform="translate(420, 32)">
+                            <rect width="80" height="26" rx="4" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="10" y="11" fill="#6a6a7a" font-size="7">QUEUE</text>
+                            <text x="10" y="22" fill="#A78BFA" font-size="10" font-weight="600">847</text>
+                        </g>
+                        <g transform="translate(510, 32)">
+                            <rect width="80" height="26" rx="4" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="10" y="11" fill="#6a6a7a" font-size="7">PROCESSING</text>
+                            <text x="10" y="22" fill="#FBBF24" font-size="10" font-weight="600">12</text>
+                        </g>
+                        <g transform="translate(600, 32)">
+                            <rect width="80" height="26" rx="4" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="10" y="11" fill="#6a6a7a" font-size="7">COMPLETED</text>
+                            <text x="10" y="22" fill="#34D399" font-size="10" font-weight="600">2,341</text>
+                        </g>
+                        <g transform="translate(690, 32)">
+                            <rect width="80" height="26" rx="4" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="10" y="11" fill="#6a6a7a" font-size="7">UPTIME</text>
+                            <text x="10" y="22" fill="#34D399" font-size="10" font-weight="600">99.7%</text>
+                        </g>
+                        
+                        <!-- Section Labels -->
+                        <text x="155" y="95" text-anchor="middle" fill="#8B5CF6" font-size="10" font-weight="600">── UNATTENDED BOTS ──</text>
+                        <text x="645" y="95" text-anchor="middle" fill="#06B6D4" font-size="10" font-weight="600">── ATTENDED BOTS ──</text>
+                        
+                        <!-- Unattended Bot Panels (Left) -->
+                        <!-- Bot 1: Invoice Bot -->
+                        <g transform="translate(40, 110)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <!-- Status LED bar -->
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#10B981"/>
+                            <!-- Bot info -->
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Invoice Bot</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#34D399" font-size="8">● Running</text>
+                            <!-- Metrics row -->
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Today:</text>
+                            <text x="50" y="80" fill="#34D399" font-size="8" font-weight="600">234</text>
+                            <text x="80" y="80" fill="#6a6a7a" font-size="7">Avg:</text>
+                            <text x="100" y="80" fill="#A78BFA" font-size="8" font-weight="600">1.2s</text>
+                        </g>
+                        
+                        <!-- Bot 2: Report Bot -->
+                        <g transform="translate(195, 110)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#F59E0B">
+                                <animate attributeName="opacity" values="1;0.4;1" dur="1s" repeatCount="indefinite"/>
+                            </rect>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Report Bot</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#FBBF24" font-size="8">◐ Processing</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Today:</text>
+                            <text x="50" y="80" fill="#FBBF24" font-size="8" font-weight="600">89</text>
+                            <text x="80" y="80" fill="#6a6a7a" font-size="7">Avg:</text>
+                            <text x="100" y="80" fill="#A78BFA" font-size="8" font-weight="600">4.5s</text>
+                        </g>
+                        
+                        <!-- Bot 3: ETL Bot -->
+                        <g transform="translate(40, 210)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#6B7280" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#6B7280"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#9CA3AF" font-size="18">🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#9CA3AF" font-size="10" font-weight="600">ETL Bot</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#6B7280" font-size="8">○ Scheduled 2:00 AM</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Last:</text>
+                            <text x="42" y="80" fill="#6B7280" font-size="8">12 hrs ago</text>
+                            <text x="95" y="80" fill="#34D399" font-size="8">✓</text>
+                        </g>
+                        
+                        <!-- Bot 4: Data Sync -->
+                        <g transform="translate(195, 210)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#10B981"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Data Sync</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#34D399" font-size="8">● Running</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Today:</text>
+                            <text x="50" y="80" fill="#34D399" font-size="8" font-weight="600">1,247</text>
+                            <text x="90" y="80" fill="#6a6a7a" font-size="7">Avg:</text>
+                            <text x="110" y="80" fill="#A78BFA" font-size="8" font-weight="600">0.3s</text>
+                        </g>
+                        
+                        <!-- Center Divider with Data Flow -->
+                        <rect x="385" y="100" width="30" height="200" rx="4" fill="#1a1a2e" stroke="#2a2a3e"/>
+                        <text x="400" y="120" text-anchor="middle" fill="#6a6a7a" font-size="8">DATA</text>
+                        <text x="400" y="132" text-anchor="middle" fill="#6a6a7a" font-size="8">FLOW</text>
+                        <!-- Animated flow indicators -->
+                        <circle cx="400" cy="160" r="3" fill="#8B5CF6">
+                            <animate attributeName="cy" values="160;280;160" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="400" cy="200" r="3" fill="#06B6D4">
+                            <animate attributeName="cy" values="200;280;200" dur="2.5s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="400" cy="240" r="3" fill="#10B981">
+                            <animate attributeName="cy" values="240;280;240" dur="1.8s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
+                        </circle>
+                        
+                        <!-- Attended Bot Panels (Right) -->
+                        <!-- Bot 5: Desktop Helper -->
+                        <g transform="translate(460, 110)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#06B6D4"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">👤🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Desktop Helper</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#22D3EE" font-size="8">● 12 users active</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Tasks:</text>
+                            <text x="50" y="80" fill="#22D3EE" font-size="8" font-weight="600">156</text>
+                            <text x="80" y="80" fill="#6a6a7a" font-size="7">Saved:</text>
+                            <text x="110" y="80" fill="#34D399" font-size="8" font-weight="600">2.1h</text>
+                        </g>
+                        
+                        <!-- Bot 6: Form Filler -->
+                        <g transform="translate(615, 110)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#EC4899" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#EC4899"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">👤🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Form Filler</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#F472B6" font-size="8">● 8 users active</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Forms:</text>
+                            <text x="55" y="80" fill="#F472B6" font-size="8" font-weight="600">89</text>
+                            <text x="80" y="80" fill="#6a6a7a" font-size="7">Saved:</text>
+                            <text x="110" y="80" fill="#34D399" font-size="8" font-weight="600">1.4h</text>
+                        </g>
+                        
+                        <!-- Bot 7: Lookup Agent -->
+                        <g transform="translate(460, 210)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#3B82F6"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">👤🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Lookup Agent</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#60A5FA" font-size="8">● 5 users active</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Queries:</text>
+                            <text x="60" y="80" fill="#60A5FA" font-size="8" font-weight="600">423</text>
+                            <text x="90" y="80" fill="#6a6a7a" font-size="7">Avg:</text>
+                            <text x="110" y="80" fill="#A78BFA" font-size="8" font-weight="600">0.8s</text>
+                        </g>
+                        
+                        <!-- Bot 8: Email Parser -->
+                        <g transform="translate(615, 210)">
+                            <rect width="145" height="90" rx="8" fill="#12121a" stroke="#14B8A6" stroke-width="2"/>
+                            <rect x="0" y="0" width="145" height="6" rx="8" fill="#14B8A6"/>
+                            <text x="72" y="28" text-anchor="middle" fill="#fff" font-size="18">👤🤖</text>
+                            <text x="72" y="48" text-anchor="middle" fill="#fff" font-size="10" font-weight="600">Email Parser</text>
+                            <text x="72" y="62" text-anchor="middle" fill="#2DD4BF" font-size="8">● 3 users active</text>
+                            <rect x="10" y="70" width="125" height="14" rx="3" fill="#1a1a2e"/>
+                            <text x="20" y="80" fill="#6a6a7a" font-size="7">Parsed:</text>
+                            <text x="55" y="80" fill="#2DD4BF" font-size="8" font-weight="600">67</text>
+                            <text x="80" y="80" fill="#6a6a7a" font-size="7">Saved:</text>
+                            <text x="110" y="80" fill="#34D399" font-size="8" font-weight="600">0.9h</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 3: PROCESS MINING -->
+        <section class="module" id="mining">
+            <div class="module-header">
+                <div class="module-icon">⛏️</div>
+                <div class="module-info">
+                    <h2>Process Mining & Discovery</h2>
+                    <p>Discover automation opportunities from event logs and system data</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Process mining analyzes event logs from enterprise systems to discover actual process flows, identify bottlenecks, and quantify automation opportunities. This data-driven approach ensures you automate the right processes with the highest ROI potential.</p>
+            </div>
+            
+            <!-- Process Mining Flow -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🔍 Process Discovery Pipeline</div>
+                    <div class="viz-badge">Analysis</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 280" class="viz-svg">
+                        <defs>
+                            <pattern id="mineGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                            <marker id="mineArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#8B5CF6"/>
+                            </marker>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#mineGrid)"/>
+                        
+                        <!-- Stage 1: Event Logs -->
+                        <g transform="translate(50, 80)">
+                            <rect width="130" height="120" rx="10" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <rect x="0" y="0" width="130" height="28" rx="10" fill="#3B82F6"/>
+                            <text x="65" y="18" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">EVENT LOGS</text>
+                            
+                            <!-- Log lines -->
+                            <g transform="translate(10, 38)">
+                                <rect width="110" height="12" rx="2" fill="#12121a"/>
+                                <text x="5" y="9" fill="#60A5FA" font-size="6">2024-01-15 09:23:41 | Order_Created</text>
+                            </g>
+                            <g transform="translate(10, 54)">
+                                <rect width="110" height="12" rx="2" fill="#12121a"/>
+                                <text x="5" y="9" fill="#60A5FA" font-size="6">2024-01-15 09:24:02 | Invoice_Gen</text>
+                            </g>
+                            <g transform="translate(10, 70)">
+                                <rect width="110" height="12" rx="2" fill="#12121a"/>
+                                <text x="5" y="9" fill="#60A5FA" font-size="6">2024-01-15 09:31:18 | Approval_Req</text>
+                            </g>
+                            <g transform="translate(10, 86)">
+                                <rect width="110" height="12" rx="2" fill="#12121a"/>
+                                <text x="5" y="9" fill="#60A5FA" font-size="6">2024-01-15 10:45:33 | Payment_Sent</text>
+                            </g>
+                            <text x="65" y="112" text-anchor="middle" fill="#6a6a7a" font-size="8">1.2M events</text>
+                        </g>
+                        
+                        <!-- Arrow 1 -->
+                        <path d="M 185 140 L 225 140" stroke="#8B5CF6" stroke-width="2" marker-end="url(#mineArrow)"/>
+                        
+                        <!-- Stage 2: Pattern Detection -->
+                        <g transform="translate(230, 80)">
+                            <rect width="130" height="120" rx="10" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <rect x="0" y="0" width="130" height="28" rx="10" fill="#8B5CF6"/>
+                            <text x="65" y="18" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">PATTERN DETECT</text>
+                            
+                            <!-- Process graph mini -->
+                            <g transform="translate(20, 45)">
+                                <circle cx="15" cy="15" r="8" fill="#A78BFA" opacity="0.5"/>
+                                <circle cx="45" cy="5" r="6" fill="#A78BFA" opacity="0.5"/>
+                                <circle cx="45" cy="25" r="6" fill="#A78BFA" opacity="0.5"/>
+                                <circle cx="75" cy="15" r="8" fill="#A78BFA" opacity="0.5"/>
+                                <line x1="23" y1="15" x2="39" y2="7" stroke="#A78BFA" stroke-width="1"/>
+                                <line x1="23" y1="15" x2="39" y2="23" stroke="#A78BFA" stroke-width="1"/>
+                                <line x1="51" y1="7" x2="67" y2="15" stroke="#A78BFA" stroke-width="1"/>
+                                <line x1="51" y1="23" x2="67" y2="15" stroke="#A78BFA" stroke-width="1"/>
+                            </g>
+                            
+                            <text x="65" y="90" text-anchor="middle" fill="#A78BFA" font-size="9">47 Variants Found</text>
+                            <text x="65" y="105" text-anchor="middle" fill="#6a6a7a" font-size="8">12 bottlenecks</text>
+                        </g>
+                        
+                        <!-- Arrow 2 -->
+                        <path d="M 365 140 L 405 140" stroke="#8B5CF6" stroke-width="2" marker-end="url(#mineArrow)"/>
+                        
+                        <!-- Stage 3: Opportunity Scoring -->
+                        <g transform="translate(410, 80)">
+                            <rect width="130" height="120" rx="10" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <rect x="0" y="0" width="130" height="28" rx="10" fill="#F59E0B"/>
+                            <text x="65" y="18" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">SCORING</text>
+                            
+                            <!-- Score bars -->
+                            <g transform="translate(10, 40)">
+                                <text x="0" y="8" fill="#6a6a7a" font-size="7">Invoice Process</text>
+                                <rect x="0" y="12" width="110" height="8" rx="2" fill="#12121a"/>
+                                <rect x="0" y="12" width="95" height="8" rx="2" fill="#10B981"/>
+                                <text x="100" y="19" fill="#34D399" font-size="7">92</text>
+                            </g>
+                            <g transform="translate(10, 62)">
+                                <text x="0" y="8" fill="#6a6a7a" font-size="7">Order Entry</text>
+                                <rect x="0" y="12" width="110" height="8" rx="2" fill="#12121a"/>
+                                <rect x="0" y="12" width="78" height="8" rx="2" fill="#FBBF24"/>
+                                <text x="83" y="19" fill="#FBBF24" font-size="7">78</text>
+                            </g>
+                            <g transform="translate(10, 84)">
+                                <text x="0" y="8" fill="#6a6a7a" font-size="7">Approvals</text>
+                                <rect x="0" y="12" width="110" height="8" rx="2" fill="#12121a"/>
+                                <rect x="0" y="12" width="65" height="8" rx="2" fill="#F59E0B"/>
+                                <text x="70" y="19" fill="#F59E0B" font-size="7">65</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Arrow 3 -->
+                        <path d="M 545 140 L 585 140" stroke="#8B5CF6" stroke-width="2" marker-end="url(#mineArrow)"/>
+                        
+                        <!-- Stage 4: Automation Candidates -->
+                        <g transform="translate(590, 80)">
+                            <rect width="160" height="120" rx="10" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <rect x="0" y="0" width="160" height="28" rx="10" fill="#10B981"/>
+                            <text x="80" y="18" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">AUTOMATION CANDIDATES</text>
+                            
+                            <g transform="translate(10, 38)">
+                                <rect width="140" height="22" rx="4" fill="#12121a" stroke="#10B981"/>
+                                <text x="8" y="15" fill="#34D399" font-size="8">✓ Invoice Processing</text>
+                                <text x="120" y="15" fill="#34D399" font-size="8">$2.1M</text>
+                            </g>
+                            <g transform="translate(10, 64)">
+                                <rect width="140" height="22" rx="4" fill="#12121a" stroke="#10B981"/>
+                                <text x="8" y="15" fill="#34D399" font-size="8">✓ Data Entry</text>
+                                <text x="120" y="15" fill="#34D399" font-size="8">$890K</text>
+                            </g>
+                            <g transform="translate(10, 90)">
+                                <rect width="140" height="22" rx="4" fill="#12121a" stroke="#FBBF24"/>
+                                <text x="8" y="15" fill="#FBBF24" font-size="8">◐ Report Generation</text>
+                                <text x="120" y="15" fill="#FBBF24" font-size="8">$450K</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Summary -->
+                        <g transform="translate(250, 230)">
+                            <rect width="300" height="35" rx="6" fill="#1a1a2e" stroke="#8B5CF6"/>
+                            <text x="150" y="15" text-anchor="middle" fill="#A78BFA" font-size="10" font-weight="600">Total Automation Potential: $3.4M / year</text>
+                            <text x="150" y="28" text-anchor="middle" fill="#6a6a7a" font-size="8">23 processes identified • 156,000 hours saved</text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- MODULE 4: AUTOMATION CREW -->
+        <section class="module" id="agents">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Automation Command Center</h2>
+                    <p>AI agents managing bot operations and process optimization</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>The Automation Crew operates as a command center, with specialized agents monitoring bot health, optimizing queues, handling exceptions, and continuously improving automation performance across the enterprise.</p>
+            </div>
+            
+            <!-- Control Room Visualization -->
+            <div class="control-room">
+                <div class="control-room-header">
+                    <div class="control-room-icon">🎮</div>
+                    <div class="control-room-title">
+                        <h3>Automation Command Center</h3>
+                        <p>Real-time monitoring and orchestration of automation fleet</p>
+                    </div>
+                </div>
+                <div class="control-room-canvas">
+                    <svg viewBox="0 0 800 300" class="control-room-svg">
+                        <defs>
+                            <pattern id="controlGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <rect width="40" height="40" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#controlGrid)"/>
+                        
+                        <!-- Control Room Frame -->
+                        <rect x="20" y="20" width="760" height="260" rx="12" fill="none" stroke="#2a2a3e" stroke-width="2"/>
+                        
+                        <!-- Top status bar -->
+                        <rect x="20" y="20" width="760" height="35" rx="12" fill="#1a1a2e"/>
+                        <circle cx="45" cy="37" r="6" fill="#10B981"/>
+                        <text x="60" y="42" fill="#34D399" font-size="10" font-weight="600">SYSTEM ONLINE</text>
+                        <text x="720" y="42" text-anchor="end" fill="#6a6a7a" font-size="9">Last Update: 2 sec ago</text>
+                        
+                        <!-- Operator Station 1: Queue Manager -->
+                        <g transform="translate(40, 70)">
+                            <rect width="170" height="120" rx="8" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
+                            <rect x="0" y="0" width="170" height="25" rx="8" fill="#8B5CF6"/>
+                            <text x="85" y="17" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">📋 QUEUE MANAGER</text>
+                            
+                            <!-- Mini queue display -->
+                            <g transform="translate(10, 35)">
+                                <rect width="150" height="18" rx="3" fill="#1a1a2e"/>
+                                <rect width="120" height="18" rx="3" fill="#8B5CF6" opacity="0.3"/>
+                                <text x="75" y="13" text-anchor="middle" fill="#A78BFA" font-size="8">847 items • 78% capacity</text>
+                            </g>
+                            <g transform="translate(10, 58)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Priority High:</text>
+                                <text x="70" y="10" fill="#EF4444" font-size="8" font-weight="600">23</text>
+                                <text x="90" y="10" fill="#6a6a7a" font-size="7">Med:</text>
+                                <text x="115" y="10" fill="#FBBF24" font-size="8" font-weight="600">156</text>
+                            </g>
+                            <g transform="translate(10, 75)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Avg Wait:</text>
+                                <text x="50" y="10" fill="#34D399" font-size="8" font-weight="600">4.2 min</text>
+                            </g>
+                            
+                            <!-- Agent indicator -->
+                            <g transform="translate(10, 95)">
+                                <circle cx="8" cy="8" r="6" fill="#8B5CF6"/>
+                                <text x="20" y="11" fill="#A78BFA" font-size="7">QueueAgent Active</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Operator Station 2: Bot Monitor -->
+                        <g transform="translate(225, 70)">
+                            <rect width="170" height="120" rx="8" fill="#12121a" stroke="#10B981" stroke-width="2"/>
+                            <rect x="0" y="0" width="170" height="25" rx="8" fill="#10B981"/>
+                            <text x="85" y="17" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">🤖 BOT MONITOR</text>
+                            
+                            <!-- Bot status grid -->
+                            <g transform="translate(15, 35)">
+                                <circle cx="10" cy="10" r="8" fill="#10B981"/><text x="10" y="13" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <circle cx="35" cy="10" r="8" fill="#10B981"/><text x="35" y="13" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <circle cx="60" cy="10" r="8" fill="#FBBF24"/><text x="60" y="13" text-anchor="middle" fill="#fff" font-size="6">⟳</text>
+                                <circle cx="85" cy="10" r="8" fill="#10B981"/><text x="85" y="13" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <circle cx="110" cy="10" r="8" fill="#10B981"/><text x="110" y="13" text-anchor="middle" fill="#fff" font-size="6">✓</text>
+                                <circle cx="135" cy="10" r="8" fill="#6B7280"/><text x="135" y="13" text-anchor="middle" fill="#fff" font-size="6">○</text>
+                            </g>
+                            <g transform="translate(10, 58)">
+                                <text x="0" y="10" fill="#34D399" font-size="8">● 4 Running</text>
+                                <text x="60" y="10" fill="#FBBF24" font-size="8">● 1 Busy</text>
+                                <text x="110" y="10" fill="#6B7280" font-size="8">● 1 Idle</text>
+                            </g>
+                            <g transform="translate(10, 75)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Uptime:</text>
+                                <text x="45" y="10" fill="#34D399" font-size="8" font-weight="600">99.7%</text>
+                                <text x="80" y="10" fill="#6a6a7a" font-size="7">Errors:</text>
+                                <text x="115" y="10" fill="#34D399" font-size="8" font-weight="600">0</text>
+                            </g>
+                            
+                            <g transform="translate(10, 95)">
+                                <circle cx="8" cy="8" r="6" fill="#10B981"/>
+                                <text x="20" y="11" fill="#34D399" font-size="7">MonitorAgent Active</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Operator Station 3: Exception Handler -->
+                        <g transform="translate(410, 70)">
+                            <rect width="170" height="120" rx="8" fill="#12121a" stroke="#F59E0B" stroke-width="2"/>
+                            <rect x="0" y="0" width="170" height="25" rx="8" fill="#F59E0B"/>
+                            <text x="85" y="17" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">⚠️ EXCEPTION HANDLER</text>
+                            
+                            <!-- Exception list -->
+                            <g transform="translate(10, 35)">
+                                <rect width="150" height="16" rx="2" fill="#1a1a2e" stroke="#EF4444" stroke-width="1"/>
+                                <text x="5" y="11" fill="#F87171" font-size="7">❌ Login timeout - Bot #3</text>
+                                <text x="140" y="11" text-anchor="end" fill="#6a6a7a" font-size="6">2m ago</text>
+                            </g>
+                            <g transform="translate(10, 55)">
+                                <rect width="150" height="16" rx="2" fill="#1a1a2e" stroke="#FBBF24" stroke-width="1"/>
+                                <text x="5" y="11" fill="#FBBF24" font-size="7">⚠ Data format - Queue 7</text>
+                                <text x="140" y="11" text-anchor="end" fill="#6a6a7a" font-size="6">5m ago</text>
+                            </g>
+                            <g transform="translate(10, 75)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Today:</text>
+                                <text x="35" y="10" fill="#F87171" font-size="8" font-weight="600">3 critical</text>
+                                <text x="90" y="10" fill="#FBBF24" font-size="8" font-weight="600">12 warnings</text>
+                            </g>
+                            
+                            <g transform="translate(10, 95)">
+                                <circle cx="8" cy="8" r="6" fill="#F59E0B"/>
+                                <text x="20" y="11" fill="#FBBF24" font-size="7">ExceptionAgent Active</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Operator Station 4: Performance Optimizer -->
+                        <g transform="translate(595, 70)">
+                            <rect width="170" height="120" rx="8" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
+                            <rect x="0" y="0" width="170" height="25" rx="8" fill="#06B6D4"/>
+                            <text x="85" y="17" text-anchor="middle" fill="#fff" font-size="9" font-weight="600">📈 OPTIMIZER</text>
+                            
+                            <!-- Performance chart mini -->
+                            <g transform="translate(15, 40)">
+                                <polyline points="0,35 20,30 40,20 60,25 80,15 100,10 120,5" fill="none" stroke="#22D3EE" stroke-width="2"/>
+                                <circle cx="120" cy="5" r="3" fill="#22D3EE"/>
+                            </g>
+                            <g transform="translate(10, 75)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Throughput:</text>
+                                <text x="55" y="10" fill="#22D3EE" font-size="8" font-weight="600">+23% ↑</text>
+                            </g>
+                            <g transform="translate(10, 88)">
+                                <text x="0" y="10" fill="#6a6a7a" font-size="7">Suggestions:</text>
+                                <text x="60" y="10" fill="#34D399" font-size="8" font-weight="600">5 applied today</text>
+                            </g>
+                            
+                            <g transform="translate(10, 95)">
+                                <circle cx="8" cy="8" r="6" fill="#06B6D4"/>
+                                <text x="20" y="11" fill="#22D3EE" font-size="7">OptimizerAgent Active</text>
+                            </g>
+                        </g>
+                        
+                        <!-- Bottom status bar -->
+                        <g transform="translate(40, 200)">
+                            <rect width="720" height="65" rx="8" fill="#12121a" stroke="#2a2a3e"/>
+                            <text x="20" y="20" fill="#6a6a7a" font-size="9">LIVE METRICS</text>
+                            
+                            <g transform="translate(20, 35)">
+                                <text x="0" y="12" fill="#6a6a7a" font-size="8">Items/Hour:</text>
+                                <text x="70" y="12" fill="#A78BFA" font-size="11" font-weight="600">2,847</text>
+                            </g>
+                            <g transform="translate(150, 35)">
+                                <text x="0" y="12" fill="#6a6a7a" font-size="8">Avg Time:</text>
+                                <text x="55" y="12" fill="#34D399" font-size="11" font-weight="600">1.2s</text>
+                            </g>
+                            <g transform="translate(270, 35)">
+                                <text x="0" y="12" fill="#6a6a7a" font-size="8">Success Rate:</text>
+                                <text x="70" y="12" fill="#34D399" font-size="11" font-weight="600">99.4%</text>
+                            </g>
+                            <g transform="translate(400, 35)">
+                                <text x="0" y="12" fill="#6a6a7a" font-size="8">Cost Saved:</text>
+                                <text x="60" y="12" fill="#FBBF24" font-size="11" font-weight="600">$24,892</text>
+                                <text x="130" y="12" fill="#6a6a7a" font-size="8">today</text>
+                            </g>
+                            <g transform="translate(550, 35)">
+                                <text x="0" y="12" fill="#6a6a7a" font-size="8">FTE Equivalent:</text>
+                                <text x="80" y="12" fill="#A78BFA" font-size="11" font-weight="600">47.3</text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="control-room-stats">
+                    <div class="control-stat">
+                        <span class="control-stat-label">Active Agents:</span>
+                        <span class="control-stat-value">4</span>
+                    </div>
+                    <div class="control-stat">
+                        <span class="control-stat-label">Bots Deployed:</span>
+                        <span class="control-stat-value">6</span>
+                    </div>
+                    <div class="control-stat">
+                        <span class="control-stat-label">Processes Automated:</span>
+                        <span class="control-stat-value">23</span>
+                    </div>
+                    <div class="control-stat">
+                        <span class="control-stat-label">System Health:</span>
+                        <span class="control-stat-value" style="color: #34D399;">Optimal</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent + Code Section -->
+            <div class="agent-section">
+                <div class="agent-section-header">
+                    <div class="agent-section-tag">Agent This</div>
+                    <div class="agent-section-title">Automation Management System</div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-info">
+                        <div class="agent-avatar">⚡</div>
+                        <div class="agent-name">AutomationCrew</div>
+                        <div class="agent-role">Intelligent Process Automation</div>
+                        <p class="agent-desc">Orchestrates RPA bots, manages work queues, handles exceptions, and continuously optimizes automation performance using AI-driven insights.</p>
+                        <ul class="agent-capabilities">
+                            <li>Dynamic queue prioritization</li>
+                            <li>Real-time bot health monitoring</li>
+                            <li>Intelligent exception handling</li>
+                            <li>Self-healing automation recovery</li>
+                            <li>Performance optimization recommendations</li>
+                            <li>Predictive maintenance alerts</li>
+                            <li>ROI tracking and reporting</li>
+                        </ul>
+                    </div>
+                    <div class="code-panel">
+                        <div class="code-header">
+                            <div class="code-tabs">
+                                <div class="code-tab active">Python</div>
+                                <div class="code-tab">YAML</div>
+                            </div>
+                            <div class="code-filename">automation_crew.py</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><span class="code-comment"># Automation Command Center Crew</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+<span class="code-comment"># Initialize LLM</span>
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Automation Agents</span>
+queue_agent = Agent(
+    role=<span class="code-string">"Queue Manager"</span>,
+    goal=<span class="code-string">"Optimize work queue distribution and prioritization"</span>,
+    backstory=<span class="code-string">"""Expert in queue theory and workload 
+    balancing across distributed bot infrastructure."""</span>,
+    llm=llm,
+    tools=[queue_analyzer, priority_scorer, load_balancer]
+)
+
+monitor_agent = Agent(
+    role=<span class="code-string">"Bot Health Monitor"</span>,
+    goal=<span class="code-string">"Ensure all bots are operating at peak performance"</span>,
+    backstory=<span class="code-string">"""Specialist in RPA bot monitoring, detecting
+    performance degradation before failures occur."""</span>,
+    llm=llm,
+    tools=[health_checker, metrics_collector, alert_manager]
+)
+
+exception_agent = Agent(
+    role=<span class="code-string">"Exception Handler"</span>,
+    goal=<span class="code-string">"Resolve automation exceptions intelligently"</span>,
+    backstory=<span class="code-string">"""Expert at analyzing exceptions, determining
+    root causes, and implementing automated fixes."""</span>,
+    llm=llm,
+    tools=[exception_parser, retry_logic, escalation_tool]
+)
+
+optimizer_agent = Agent(
+    role=<span class="code-string">"Performance Optimizer"</span>,
+    goal=<span class="code-string">"Continuously improve automation efficiency"</span>,
+    backstory=<span class="code-string">"""Data scientist focused on automation KPIs,
+    identifying optimization opportunities."""</span>,
+    llm=llm,
+    tools=[performance_analyzer, bottleneck_detector, recommender]
+)
+
+<span class="code-comment"># Create Automation Crew</span>
+automation_crew = Crew(
+    agents=[queue_agent, monitor_agent, 
+            exception_agent, optimizer_agent],
+    process=Process.hierarchical,
+    manager_llm=llm,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">manage_automation_fleet</span>():
+    <span class="code-string">"""Run the automation command center."""</span>
+    tasks = [
+        Task(description=<span class="code-string">"Optimize queue distribution"</span>, agent=queue_agent),
+        Task(description=<span class="code-string">"Check all bot health status"</span>, agent=monitor_agent),
+        Task(description=<span class="code-string">"Handle pending exceptions"</span>, agent=exception_agent),
+        Task(description=<span class="code-string">"Generate optimization report"</span>, agent=optimizer_agent)
+    ]
+    <span class="code-keyword">return await</span> automation_crew.kickoff_async(tasks=tasks)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS SECTION -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Automation Tools</h2>
+                    <p>RPA platforms, workflow engines, and process mining tools</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟠</div>
+                        <div class="tool-card-name">UiPath</div>
+                    </div>
+                    <div class="tool-card-desc">Enterprise RPA platform with AI capabilities, attended/unattended bots, and robust orchestration.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔵</div>
+                        <div class="tool-card-name">Power Automate</div>
+                    </div>
+                    <div class="tool-card-desc">Microsoft's cloud workflow automation with 500+ connectors and desktop flow capabilities.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟣</div>
+                        <div class="tool-card-name">Automation Anywhere</div>
+                    </div>
+                    <div class="tool-card-desc">Cloud-native RPA with IQ Bot for intelligent document processing and Bot Insight analytics.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🟢</div>
+                        <div class="tool-card-name">Celonis</div>
+                    </div>
+                    <div class="tool-card-desc">Process mining leader for discovering, analyzing, and optimizing business processes.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into automation and RPA topics</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat08-p1-automation-maturity.html" class="page-card">
+                    <div class="page-num">Page 8.1</div>
+                    <div class="page-title">Automation Maturity</div>
+                    <div class="page-desc">Five-level maturity model from manual processes to autonomous operations</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat08-p2-bot-orchestration.html" class="page-card">
+                    <div class="page-num">Page 8.2</div>
+                    <div class="page-title">Bot Orchestration</div>
+                    <div class="page-desc">Command center for managing attended and unattended automation fleets</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat08-p3-process-mining.html" class="page-card">
+                    <div class="page-num">Page 8.3</div>
+                    <div class="page-title">Process Mining</div>
+                    <div class="page-desc">Discover automation opportunities from event logs and system data</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat08-p4-power-platform.html" class="page-card">
+                    <div class="page-num">Page 8.4</div>
+                    <div class="page-title">Power Platform</div>
+                    <div class="page-desc">Microsoft Power Automate, Power Apps, and low-code automation</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat08-p5-rpa-platforms.html" class="page-card">
+                    <div class="page-num">Page 8.5</div>
+                    <div class="page-title">RPA Platforms</div>
+                    <div class="page-desc">UiPath, Automation Anywhere, Blue Prism platform deep dives</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat08-p6-document-processing.html" class="page-card">
+                    <div class="page-num">Page 8.6</div>
+                    <div class="page-title">Document Processing</div>
+                    <div class="page-desc">Intelligent document processing, OCR, and extraction pipelines</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="../category-07/cat07-knowledge-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">07: Knowledge Management</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 08</div>
+        <a href="cat08-p1-automation-maturity.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">First Page</div>
+                <div class="footer-link-title">8.1: Automation Maturity</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

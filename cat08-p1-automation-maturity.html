@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Maturity | Automation & RPA | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* MATURITY LEVELS */
+        .maturity-stack { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+        .maturity-level { display: grid; grid-template-columns: 80px 1fr 200px; gap: 0; background: var(--bg-card); border: 1px solid var(--border-color); position: relative; }
+        .maturity-level:first-child { border-radius: 12px 12px 0 0; }
+        .maturity-level:last-child { border-radius: 0 0 12px 12px; }
+        .maturity-level:not(:last-child) { border-bottom: none; }
+        
+        .level-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border-right: 1px solid var(--border-color); }
+        .level-num { font-size: 28px; font-weight: 800; }
+        .level-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+        
+        .level-content { padding: 20px 24px; }
+        .level-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+        .level-subtitle { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .level-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .level-characteristics { display: flex; flex-wrap: wrap; gap: 6px; }
+        .level-char { font-size: 10px; padding: 4px 10px; background: var(--bg-dark); border-radius: 4px; color: var(--text-muted); }
+        
+        .level-tech { padding: 20px; border-left: 1px solid var(--border-color); background: var(--bg-card-alt); display: flex; flex-direction: column; justify-content: center; }
+        .level-tech-title { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+        .level-tech-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tech-tag { font-size: 10px; padding: 4px 8px; background: var(--bg-dark); border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+        
+        .level-1 .level-badge { background: linear-gradient(135deg, #374151, #4B5563); }
+        .level-1 .level-num { color: #9CA3AF; }
+        .level-1 .level-label { color: #6B7280; }
+        .level-1 .level-title { color: #9CA3AF; }
+        
+        .level-2 .level-badge { background: linear-gradient(135deg, #92400E, #B45309); }
+        .level-2 .level-num { color: #FCD34D; }
+        .level-2 .level-label { color: #F59E0B; }
+        .level-2 .level-title { color: #FBBF24; }
+        
+        .level-3 .level-badge { background: linear-gradient(135deg, #0E7490, #0891B2); }
+        .level-3 .level-num { color: #67E8F9; }
+        .level-3 .level-label { color: #06B6D4; }
+        .level-3 .level-title { color: #22D3EE; }
+        
+        .level-4 .level-badge { background: linear-gradient(135deg, #6D28D9, #7C3AED); }
+        .level-4 .level-num { color: #C4B5FD; }
+        .level-4 .level-label { color: #8B5CF6; }
+        .level-4 .level-title { color: #A78BFA; }
+        
+        .level-5 .level-badge { background: linear-gradient(135deg, #BE185D, #DB2777); }
+        .level-5 .level-num { color: #F9A8D4; }
+        .level-5 .level-label { color: #EC4899; }
+        .level-5 .level-title { color: #F472B6; }
+        
+        /* BENCHMARK TABLE */
+        .benchmark-table-wrapper { overflow-x: auto; margin-bottom: 20px; }
+        .benchmark-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; font-size: 12px; }
+        .benchmark-table th { background: var(--bg-card-alt); padding: 14px 16px; text-align: left; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); }
+        .benchmark-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+        .benchmark-table tr:last-child td { border-bottom: none; }
+        .benchmark-table tr:hover td { background: var(--bg-hover); }
+        .benchmark-leader td { background: rgba(16, 185, 129, 0.05); }
+        .benchmark-leader td:first-child { border-left: 3px solid var(--green); }
+        .benchmark-mid td { background: rgba(6, 182, 212, 0.05); }
+        .benchmark-mid td:first-child { border-left: 3px solid var(--cyan); }
+        .benchmark-emerging td { background: rgba(245, 158, 11, 0.05); }
+        .benchmark-emerging td:first-child { border-left: 3px solid var(--yellow); }
+        .level-tag { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .level-tag.level-4 { background: var(--cat-glow); color: var(--cat-light); }
+        .level-tag.level-3 { background: rgba(6, 182, 212, 0.2); color: var(--cyan); }
+        .level-tag.level-2 { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .level-tag.level-1 { background: rgba(107, 114, 128, 0.2); color: #9CA3AF; }
+        
+        /* BENCHMARK INSIGHTS */
+        .benchmark-insights { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .insight-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; align-items: flex-start; gap: 16px; }
+        .insight-icon { font-size: 28px; flex-shrink: 0; }
+        .insight-content { flex: 1; }
+        .insight-title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .insight-stat { font-size: 24px; font-weight: 700; color: var(--cat-light); margin-bottom: 6px; }
+        .insight-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* LEADER PROFILES */
+        .leader-profiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .leader-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .leader-card.laggard { grid-column: span 2; }
+        .leader-header { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .leader-logo { width: 48px; height: 48px; background: var(--bg-dark); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .leader-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .leader-level { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .leader-body { padding: 20px; }
+        .leader-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .leader-stat { text-align: center; padding: 12px; background: var(--bg-dark); border-radius: 8px; }
+        .leader-stat-value { font-size: 20px; font-weight: 700; color: var(--cat-light); }
+        .leader-stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+        .leader-desc { margin-bottom: 16px; }
+        .leader-desc p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+        .leader-desc p:last-child { margin-bottom: 0; }
+        .leader-capabilities { display: flex; flex-wrap: wrap; gap: 6px; }
+        .capability-tag { font-size: 10px; padding: 4px 10px; background: var(--bg-dark); border-radius: 4px; color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .capability-tag.gap-tag { color: var(--red); border-color: rgba(239, 68, 68, 0.3); }
+        .leader-card.laggard .leader-stat-value { color: var(--yellow); }
+        .leader-card.laggard .capability-tag:not(.gap-tag) { color: var(--text-muted); border-color: var(--border-color); }
+        
+        /* ASSESSMENT */
+        .assess-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .assess-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .assess-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .assess-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .assess-icon.process { background: linear-gradient(135deg, var(--cyan), var(--blue)); }
+        .assess-icon.tech { background: linear-gradient(135deg, var(--cat-primary), var(--pink)); }
+        .assess-icon.people { background: linear-gradient(135deg, var(--green), var(--teal)); }
+        .assess-icon.governance { background: linear-gradient(135deg, var(--yellow), var(--orange)); }
+        .assess-title { font-size: 14px; font-weight: 600; }
+        .assess-questions { list-style: none; }
+        .assess-questions li { font-size: 11px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .assess-questions li:last-child { border-bottom: none; }
+        .assess-questions li::before { content: '?'; color: var(--cat-light); font-weight: bold; flex-shrink: 0; width: 16px; height: 16px; background: var(--cat-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        
+        /* PROGRESSION */
+        .progression-timeline { position: relative; margin-bottom: 20px; padding-left: 40px; }
+        .progression-timeline::before { content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #6B7280, #F59E0B, #06B6D4, #8B5CF6, #EC4899); }
+        .progression-phase { position: relative; padding: 20px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; }
+        .progression-phase::before { content: ''; position: absolute; left: -33px; top: 24px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--bg-dark); }
+        .phase-1::before { background: #6B7280; }
+        .phase-2::before { background: #F59E0B; }
+        .phase-3::before { background: #06B6D4; }
+        .phase-4::before { background: #8B5CF6; }
+        .phase-5::before { background: #EC4899; }
+        .progression-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .progression-title { font-size: 14px; font-weight: 600; }
+        .progression-duration { font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        .progression-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+        .progression-milestones { display: flex; flex-wrap: wrap; gap: 8px; }
+        .milestone { font-size: 10px; padding: 4px 10px; background: var(--bg-dark); border-radius: 4px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+        .milestone::before { content: '✓'; color: var(--green); }
+        
+        /* SCORECARD */
+        .scorecard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .scorecard-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .scorecard-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .scorecard-badge { font-size: 10px; padding: 4px 10px; background: var(--cat-glow); border-radius: 4px; color: var(--cat-light); }
+        .scorecard-body { padding: 20px; }
+        .score-category { margin-bottom: 20px; }
+        .score-category:last-child { margin-bottom: 0; }
+        .score-category-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .score-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .score-item { display: flex; align-items: center; gap: 12px; }
+        .score-item-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
+        .score-item-bar { width: 100px; height: 8px; background: var(--bg-dark); border-radius: 4px; overflow: hidden; }
+        .score-item-fill { height: 100%; border-radius: 4px; }
+        .score-item-value { font-size: 10px; color: var(--text-muted); width: 30px; text-align: right; }
+        
+        /* BEST PRACTICES */
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-primary), var(--pink)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .assess-grid { grid-template-columns: 1fr; }
+            .maturity-level { grid-template-columns: 60px 1fr; }
+            .level-tech { display: none; }
+            .related-pages { grid-template-columns: 1fr; }
+            .score-items { grid-template-columns: 1fr; }
+            .benchmark-insights { grid-template-columns: repeat(2, 1fr); }
+            .leader-profiles { grid-template-columns: 1fr; }
+            .leader-card.laggard { grid-column: span 1; }
+            .leader-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .benchmark-insights { grid-template-columns: 1fr; }
+            .leader-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat08-automation-overview.html">Automation & RPA</a>
+        <span class="sep">/</span>
+        <span class="current">Automation Maturity</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">⚡ Category 08</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat08-automation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat08-p1-automation-maturity.html" class="active"><span class="nav-icon">📊</span> 8.1 Automation Maturity</a></li>
+            <li><a href="cat08-p2-bot-orchestration.html"><span class="nav-icon">🤖</span> 8.2 Bot Orchestration</a></li>
+            <li><a href="cat08-p3-process-mining.html"><span class="nav-icon">⛏️</span> 8.3 Process Mining</a></li>
+            <li><a href="cat08-p4-power-platform.html"><span class="nav-icon">⚡</span> 8.4 Power Platform</a></li>
+            <li><a href="cat08-p5-rpa-platforms.html"><span class="nav-icon">🔧</span> 8.5 RPA Platforms</a></li>
+            <li><a href="cat08-p6-document-processing.html"><span class="nav-icon">📄</span> 8.6 Document Processing</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#levels"><span class="nav-icon">📊</span> The Five Levels</a></li>
+            <li><a href="#benchmarks"><span class="nav-icon">🏆</span> Industry Benchmarks</a></li>
+            <li><a href="#assessment"><span class="nav-icon">📋</span> Assessment</a></li>
+            <li><a href="#progression"><span class="nav-icon">🚀</span> Progression Roadmap</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📈</span> Scorecard</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">📊 Page 8.1 • Strategic Framework</div>
+                <h1>Automation Maturity Model</h1>
+                <p>Five levels from manual processes to fully autonomous operations. Understand where you are, where you're going, and how to get there faster.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">5</div>
+                    <div class="hero-metric-label">Maturity Levels</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">L2-3</div>
+                    <div class="hero-metric-label">Typical Enterprise</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">18-24</div>
+                    <div class="hero-metric-label">Months to Advance</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">3x</div>
+                    <div class="hero-metric-label">ROI at Level 4+</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Automation Maturity</h2>
+                    <p>Why maturity models matter for automation success</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Journey from Manual to Autonomous</h3>
+                <p>Organizations progress through distinct <strong>automation maturity levels</strong>, from basic task automation to fully autonomous AI-driven operations. Understanding your current level helps identify the right technologies, investments, and strategies for advancement. Most enterprises today sit at Level 2-3, having implemented RPA for individual tasks but not yet achieving intelligent, end-to-end process automation.</p>
+                <p>Each maturity level represents a step change in <strong>capability, complexity, and value delivered</strong>. Moving up requires not just technology, but also process redesign, organizational change, and governance evolution. The goal isn't necessarily to reach Level 5—it's to reach the level that maximizes value for your specific context while building a foundation for continuous improvement.</p>
+                <p>This framework helps you <strong>assess current state</strong>, identify gaps, prioritize investments, and build a realistic roadmap. It's based on patterns observed across hundreds of enterprise automation programs and aligns with industry standards from Gartner, Forrester, and major RPA vendors.</p>
+            </div>
+        </section>
+
+        <!-- THE FIVE LEVELS -->
+        <section class="module" id="levels">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>The Five Maturity Levels</h2>
+                    <p>From manual operations to autonomous intelligence</p>
+                </div>
+            </div>
+            
+            <div class="maturity-stack">
+                <div class="maturity-level level-5">
+                    <div class="level-badge">
+                        <div class="level-num">L5</div>
+                        <div class="level-label">Autonomous</div>
+                    </div>
+                    <div class="level-content">
+                        <div class="level-title">🧠 Autonomous Operations</div>
+                        <div class="level-subtitle">Self-learning, self-healing, continuous optimization</div>
+                        <div class="level-desc">AI systems that autonomously identify automation opportunities, build and deploy solutions, monitor performance, and continuously optimize. Humans focus on strategy and exception cases only. The automation system learns from outcomes and improves without human intervention.</div>
+                        <div class="level-characteristics">
+                            <span class="level-char">Self-building automations</span>
+                            <span class="level-char">Autonomous optimization</span>
+                            <span class="level-char">Predictive maintenance</span>
+                            <span class="level-char">Zero-touch operations</span>
+                            <span class="level-char">Continuous learning</span>
+                        </div>
+                    </div>
+                    <div class="level-tech">
+                        <div class="level-tech-title">Technologies</div>
+                        <div class="level-tech-list">
+                            <span class="tech-tag">🧠 AutoML</span>
+                            <span class="tech-tag">🤖 AI Agents</span>
+                            <span class="tech-tag">🔄 Self-healing</span>
+                            <span class="tech-tag">📊 AIOps</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="maturity-level level-4">
+                    <div class="level-badge">
+                        <div class="level-num">L4</div>
+                        <div class="level-label">Intelligent</div>
+                    </div>
+                    <div class="level-content">
+                        <div class="level-title">🤖 Intelligent Automation</div>
+                        <div class="level-subtitle">AI/ML enhanced decision-making and processing</div>
+                        <div class="level-desc">Automation enhanced with AI capabilities: natural language processing for unstructured data, computer vision for documents, ML models for predictions and decisions. Bots handle complex scenarios that previously required human judgment. Integration with LLMs enables conversational interfaces.</div>
+                        <div class="level-characteristics">
+                            <span class="level-char">AI-powered decisions</span>
+                            <span class="level-char">Document AI / IDP</span>
+                            <span class="level-char">NLP / Chatbots</span>
+                            <span class="level-char">Predictive analytics</span>
+                            <span class="level-char">Computer vision</span>
+                        </div>
+                    </div>
+                    <div class="level-tech">
+                        <div class="level-tech-title">Technologies</div>
+                        <div class="level-tech-list">
+                            <span class="tech-tag">🧠 LLMs</span>
+                            <span class="tech-tag">📄 Document AI</span>
+                            <span class="tech-tag">👁️ Computer Vision</span>
+                            <span class="tech-tag">📊 ML Models</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="maturity-level level-3">
+                    <div class="level-badge">
+                        <div class="level-num">L3</div>
+                        <div class="level-label">Process</div>
+                    </div>
+                    <div class="level-content">
+                        <div class="level-title">⚡ Process Automation</div>
+                        <div class="level-subtitle">End-to-end orchestrated workflows across systems</div>
+                        <div class="level-desc">Full business processes automated end-to-end, spanning multiple systems and departments. Centralized orchestration manages work queues, exceptions, and handoffs. Human-in-the-loop for approvals and exceptions. Process mining identifies optimization opportunities.</div>
+                        <div class="level-characteristics">
+                            <span class="level-char">End-to-end processes</span>
+                            <span class="level-char">Central orchestration</span>
+                            <span class="level-char">Exception handling</span>
+                            <span class="level-char">Cross-system integration</span>
+                            <span class="level-char">Process mining</span>
+                        </div>
+                    </div>
+                    <div class="level-tech">
+                        <div class="level-tech-title">Technologies</div>
+                        <div class="level-tech-list">
+                            <span class="tech-tag">⚡ Power Automate</span>
+                            <span class="tech-tag">🔄 Orchestrator</span>
+                            <span class="tech-tag">⛏️ Celonis</span>
+                            <span class="tech-tag">📋 Workflow</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="maturity-level level-2">
+                    <div class="level-badge">
+                        <div class="level-num">L2</div>
+                        <div class="level-label">Task</div>
+                    </div>
+                    <div class="level-content">
+                        <div class="level-title">🔧 Task Automation</div>
+                        <div class="level-subtitle">Rule-based bots for repetitive single-system tasks</div>
+                        <div class="level-desc">Individual tasks automated with RPA bots following predefined rules. Typically single-application focused (data entry, copy-paste, report generation). Bots run attended (user-triggered) or unattended (scheduled). Limited exception handling—failures require human intervention.</div>
+                        <div class="level-characteristics">
+                            <span class="level-char">Rule-based bots</span>
+                            <span class="level-char">Single application</span>
+                            <span class="level-char">Attended/unattended</span>
+                            <span class="level-char">Basic scheduling</span>
+                            <span class="level-char">Manual exception handling</span>
+                        </div>
+                    </div>
+                    <div class="level-tech">
+                        <div class="level-tech-title">Technologies</div>
+                        <div class="level-tech-list">
+                            <span class="tech-tag">🟠 UiPath</span>
+                            <span class="tech-tag">🟣 Automation Anywhere</span>
+                            <span class="tech-tag">🔵 Blue Prism</span>
+                            <span class="tech-tag">📝 Macros</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="maturity-level level-1">
+                    <div class="level-badge">
+                        <div class="level-num">L1</div>
+                        <div class="level-label">Manual</div>
+                    </div>
+                    <div class="level-content">
+                        <div class="level-title">📋 Manual Processes</div>
+                        <div class="level-subtitle">Human-driven operations with basic tooling</div>
+                        <div class="level-desc">Processes executed manually by humans using basic productivity tools. Heavy reliance on spreadsheets, email, and copy-paste workflows. High error rates, inconsistent execution, and poor visibility. Knowledge trapped in individuals rather than systems.</div>
+                        <div class="level-characteristics">
+                            <span class="level-char">Spreadsheet-based</span>
+                            <span class="level-char">Copy-paste workflows</span>
+                            <span class="level-char">Email-driven</span>
+                            <span class="level-char">High error rate</span>
+                            <span class="level-char">No audit trail</span>
+                        </div>
+                    </div>
+                    <div class="level-tech">
+                        <div class="level-tech-title">Technologies</div>
+                        <div class="level-tech-list">
+                            <span class="tech-tag">📊 Excel</span>
+                            <span class="tech-tag">📧 Outlook</span>
+                            <span class="tech-tag">📝 Word</span>
+                            <span class="tech-tag">🖱️ Manual Entry</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <p><strong>Most enterprises operate at Level 2-3.</strong> They've deployed RPA bots for individual tasks but haven't achieved true end-to-end process automation or intelligent decision-making. The jump from L3 to L4 is particularly challenging because it requires AI/ML capabilities, data infrastructure, and organizational change beyond traditional RPA programs.</p>
+            </div>
+        </section>
+
+        <!-- INDUSTRY BENCHMARKS -->
+        <section class="module" id="benchmarks">
+            <div class="module-header">
+                <div class="module-icon">🏆</div>
+                <div class="module-info">
+                    <h2>Industry Benchmarks</h2>
+                    <p>Real-world examples of automation maturity leaders and laggards</p>
+                </div>
+            </div>
+            
+            <div class="benchmark-table-wrapper">
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Industry</th>
+                            <th>Level</th>
+                            <th>Bots</th>
+                            <th>Hours Saved</th>
+                            <th>Key Achievements</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="benchmark-leader">
+                            <td><strong>Walmart</strong></td>
+                            <td>Retail</td>
+                            <td><span class="level-tag level-4">L4</span></td>
+                            <td>500+</td>
+                            <td>2M+ annually</td>
+                            <td>AI-powered supply chain, IDP for invoices, autonomous inventory</td>
+                        </tr>
+                        <tr class="benchmark-leader">
+                            <td><strong>JPMorgan Chase</strong></td>
+                            <td>Financial Services</td>
+                            <td><span class="level-tag level-4">L4</span></td>
+                            <td>1,000+</td>
+                            <td>1.5M+ annually</td>
+                            <td>COiN platform processes 12K contracts/year, ML fraud detection</td>
+                        </tr>
+                        <tr class="benchmark-leader">
+                            <td><strong>AT&T</strong></td>
+                            <td>Telecommunications</td>
+                            <td><span class="level-tag level-4">L4</span></td>
+                            <td>800+</td>
+                            <td>3M+ annually</td>
+                            <td>Network operations automation, predictive maintenance, AI chatbots</td>
+                        </tr>
+                        <tr class="benchmark-leader">
+                            <td><strong>Zurich Insurance</strong></td>
+                            <td>Insurance</td>
+                            <td><span class="level-tag level-4">L4</span></td>
+                            <td>200+</td>
+                            <td>500K+ annually</td>
+                            <td>Claims processing AI, underwriting automation, Document AI</td>
+                        </tr>
+                        <tr class="benchmark-mid">
+                            <td><strong>Coca-Cola</strong></td>
+                            <td>Consumer Goods</td>
+                            <td><span class="level-tag level-3">L3</span></td>
+                            <td>150+</td>
+                            <td>400K+ annually</td>
+                            <td>Finance automation, supply chain orchestration, shared services</td>
+                        </tr>
+                        <tr class="benchmark-mid">
+                            <td><strong>Unilever</strong></td>
+                            <td>Consumer Goods</td>
+                            <td><span class="level-tag level-3">L3</span></td>
+                            <td>300+</td>
+                            <td>600K+ annually</td>
+                            <td>Global CoE, end-to-end P2P automation, multi-region deployment</td>
+                        </tr>
+                        <tr class="benchmark-mid">
+                            <td><strong>Deutsche Telekom</strong></td>
+                            <td>Telecommunications</td>
+                            <td><span class="level-tag level-3">L3</span></td>
+                            <td>250+</td>
+                            <td>800K+ annually</td>
+                            <td>Customer service automation, network provisioning, back-office</td>
+                        </tr>
+                        <tr class="benchmark-emerging">
+                            <td><strong>Typical Mid-Market</strong></td>
+                            <td>Various</td>
+                            <td><span class="level-tag level-2">L2</span></td>
+                            <td>10-50</td>
+                            <td>50K-100K</td>
+                            <td>Finance bots, HR onboarding, report generation, data entry</td>
+                        </tr>
+                        <tr class="benchmark-emerging">
+                            <td><strong>SMB / Early Stage</strong></td>
+                            <td>Various</td>
+                            <td><span class="level-tag level-1">L1-2</span></td>
+                            <td>1-10</td>
+                            <td>&lt;10K</td>
+                            <td>Pilot programs, single department, proof of concept</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="benchmark-insights">
+                <div class="insight-card">
+                    <div class="insight-icon">📊</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Fortune 500 Average</div>
+                        <div class="insight-stat">Level 2.8</div>
+                        <div class="insight-desc">Most large enterprises have deployed RPA but lack AI integration and end-to-end orchestration</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">🏆</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Top Quartile</div>
+                        <div class="insight-stat">500+ Bots</div>
+                        <div class="insight-desc">Leaders operate 500+ bots with centralized orchestration and AI-powered decision making</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">💰</div>
+                    <div class="insight-content">
+                        <div class="insight-title">ROI Benchmark</div>
+                        <div class="insight-stat">300-400%</div>
+                        <div class="insight-desc">Mature programs (L3+) achieve 3-4x ROI within 18 months of deployment</div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">⏱️</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Hours per Bot</div>
+                        <div class="insight-stat">2,500/yr</div>
+                        <div class="insight-desc">Well-designed bots save 2,500+ hours annually—equivalent to 1.2 FTEs</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="leader-profiles">
+                <div class="leader-card">
+                    <div class="leader-header">
+                        <div class="leader-logo">🏦</div>
+                        <div class="leader-info">
+                            <div class="leader-name">JPMorgan Chase</div>
+                            <div class="leader-level"><span class="level-tag level-4">Level 4</span> Intelligent Automation</div>
+                        </div>
+                    </div>
+                    <div class="leader-body">
+                        <div class="leader-stats">
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">1,000+</div>
+                                <div class="leader-stat-label">Bots Deployed</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">$150M+</div>
+                                <div class="leader-stat-label">Annual Savings</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">360K</div>
+                                <div class="leader-stat-label">Contracts/Year</div>
+                            </div>
+                        </div>
+                        <div class="leader-desc">
+                            <p><strong>COiN Platform:</strong> Contract Intelligence uses ML to review commercial credit agreements in seconds—work that previously took 360,000 hours of lawyer time annually.</p>
+                            <p><strong>Key Success Factors:</strong> Executive sponsorship from CEO Jamie Dimon, $12B annual tech investment, dedicated AI/ML teams, and treating automation as strategic capability not cost reduction.</p>
+                        </div>
+                        <div class="leader-capabilities">
+                            <span class="capability-tag">Document AI</span>
+                            <span class="capability-tag">ML Models</span>
+                            <span class="capability-tag">NLP Processing</span>
+                            <span class="capability-tag">Fraud Detection</span>
+                            <span class="capability-tag">Predictive Analytics</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card">
+                    <div class="leader-header">
+                        <div class="leader-logo">🛒</div>
+                        <div class="leader-info">
+                            <div class="leader-name">Walmart</div>
+                            <div class="leader-level"><span class="level-tag level-4">Level 4</span> Intelligent Automation</div>
+                        </div>
+                    </div>
+                    <div class="leader-body">
+                        <div class="leader-stats">
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">500+</div>
+                                <div class="leader-stat-label">Bots Deployed</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">2M+</div>
+                                <div class="leader-stat-label">Hours Saved/Year</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">4,700+</div>
+                                <div class="leader-stat-label">Stores Covered</div>
+                            </div>
+                        </div>
+                        <div class="leader-desc">
+                            <p><strong>Scale Operations:</strong> Automation spans accounts payable, claims management, supply chain, and in-store operations. IDP processes millions of invoices from 100,000+ suppliers.</p>
+                            <p><strong>Key Success Factors:</strong> Global CoE model, standardized processes before automation, strong vendor partnerships (UiPath, Blue Prism), and integration with existing SAP infrastructure.</p>
+                        </div>
+                        <div class="leader-capabilities">
+                            <span class="capability-tag">Invoice Processing</span>
+                            <span class="capability-tag">Supply Chain</span>
+                            <span class="capability-tag">Inventory AI</span>
+                            <span class="capability-tag">Claims Automation</span>
+                            <span class="capability-tag">Store Operations</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="leader-card laggard">
+                    <div class="leader-header">
+                        <div class="leader-logo">🏢</div>
+                        <div class="leader-info">
+                            <div class="leader-name">Typical Enterprise (Anonymized)</div>
+                            <div class="leader-level"><span class="level-tag level-2">Level 2</span> Task Automation</div>
+                        </div>
+                    </div>
+                    <div class="leader-body">
+                        <div class="leader-stats">
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">25</div>
+                                <div class="leader-stat-label">Bots Deployed</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">$500K</div>
+                                <div class="leader-stat-label">Annual Savings</div>
+                            </div>
+                            <div class="leader-stat">
+                                <div class="leader-stat-value">3</div>
+                                <div class="leader-stat-label">Departments</div>
+                            </div>
+                        </div>
+                        <div class="leader-desc">
+                            <p><strong>Current State:</strong> Finance and HR departments have deployed bots for data entry, report generation, and employee onboarding. No centralized orchestration—bots managed by individual teams.</p>
+                            <p><strong>Gaps to Address:</strong> No CoE governance, fragmented tools (Power Automate + UiPath), no process mining, limited exception handling, and IT infrastructure constraints.</p>
+                        </div>
+                        <div class="leader-capabilities gap">
+                            <span class="capability-tag">Data Entry</span>
+                            <span class="capability-tag">Reports</span>
+                            <span class="capability-tag gap-tag">❌ No AI/ML</span>
+                            <span class="capability-tag gap-tag">❌ No Orchestration</span>
+                            <span class="capability-tag gap-tag">❌ No CoE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ASSESSMENT -->
+        <section class="module" id="assessment">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Maturity Assessment</h2>
+                    <p>Evaluate your organization across four dimensions</p>
+                </div>
+            </div>
+            
+            <div class="assess-grid">
+                <div class="assess-card">
+                    <div class="assess-header">
+                        <div class="assess-icon process">⚙️</div>
+                        <div class="assess-title">Process Dimension</div>
+                    </div>
+                    <ul class="assess-questions">
+                        <li>Are processes documented with clear steps and decision points?</li>
+                        <li>Do you have end-to-end process visibility across systems?</li>
+                        <li>Are exceptions handled systematically or ad-hoc?</li>
+                        <li>Is process performance measured with KPIs?</li>
+                        <li>Do you use process mining to discover improvement opportunities?</li>
+                    </ul>
+                </div>
+                
+                <div class="assess-card">
+                    <div class="assess-header">
+                        <div class="assess-icon tech">🔧</div>
+                        <div class="assess-title">Technology Dimension</div>
+                    </div>
+                    <ul class="assess-questions">
+                        <li>What automation tools are deployed (RPA, workflow, AI)?</li>
+                        <li>Is there centralized orchestration for bot management?</li>
+                        <li>Are automations integrated across multiple systems?</li>
+                        <li>Do you leverage AI/ML for intelligent processing?</li>
+                        <li>Is there a unified automation platform or fragmented tools?</li>
+                    </ul>
+                </div>
+                
+                <div class="assess-card">
+                    <div class="assess-header">
+                        <div class="assess-icon people">👥</div>
+                        <div class="assess-title">People Dimension</div>
+                    </div>
+                    <ul class="assess-questions">
+                        <li>Is there a dedicated automation team or CoE?</li>
+                        <li>What skills exist: RPA developers, AI/ML, process analysts?</li>
+                        <li>Do business users build their own automations (citizen dev)?</li>
+                        <li>Is there executive sponsorship for automation initiatives?</li>
+                        <li>How is change management handled for automation adoption?</li>
+                    </ul>
+                </div>
+                
+                <div class="assess-card">
+                    <div class="assess-header">
+                        <div class="assess-icon governance">📜</div>
+                        <div class="assess-title">Governance Dimension</div>
+                    </div>
+                    <ul class="assess-questions">
+                        <li>Is there a formal automation strategy aligned to business goals?</li>
+                        <li>How is automation ROI measured and reported?</li>
+                        <li>Are there standards for bot development and deployment?</li>
+                        <li>How is security/compliance managed for automations?</li>
+                        <li>Is there a pipeline for identifying and prioritizing opportunities?</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROGRESSION ROADMAP -->
+        <section class="module" id="progression">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Progression Roadmap</h2>
+                    <p>Typical journey to advance maturity levels</p>
+                </div>
+            </div>
+            
+            <div class="progression-timeline">
+                <div class="progression-phase phase-1">
+                    <div class="progression-header">
+                        <div class="progression-title">Phase 1: Foundation (L1 → L2)</div>
+                        <div class="progression-duration">3-6 months</div>
+                    </div>
+                    <div class="progression-desc">Establish RPA capabilities with initial proof-of-concept automations. Focus on high-volume, rule-based tasks with clear ROI. Build internal skills and select enterprise RPA platform.</div>
+                    <div class="progression-milestones">
+                        <span class="milestone">RPA platform selected</span>
+                        <span class="milestone">3-5 bots deployed</span>
+                        <span class="milestone">CoE established</span>
+                        <span class="milestone">First ROI demonstrated</span>
+                    </div>
+                </div>
+                
+                <div class="progression-phase phase-2">
+                    <div class="progression-header">
+                        <div class="progression-title">Phase 2: Scale (L2 → L3)</div>
+                        <div class="progression-duration">6-12 months</div>
+                    </div>
+                    <div class="progression-desc">Expand from task automation to end-to-end process automation. Implement orchestration for bot management and work queues. Integrate across multiple systems and departments.</div>
+                    <div class="progression-milestones">
+                        <span class="milestone">20+ bots in production</span>
+                        <span class="milestone">Orchestration deployed</span>
+                        <span class="milestone">Cross-system processes</span>
+                        <span class="milestone">Exception handling</span>
+                    </div>
+                </div>
+                
+                <div class="progression-phase phase-3">
+                    <div class="progression-header">
+                        <div class="progression-title">Phase 3: Optimize (L3 → L4)</div>
+                        <div class="progression-duration">12-18 months</div>
+                    </div>
+                    <div class="progression-desc">Introduce AI/ML capabilities for intelligent automation. Deploy document processing (IDP), NLP for unstructured data, and ML models for decisions. Implement process mining for continuous improvement.</div>
+                    <div class="progression-milestones">
+                        <span class="milestone">Document AI deployed</span>
+                        <span class="milestone">ML models in production</span>
+                        <span class="milestone">Process mining active</span>
+                        <span class="milestone">Chatbot integration</span>
+                    </div>
+                </div>
+                
+                <div class="progression-phase phase-4">
+                    <div class="progression-header">
+                        <div class="progression-title">Phase 4: Autonomous (L4 → L5)</div>
+                        <div class="progression-duration">18-24+ months</div>
+                    </div>
+                    <div class="progression-desc">Achieve autonomous operations with self-learning and self-healing capabilities. AI agents identify and build new automations. Continuous optimization without human intervention.</div>
+                    <div class="progression-milestones">
+                        <span class="milestone">Self-healing bots</span>
+                        <span class="milestone">Auto-optimization</span>
+                        <span class="milestone">AI-driven discovery</span>
+                        <span class="milestone">Zero-touch operations</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Maturity Scorecard</h2>
+                    <p>Sample scoring across dimensions</p>
+                </div>
+            </div>
+            
+            <div class="scorecard">
+                <div class="scorecard-header">
+                    <div class="scorecard-title">📊 Example Enterprise Assessment</div>
+                    <div class="scorecard-badge">Overall: Level 2.7</div>
+                </div>
+                <div class="scorecard-body">
+                    <div class="score-category">
+                        <div class="score-category-title">⚙️ Process Maturity</div>
+                        <div class="score-items">
+                            <div class="score-item">
+                                <span class="score-item-label">Process documentation</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 70%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">End-to-end visibility</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 50%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">2.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Exception management</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 40%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">2.0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">KPI measurement</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 60%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="score-category">
+                        <div class="score-category-title">🔧 Technology Maturity</div>
+                        <div class="score-items">
+                            <div class="score-item">
+                                <span class="score-item-label">RPA deployment</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 70%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Orchestration</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 60%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">AI/ML integration</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 30%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">1.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Platform unification</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 50%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">2.5</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="score-category">
+                        <div class="score-category-title">👥 People Maturity</div>
+                        <div class="score-items">
+                            <div class="score-item">
+                                <span class="score-item-label">CoE capability</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 60%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Developer skills</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 70%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Citizen development</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 40%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">2.0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Executive support</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 80%; background: var(--green);"></div></div>
+                                <span class="score-item-value">4.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="score-category">
+                        <div class="score-category-title">📜 Governance Maturity</div>
+                        <div class="score-items">
+                            <div class="score-item">
+                                <span class="score-item-label">Automation strategy</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 50%; background: var(--yellow);"></div></div>
+                                <span class="score-item-value">2.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">ROI measurement</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 60%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Development standards</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 70%; background: var(--cyan);"></div></div>
+                                <span class="score-item-value">3.5</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-item-label">Security compliance</span>
+                                <div class="score-item-bar"><div class="score-item-fill" style="width: 80%; background: var(--green);"></div></div>
+                                <span class="score-item-value">4.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for advancing automation maturity</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with high-volume, rule-based processes for quick wins</li>
+                        <li>Establish a Center of Excellence early in the journey</li>
+                        <li>Invest in process discovery before automation development</li>
+                        <li>Build reusable components and automation libraries</li>
+                        <li>Implement robust exception handling from the start</li>
+                        <li>Measure and communicate ROI consistently</li>
+                        <li>Enable citizen development with proper governance</li>
+                        <li>Plan for scale from the beginning</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Automate broken processes—fix first, then automate</li>
+                        <li>Skip the pilot phase and deploy at scale immediately</li>
+                        <li>Ignore change management and user adoption</li>
+                        <li>Build automations without considering maintenance</li>
+                        <li>Underestimate the need for IT infrastructure support</li>
+                        <li>Focus only on cost savings—consider quality and speed too</li>
+                        <li>Let individual teams build siloed automation capabilities</li>
+                        <li>Assume one level up is always the right next step</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered maturity assessment</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📊</div>
+                    <div class="agent-name">MaturityAssessor</div>
+                    <div class="agent-role">Automation Maturity Analyst</div>
+                    <div class="agent-desc">Conducts comprehensive maturity assessments through structured interviews, analyzes current state across all dimensions, identifies gaps, and generates personalized roadmaps for advancement.</div>
+                    <ul class="agent-capabilities">
+                        <li>Structured maturity interviews</li>
+                        <li>Multi-dimensional scoring</li>
+                        <li>Gap analysis and prioritization</li>
+                        <li>Benchmark against industry peers</li>
+                        <li>Generate progression roadmaps</li>
+                        <li>Estimate investment requirements</li>
+                        <li>Track maturity over time</li>
+                        <li>Recommend next best actions</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Assessment</div>
+                        <div class="code-tab">Roadmap</div>
+                        <div class="code-filename">maturity_assessor.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># maturity_assessor.py - Automation Maturity Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> pydantic <span class="code-keyword">import</span> BaseModel
+
+<span class="code-keyword">class</span> <span class="code-function">MaturityScore</span>(BaseModel):
+    process: float
+    technology: float  
+    people: float
+    governance: float
+    overall: float
+    level: int
+
+<span class="code-keyword">class</span> <span class="code-function">MaturityAssessor</span>:
+    dimensions = [<span class="code-string">"process"</span>, <span class="code-string">"technology"</span>, <span class="code-string">"people"</span>, <span class="code-string">"governance"</span>]
+    
+    <span class="code-keyword">def</span> <span class="code-function">assess</span>(self, responses: dict) -> MaturityScore:
+        <span class="code-string">"""Calculate maturity scores from assessment responses."""</span>
+        scores = {}
+        <span class="code-keyword">for</span> dim <span class="code-keyword">in</span> self.dimensions:
+            scores[dim] = self._score_dimension(dim, responses)
+        
+        overall = sum(scores.values()) / len(scores)
+        level = self._determine_level(overall)
+        
+        <span class="code-keyword">return</span> MaturityScore(**scores, overall=overall, level=level)
+    
+    <span class="code-keyword">def</span> <span class="code-function">generate_roadmap</span>(self, current: MaturityScore, target: int):
+        <span class="code-string">"""Generate progression roadmap to target level."""</span>
+        gaps = self._identify_gaps(current, target)
+        initiatives = self._prioritize_initiatives(gaps)
+        timeline = self._estimate_timeline(initiatives)
+        
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"current_level"</span>: current.level,
+            <span class="code-string">"target_level"</span>: target,
+            <span class="code-string">"gaps"</span>: gaps,
+            <span class="code-string">"initiatives"</span>: initiatives,
+            <span class="code-string">"timeline"</span>: timeline,
+            <span class="code-string">"investment"</span>: self._estimate_investment(initiatives)
+        }
+
+<span class="code-comment"># Agent definition</span>
+assessor_agent = Agent(
+    role=<span class="code-string">"Automation Maturity Assessor"</span>,
+    goal=<span class="code-string">"Evaluate and improve automation maturity"</span>,
+    tools=[AssessmentSurvey(), GapAnalyzer(), 
+           RoadmapGenerator(), BenchmarkTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring automation topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat08-p2-bot-orchestration.html" class="related-card">
+                    <div class="related-num">Page 8.2</div>
+                    <div class="related-title">Bot Orchestration</div>
+                    <div class="related-desc">Central command for automation fleets</div>
+                </a>
+                <a href="cat08-p3-process-mining.html" class="related-card">
+                    <div class="related-num">Page 8.3</div>
+                    <div class="related-title">Process Mining</div>
+                    <div class="related-desc">Discover automation opportunities</div>
+                </a>
+                <a href="cat08-p5-rpa-platforms.html" class="related-card">
+                    <div class="related-num">Page 8.5</div>
+                    <div class="related-title">RPA Platforms</div>
+                    <div class="related-desc">UiPath, AA, Blue Prism deep dives</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat08-automation-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Category Overview</div>
+                <div class="footer-link-title">Automation & RPA</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 8.1 of 6</div>
+        <a href="cat08-p2-bot-orchestration.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">8.2: Bot Orchestration</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

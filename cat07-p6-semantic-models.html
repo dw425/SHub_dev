@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Models | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--teal), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        .overview-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        
+        .arch-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .arch-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .arch-card.full-width { grid-column: 1 / -1; }
+        .arch-card-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); }
+        .arch-card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .arch-card-icon.consumption { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+        .arch-card-icon.semantic { background: linear-gradient(135deg, var(--cyan), var(--teal)); }
+        .arch-card-icon.transform { background: linear-gradient(135deg, var(--blue), var(--indigo)); }
+        .arch-card-icon.storage { background: linear-gradient(135deg, var(--green), var(--teal)); }
+        .arch-card-icon.ingestion { background: linear-gradient(135deg, var(--yellow), var(--cat-primary)); }
+        .arch-card-title { font-size: 16px; font-weight: 600; }
+        .arch-card-subtitle { font-size: 11px; color: var(--text-muted); }
+        .arch-card-body { padding: 20px; }
+        .arch-card-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .arch-subsection { margin-bottom: 16px; }
+        .arch-subsection:last-child { margin-bottom: 0; }
+        .arch-subsection-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--cat-light); margin-bottom: 8px; }
+        .arch-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+        .arch-tool { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 6px; font-size: 11px; }
+        .arch-tool-icon { font-size: 14px; }
+        .arch-tool-name { font-weight: 500; }
+        .arch-tool-type { font-size: 9px; color: var(--text-muted); margin-left: 4px; }
+        .arch-capabilities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .arch-capability { font-size: 11px; color: var(--text-secondary); padding: 6px 10px; background: var(--bg-dark); border-radius: 4px; display: flex; align-items: center; gap: 6px; }
+        .arch-capability::before { content: '•'; color: var(--cat-light); }
+        .arch-flow { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .arch-flow-item { padding: 8px 16px; background: var(--bg-card-alt); border-radius: 8px; font-size: 11px; font-weight: 600; }
+        .arch-flow-item.highlight { background: var(--cat-glow); color: var(--cat-light); border: 1px solid var(--cat-primary); }
+        .arch-flow-arrow { color: var(--cat-light); font-size: 16px; }
+        
+        .concepts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .concept-card:nth-child(1)::before { background: var(--blue); }
+        .concept-card:nth-child(2)::before { background: var(--green); }
+        .concept-card:nth-child(3)::before { background: var(--purple); }
+        .concept-card:nth-child(4)::before { background: var(--pink); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .concept-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px; }
+        .concept-example { font-size: 10px; color: var(--text-muted); font-style: italic; }
+        
+        .schema-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .schema-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .schema-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .schema-icon { font-size: 24px; }
+        .schema-name { font-size: 14px; font-weight: 600; }
+        .schema-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--bg-card-alt); color: var(--text-muted); margin-left: auto; }
+        .schema-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .schema-pros { list-style: none; margin-bottom: 8px; }
+        .schema-pros li { font-size: 10px; color: var(--green); padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+        .schema-pros li::before { content: '+'; }
+        .schema-cons { list-style: none; }
+        .schema-cons li { font-size: 10px; color: var(--red); padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+        .schema-cons li::before { content: '−'; }
+        
+        .tools-compare { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; font-size: 11px; }
+        .tools-compare th { background: var(--bg-card-alt); padding: 12px 8px; text-align: center; font-size: 10px; border-bottom: 1px solid var(--border-color); }
+        .tools-compare th:first-child { text-align: left; padding-left: 16px; width: 160px; }
+        .tools-compare td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .tools-compare td:first-child { text-align: left; padding-left: 16px; font-weight: 500; }
+        .tools-compare tr:last-child td { border-bottom: none; }
+        .tools-compare tr:hover td { background: var(--bg-hover); }
+        .tool-head { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tool-head-icon { font-size: 18px; }
+        .tool-head-name { font-weight: 600; font-size: 9px; }
+        .check { color: var(--green); font-weight: bold; }
+        .partial { color: var(--yellow); }
+        .none { color: var(--text-muted); }
+        .feature-name { color: var(--text-secondary); }
+        .feature-category { font-size: 9px; color: var(--cat-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .metric-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .metric-type { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .metric-type-icon { font-size: 28px; margin-bottom: 12px; }
+        .metric-type-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .metric-type-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .metric-type-example { font-size: 10px; color: var(--cyan); background: var(--bg-dark); padding: 10px; border-radius: 6px; font-family: monospace; }
+        
+        .implementation-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .impl-step { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; position: relative; }
+        .impl-step::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: var(--cat-light); font-size: 14px; z-index: 1; }
+        .impl-step:last-child::after { display: none; }
+        .step-num { font-size: 10px; color: var(--cat-light); margin-bottom: 6px; }
+        .step-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .step-tasks { list-style: none; }
+        .step-tasks li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .step-tasks li::before { content: '•'; color: var(--cat-light); }
+        
+        .governance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .gov-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .gov-icon { font-size: 28px; margin-bottom: 12px; }
+        .gov-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .gov-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .gov-list { list-style: none; }
+        .gov-list li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .gov-list li::before { content: '•'; color: var(--cat-light); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cyan), var(--teal)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .concepts-grid, .implementation-steps { grid-template-columns: repeat(2, 1fr); }
+            .schema-grid, .metric-types, .governance-grid, .related-pages { grid-template-columns: 1fr; }
+            .tools-compare { font-size: 9px; }
+            .tools-compare th, .tools-compare td { padding: 6px 4px; }
+            .arch-grid { grid-template-columns: 1fr; }
+            .arch-capabilities { grid-template-columns: 1fr; }
+            .arch-flow { flex-direction: column; }
+            .arch-flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Semantic Models</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Semantic Layer</a></li>
+            <li><a href="#concepts"><span class="nav-icon">🧩</span> Core Concepts</a></li>
+            <li><a href="#schemas"><span class="nav-icon">📐</span> Modeling Patterns</a></li>
+            <li><a href="#metrics"><span class="nav-icon">📊</span> Metrics Layer</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools Comparison</a></li>
+            <li><a href="#implementation"><span class="nav-icon">🚀</span> Implementation</a></li>
+            <li><a href="#governance"><span class="nav-icon">👥</span> Governance</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html" class="active"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">🧊 Page 7.6 • Business Intelligence Layer</div>
+                <h1>Semantic Models</h1>
+                <p>Create a unified business language layer that translates raw data into meaningful metrics, dimensions, and KPIs—enabling consistent analytics across all tools and users.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">1</div>
+                    <div class="hero-metric-label">Single Source of Truth</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">60%</div>
+                    <div class="hero-metric-label">Reduced Metric Conflicts</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">3x</div>
+                    <div class="hero-metric-label">Faster Dashboard Dev</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">SQL</div>
+                    <div class="hero-metric-label">Universal Interface</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Semantic Models</h2>
+                    <p>The abstraction layer between data and business meaning</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Metric Chaos Problem</h3>
+                <p>In most organizations, the same metric is calculated differently by different teams. Finance says revenue is $10M, Sales says $12M, and the CEO's dashboard shows $11M. Everyone is "right" based on their definitions, but the organization lacks a <strong>single source of truth</strong>. This metric chaos erodes trust in data and wastes countless hours reconciling numbers.</p>
+                <p><strong>Semantic models</strong> solve this by creating a centralized definition layer. Instead of each dashboard defining "revenue" independently, all tools query the semantic layer which provides one authoritative calculation. Changes propagate everywhere instantly. Business users speak the same language because they're accessing the same definitions.</p>
+                <p>The semantic layer sits between raw data and consumption tools (BI, applications, AI). It translates <strong>physical schemas</strong> (tables, columns) into <strong>business concepts</strong> (customers, revenue, churn rate). This abstraction enables self-service analytics—users explore business concepts without needing to understand complex joins, data models, or SQL. Modern semantic layers also power AI assistants that answer natural language questions about your data.</p>
+            </div>
+        </section>
+
+        <!-- SEMANTIC LAYER ARCHITECTURE -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Semantic Layer Architecture</h2>
+                    <p>The modern data stack with semantic modeling</p>
+                </div>
+            </div>
+            <!-- Data Flow Overview -->
+            <div class="arch-flow">
+                <div class="arch-flow-item">📥 Ingestion</div>
+                <div class="arch-flow-arrow">→</div>
+                <div class="arch-flow-item">🗄️ Storage</div>
+                <div class="arch-flow-arrow">→</div>
+                <div class="arch-flow-item">🔄 Transformation</div>
+                <div class="arch-flow-arrow">→</div>
+                <div class="arch-flow-item highlight">🧊 Semantic Layer</div>
+                <div class="arch-flow-arrow">→</div>
+                <div class="arch-flow-item">🎯 Consumption</div>
+            </div>
+            
+            <!-- Layer 5: Consumption -->
+            <div class="arch-grid">
+                <div class="arch-card full-width">
+                    <div class="arch-card-header">
+                        <div class="arch-card-icon consumption">🎯</div>
+                        <div>
+                            <div class="arch-card-title">Consumption Layer</div>
+                            <div class="arch-card-subtitle">Where business users interact with data</div>
+                        </div>
+                    </div>
+                    <div class="arch-card-body">
+                        <div class="arch-card-desc">The consumption layer is where insights reach end users through dashboards, reports, applications, and AI assistants. All tools in this layer query the semantic layer rather than raw data, ensuring consistent metrics across the organization.</div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">BI & Visualization Tools</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">📊</span><span class="arch-tool-name">Tableau</span><span class="arch-tool-type">Enterprise</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📈</span><span class="arch-tool-name">Power BI</span><span class="arch-tool-type">Microsoft</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">👁️</span><span class="arch-tool-name">Looker</span><span class="arch-tool-type">Google</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📉</span><span class="arch-tool-name">Qlik</span><span class="arch-tool-type">Enterprise</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📋</span><span class="arch-tool-name">Metabase</span><span class="arch-tool-type">Open Source</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">Superset</span><span class="arch-tool-type">Open Source</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📊</span><span class="arch-tool-name">Mode</span><span class="arch-tool-type">Analytics</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🎨</span><span class="arch-tool-name">Sigma</span><span class="arch-tool-type">Cloud BI</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">AI & Embedded Analytics</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🤖</span><span class="arch-tool-name">Text-to-SQL Bots</span><span class="arch-tool-type">NL Query</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">💬</span><span class="arch-tool-name">Slack/Teams Apps</span><span class="arch-tool-type">Chat</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📱</span><span class="arch-tool-name">Mobile Dashboards</span><span class="arch-tool-type">Mobile</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔌</span><span class="arch-tool-name">Embedded Analytics</span><span class="arch-tool-type">Custom Apps</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📓</span><span class="arch-tool-name">Jupyter/Hex</span><span class="arch-tool-type">Notebooks</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📑</span><span class="arch-tool-name">Excel/Sheets</span><span class="arch-tool-type">Spreadsheets</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Key Capabilities</div>
+                            <div class="arch-capabilities">
+                                <div class="arch-capability">Self-service exploration</div>
+                                <div class="arch-capability">Scheduled reports & alerts</div>
+                                <div class="arch-capability">Interactive dashboards</div>
+                                <div class="arch-capability">Data storytelling</div>
+                                <div class="arch-capability">Embedded analytics APIs</div>
+                                <div class="arch-capability">Natural language queries</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layer 4: Semantic (highlighted) -->
+            <div class="arch-grid">
+                <div class="arch-card full-width" style="border: 2px solid var(--cat-primary);">
+                    <div class="arch-card-header" style="background: var(--cat-glow);">
+                        <div class="arch-card-icon semantic">🧊</div>
+                        <div>
+                            <div class="arch-card-title">Semantic Layer</div>
+                            <div class="arch-card-subtitle">The focus of this page — Business logic abstraction</div>
+                        </div>
+                    </div>
+                    <div class="arch-card-body">
+                        <div class="arch-card-desc">The semantic layer translates physical database schemas into business concepts. It defines metrics, dimensions, and relationships once, making them available to all consumption tools. This is the "single source of truth" that eliminates metric conflicts.</div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Universal Semantic Layers (Multi-Tool)</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🧊</span><span class="arch-tool-name">Cube</span><span class="arch-tool-type">Headless BI</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📊</span><span class="arch-tool-name">dbt Metrics</span><span class="arch-tool-type">Metrics Layer</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">⚡</span><span class="arch-tool-name">MetricFlow</span><span class="arch-tool-type">dbt Labs</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">AtScale</span><span class="arch-tool-type">Enterprise</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🏔️</span><span class="arch-tool-name">Snowflake Cortex</span><span class="arch-tool-type">Native</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Embedded Semantic Layers (Tool-Specific)</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">👁️</span><span class="arch-tool-name">LookML</span><span class="arch-tool-type">Looker</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📈</span><span class="arch-tool-name">Power BI Datasets</span><span class="arch-tool-type">Power BI</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📊</span><span class="arch-tool-name">Tableau Data Models</span><span class="arch-tool-type">Tableau</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📉</span><span class="arch-tool-name">Qlik Data Model</span><span class="arch-tool-type">Qlik</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Key Capabilities</div>
+                            <div class="arch-capabilities">
+                                <div class="arch-capability">Metric definitions (KPIs)</div>
+                                <div class="arch-capability">Dimension hierarchies</div>
+                                <div class="arch-capability">Row-level security</div>
+                                <div class="arch-capability">Caching & pre-aggregation</div>
+                                <div class="arch-capability">API access (SQL/REST/GraphQL)</div>
+                                <div class="arch-capability">Business glossary integration</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layer 3: Transformation -->
+            <div class="arch-grid">
+                <div class="arch-card full-width">
+                    <div class="arch-card-header">
+                        <div class="arch-card-icon transform">🔄</div>
+                        <div>
+                            <div class="arch-card-title">Transformation Layer</div>
+                            <div class="arch-card-subtitle">Data modeling and business logic</div>
+                        </div>
+                    </div>
+                    <div class="arch-card-body">
+                        <div class="arch-card-desc">The transformation layer applies business logic to raw data, creating clean, modeled datasets. This is where data engineers build staging models, fact/dimension tables, and data marts using SQL and orchestration tools.</div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Transformation Frameworks</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🔶</span><span class="arch-tool-name">dbt</span><span class="arch-tool-type">SQL Framework</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📋</span><span class="arch-tool-name">Dataform</span><span class="arch-tool-type">Google</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">SQLMesh</span><span class="arch-tool-type">Open Source</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔧</span><span class="arch-tool-name">Coalesce</span><span class="arch-tool-type">GUI-based</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Orchestration & Scheduling</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🌀</span><span class="arch-tool-name">Airflow</span><span class="arch-tool-type">Workflows</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🎯</span><span class="arch-tool-name">Dagster</span><span class="arch-tool-type">Data Orchestrator</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">⚡</span><span class="arch-tool-name">Prefect</span><span class="arch-tool-type">Modern Orchestrator</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">dbt Cloud</span><span class="arch-tool-type">Managed</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Key Capabilities</div>
+                            <div class="arch-capabilities">
+                                <div class="arch-capability">Staging & cleaning</div>
+                                <div class="arch-capability">Fact & dimension modeling</div>
+                                <div class="arch-capability">Incremental builds</div>
+                                <div class="arch-capability">Data quality tests</div>
+                                <div class="arch-capability">Documentation generation</div>
+                                <div class="arch-capability">Lineage tracking</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layer 2: Storage -->
+            <div class="arch-grid">
+                <div class="arch-card full-width">
+                    <div class="arch-card-header">
+                        <div class="arch-card-icon storage">🗄️</div>
+                        <div>
+                            <div class="arch-card-title">Storage Layer</div>
+                            <div class="arch-card-subtitle">Data warehouse and lakehouse platforms</div>
+                        </div>
+                    </div>
+                    <div class="arch-card-body">
+                        <div class="arch-card-desc">The storage layer holds your data—raw, processed, and aggregated. Modern platforms combine warehouse (structured SQL) and lakehouse (semi-structured, ML-ready) capabilities. This is where compute happens for analytics queries.</div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Cloud Data Warehouses</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">❄️</span><span class="arch-tool-name">Snowflake</span><span class="arch-tool-type">Multi-cloud</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🟠</span><span class="arch-tool-name">Databricks</span><span class="arch-tool-type">Lakehouse</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔵</span><span class="arch-tool-name">BigQuery</span><span class="arch-tool-type">Google</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔴</span><span class="arch-tool-name">Redshift</span><span class="arch-tool-type">AWS</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">Azure Synapse</span><span class="arch-tool-type">Microsoft</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Open Table Formats & Query Engines</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🧊</span><span class="arch-tool-name">Apache Iceberg</span><span class="arch-tool-type">Table Format</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">Δ</span><span class="arch-tool-name">Delta Lake</span><span class="arch-tool-type">Databricks</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🦆</span><span class="arch-tool-name">DuckDB</span><span class="arch-tool-type">Embedded</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">⚡</span><span class="arch-tool-name">Trino/Presto</span><span class="arch-tool-type">Query Engine</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔥</span><span class="arch-tool-name">Apache Spark</span><span class="arch-tool-type">Processing</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Key Capabilities</div>
+                            <div class="arch-capabilities">
+                                <div class="arch-capability">Columnar storage</div>
+                                <div class="arch-capability">Elastic compute scaling</div>
+                                <div class="arch-capability">Time travel & versioning</div>
+                                <div class="arch-capability">Semi-structured data (JSON)</div>
+                                <div class="arch-capability">ACID transactions</div>
+                                <div class="arch-capability">Separation of storage/compute</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Layer 1: Ingestion -->
+            <div class="arch-grid">
+                <div class="arch-card full-width">
+                    <div class="arch-card-header">
+                        <div class="arch-card-icon ingestion">📥</div>
+                        <div>
+                            <div class="arch-card-title">Ingestion Layer</div>
+                            <div class="arch-card-subtitle">Extract and load from source systems</div>
+                        </div>
+                    </div>
+                    <div class="arch-card-body">
+                        <div class="arch-card-desc">The ingestion layer extracts data from source systems (databases, SaaS apps, APIs, files) and loads it into the storage layer. Modern ELT approaches load raw data first, then transform in the warehouse.</div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">ELT/ETL Platforms</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">🔌</span><span class="arch-tool-name">Fivetran</span><span class="arch-tool-type">Managed ELT</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔷</span><span class="arch-tool-name">Airbyte</span><span class="arch-tool-type">Open Source</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🧵</span><span class="arch-tool-name">Stitch</span><span class="arch-tool-type">Talend</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔶</span><span class="arch-tool-name">Matillion</span><span class="arch-tool-type">ETL</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔧</span><span class="arch-tool-name">Informatica</span><span class="arch-tool-type">Enterprise</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Streaming & CDC</div>
+                            <div class="arch-tools">
+                                <div class="arch-tool"><span class="arch-tool-icon">📡</span><span class="arch-tool-name">Kafka</span><span class="arch-tool-type">Streaming</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🔄</span><span class="arch-tool-name">Debezium</span><span class="arch-tool-type">CDC</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">⚡</span><span class="arch-tool-name">Confluent</span><span class="arch-tool-type">Managed Kafka</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">🌊</span><span class="arch-tool-name">AWS Kinesis</span><span class="arch-tool-type">AWS Streaming</span></div>
+                                <div class="arch-tool"><span class="arch-tool-icon">📨</span><span class="arch-tool-name">Pub/Sub</span><span class="arch-tool-type">Google</span></div>
+                            </div>
+                        </div>
+                        <div class="arch-subsection">
+                            <div class="arch-subsection-title">Key Capabilities</div>
+                            <div class="arch-capabilities">
+                                <div class="arch-capability">Pre-built connectors (500+)</div>
+                                <div class="arch-capability">Incremental sync</div>
+                                <div class="arch-capability">Schema detection</div>
+                                <div class="arch-capability">Change data capture (CDC)</div>
+                                <div class="arch-capability">Real-time streaming</div>
+                                <div class="arch-capability">Error handling & retries</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The <strong>five-layer modern data stack</strong> shown above represents how data flows from source systems to business insights. The semantic layer sits at the critical junction—above the transformation layer where data is modeled, but below the consumption layer where users interact with data. This positioning allows it to provide a consistent abstraction across all downstream tools.</p>
+                <p>Two architectural patterns dominate: <strong>Universal semantic layers</strong> (Cube, AtScale, dbt Metrics) serve multiple BI tools through standard SQL or APIs, enabling true tool-agnostic metric definitions. <strong>Embedded semantic layers</strong> (Looker's LookML, Tableau's data models) are tightly coupled to one tool but offer deeper integration. Most organizations start embedded and evolve to universal as their multi-tool needs grow. The key decision: do you need metrics accessible from 1 tool or 10?</p>
+            </div>
+        </section>
+
+        <!-- CORE CONCEPTS -->
+        <section class="module" id="concepts">
+            <div class="module-header">
+                <div class="module-icon">🧩</div>
+                <div class="module-info">
+                    <h2>Core Concepts</h2>
+                    <p>The building blocks of semantic models</p>
+                </div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-icon">📏</div>
+                    <div class="concept-name">Dimensions</div>
+                    <div class="concept-desc">Categorical attributes used for grouping, filtering, and slicing data. The "by what" of analysis.</div>
+                    <div class="concept-example">Customer, Product, Region, Date, Channel</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">📊</div>
+                    <div class="concept-name">Measures</div>
+                    <div class="concept-desc">Aggregatable numeric values. The raw building blocks of metrics with defined aggregation rules.</div>
+                    <div class="concept-example">SUM(amount), COUNT(orders), AVG(price)</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🎯</div>
+                    <div class="concept-name">Metrics</div>
+                    <div class="concept-desc">Business KPIs composed from measures with specific calculations and time grains.</div>
+                    <div class="concept-example">Revenue, MRR, Churn Rate, LTV</div>
+                </div>
+                <div class="concept-card">
+                    <div class="concept-icon">🌳</div>
+                    <div class="concept-name">Hierarchies</div>
+                    <div class="concept-desc">Dimensional roll-up paths enabling drill-down analysis from high to low level.</div>
+                    <div class="concept-example">Year → Quarter → Month → Day</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Dimensions</strong> describe the "who, what, where, when" of your data—they're the axes of analysis. Good semantic models include dimension <strong>attributes</strong> (customer name, email) and <strong>hierarchies</strong> (category → subcategory → product) that enable drilling. Dimensions should use business-friendly names, not database column names.</p>
+                <p><strong>Measures vs. Metrics</strong>: measures are atomic aggregations (sum of order_amount), while metrics are business concepts that may combine multiple measures with specific logic (Net Revenue = Gross Revenue - Refunds - Discounts). Define metrics once in the semantic layer with clear documentation, owners, and certification status. This prevents the proliferation of conflicting definitions across dashboards.</p>
+            </div>
+        </section>
+
+        <!-- MODELING PATTERNS -->
+        <section class="module" id="schemas">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Modeling Patterns</h2>
+                    <p>Common schema designs for semantic models</p>
+                </div>
+            </div>
+            <div class="schema-grid">
+                <div class="schema-card">
+                    <div class="schema-header">
+                        <div class="schema-icon">⭐</div>
+                        <div class="schema-name">Star Schema</div>
+                        <div class="schema-badge">Most Common</div>
+                    </div>
+                    <div class="schema-desc">Central fact table surrounded by denormalized dimension tables. Simple, fast queries, easy to understand.</div>
+                    <ul class="schema-pros">
+                        <li>Query performance</li>
+                        <li>Easy to understand</li>
+                        <li>BI tool friendly</li>
+                    </ul>
+                    <ul class="schema-cons">
+                        <li>Data redundancy</li>
+                        <li>ETL complexity</li>
+                    </ul>
+                </div>
+                <div class="schema-card">
+                    <div class="schema-header">
+                        <div class="schema-icon">❄️</div>
+                        <div class="schema-name">Snowflake Schema</div>
+                        <div class="schema-badge">Normalized</div>
+                    </div>
+                    <div class="schema-desc">Star schema with normalized dimensions. Reduces redundancy but adds query complexity with more joins.</div>
+                    <ul class="schema-pros">
+                        <li>Less storage</li>
+                        <li>Data integrity</li>
+                        <li>Flexible updates</li>
+                    </ul>
+                    <ul class="schema-cons">
+                        <li>More complex queries</li>
+                        <li>Slower performance</li>
+                    </ul>
+                </div>
+                <div class="schema-card">
+                    <div class="schema-header">
+                        <div class="schema-icon">📋</div>
+                        <div class="schema-name">One Big Table (OBT)</div>
+                        <div class="schema-badge">Modern</div>
+                    </div>
+                    <div class="schema-desc">Fully denormalized single table with all dimensions and facts. Leverages modern warehouse power.</div>
+                    <ul class="schema-pros">
+                        <li>Simplest queries</li>
+                        <li>No joins needed</li>
+                        <li>Self-service friendly</li>
+                    </ul>
+                    <ul class="schema-cons">
+                        <li>Massive redundancy</li>
+                        <li>Update complexity</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Star schemas</strong> remain the gold standard for semantic modeling—they balance simplicity with performance. The central fact table contains foreign keys to dimension tables plus measures. Dimension tables are denormalized (customer dimension includes city, state, country directly rather than normalizing to separate tables).</p>
+                <p>The <strong>One Big Table (OBT)</strong> pattern has gained popularity with modern columnar warehouses that handle wide tables efficiently. OBT eliminates joins entirely, making queries trivial and enabling true self-service. The trade-off is storage cost (solved by cheap cloud storage) and update complexity (solved by automated dbt models). Consider OBT for read-heavy analytics workloads where simplicity matters more than storage efficiency.</p>
+            </div>
+        </section>
+
+        <!-- METRICS LAYER -->
+        <section class="module" id="metrics">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Metrics Layer</h2>
+                    <p>Defining business metrics programmatically</p>
+                </div>
+            </div>
+            <div class="metric-types">
+                <div class="metric-type">
+                    <div class="metric-type-icon">➕</div>
+                    <div class="metric-type-name">Simple Metric</div>
+                    <div class="metric-type-desc">Direct aggregation of a single measure with no additional logic.</div>
+                    <div class="metric-type-example">revenue:<br>  type: sum<br>  sql: order_amount</div>
+                </div>
+                <div class="metric-type">
+                    <div class="metric-type-icon">➗</div>
+                    <div class="metric-type-name">Derived Metric</div>
+                    <div class="metric-type-desc">Calculated from other metrics using mathematical operations.</div>
+                    <div class="metric-type-example">average_order_value:<br>  type: derived<br>  expr: revenue / orders</div>
+                </div>
+                <div class="metric-type">
+                    <div class="metric-type-icon">📅</div>
+                    <div class="metric-type-name">Cumulative Metric</div>
+                    <div class="metric-type-desc">Running totals or period-over-period calculations with time context.</div>
+                    <div class="metric-type-example">mtd_revenue:<br>  type: cumulative<br>  grain: month</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Modern metrics layers (dbt Metrics, Cube, MetricFlow) define metrics as <strong>code</strong>—version controlled, testable, and documented. Each metric specifies its calculation, time grain, dimensions it can be sliced by, and filters. This enables consistency: "revenue" means the same thing whether queried from Tableau, Python, or a Slack bot.</p>
+                <p><strong>Metric composition</strong> is powerful: define atomic metrics (revenue, orders, customers) then compose derived metrics (AOV = revenue/orders, LTV = revenue/customers). Changes to base metrics automatically propagate to derived ones. Add <strong>semantic metadata</strong>: owners, descriptions, certification status, and lineage. This transforms metrics from tribal knowledge into governed, discoverable assets.</p>
+            </div>
+        </section>
+
+        <!-- TOOLS COMPARISON -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2">Tools Comparison</h2>
+                    <p>Evaluating semantic layer platforms across 12 capabilities</p>
+                </div>
+            </div>
+            <table class="tools-compare">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🧊</span><span class="tool-head-name">Cube</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📊</span><span class="tool-head-name">dbt Metrics</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🔷</span><span class="tool-head-name">AtScale</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">👁️</span><span class="tool-head-name">LookML</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📈</span><span class="tool-head-name">Power BI</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🎯</span><span class="tool-head-name">Tableau</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">⚡</span><span class="tool-head-name">Metricflow</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🏔️</span><span class="tool-head-name">Snowflake</span></div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="feature-category">Architecture</span><br><span class="feature-name">Universal (Multi-Tool)</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Architecture</span><br><span class="feature-name">SQL API</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Metrics</span><br><span class="feature-name">Metric Definitions</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Metrics</span><br><span class="feature-name">Derived Metrics</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Performance</span><br><span class="feature-name">Caching Layer</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Performance</span><br><span class="feature-name">Pre-Aggregation</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Access Control</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Data Lineage</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Developer</span><br><span class="feature-name">Version Control</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Developer</span><br><span class="feature-name">REST/GraphQL API</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">AI</span><br><span class="feature-name">AI/NL Query Support</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">AI</span><br><span class="feature-name">LLM Integration</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Best For</strong></td>
+                        <td style="font-size: 9px;">Universal</td>
+                        <td style="font-size: 9px;">dbt Users</td>
+                        <td style="font-size: 9px;">Enterprise</td>
+                        <td style="font-size: 9px;">Looker</td>
+                        <td style="font-size: 9px;">Microsoft</td>
+                        <td style="font-size: 9px;">Tableau</td>
+                        <td style="font-size: 9px;">dbt Cloud</td>
+                        <td style="font-size: 9px;">Snowflake</td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Pricing</strong></td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">Free/$$</td>
+                        <td style="font-size: 9px;">$$$$</td>
+                        <td style="font-size: 9px;">$$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">Included</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Universal semantic layers</strong> (Cube, AtScale, dbt Metrics) serve multiple BI tools through SQL or APIs, enabling true tool-agnostic metric definitions. <strong>Cube</strong> offers the best developer experience with JavaScript/TypeScript-based definitions, GraphQL APIs, and strong caching. <strong>AtScale</strong> targets enterprise with OLAP-style modeling and deep BI integration.</p>
+                <p><strong>Embedded semantic layers</strong> (LookML, Power BI, Tableau) are tightly coupled to their respective tools. LookML is the most mature, with robust modeling capabilities and version control, but requires Looker. <strong>dbt Metrics/MetricFlow</strong> (now owned by dbt Labs) defines metrics alongside your dbt models—natural for existing dbt users but still maturing. Choose universal layers for multi-tool environments; embedded layers for single-tool shops seeking simplicity.</p>
+            </div>
+        </section>
+
+        <!-- IMPLEMENTATION -->
+        <section class="module" id="implementation">
+            <div class="module-header">
+                <div class="module-icon">🚀</div>
+                <div class="module-info">
+                    <h2>Implementation Roadmap</h2>
+                    <p>Building your semantic layer step by step</p>
+                </div>
+            </div>
+            <div class="implementation-steps">
+                <div class="impl-step">
+                    <div class="step-num">Phase 1</div>
+                    <div class="step-name">Audit</div>
+                    <ul class="step-tasks">
+                        <li>Inventory existing metrics</li>
+                        <li>Document current definitions</li>
+                        <li>Identify conflicts/duplicates</li>
+                        <li>Map data sources</li>
+                    </ul>
+                </div>
+                <div class="impl-step">
+                    <div class="step-num">Phase 2</div>
+                    <div class="step-name">Design</div>
+                    <ul class="step-tasks">
+                        <li>Define core dimensions</li>
+                        <li>Standardize metric names</li>
+                        <li>Create calculation specs</li>
+                        <li>Design hierarchies</li>
+                    </ul>
+                </div>
+                <div class="impl-step">
+                    <div class="step-num">Phase 3</div>
+                    <div class="step-name">Build</div>
+                    <ul class="step-tasks">
+                        <li>Implement in chosen tool</li>
+                        <li>Write tests for metrics</li>
+                        <li>Set up CI/CD pipeline</li>
+                        <li>Configure access control</li>
+                    </ul>
+                </div>
+                <div class="impl-step">
+                    <div class="step-num">Phase 4</div>
+                    <div class="step-name">Adopt</div>
+                    <ul class="step-tasks">
+                        <li>Migrate dashboards</li>
+                        <li>Train users</li>
+                        <li>Sunset legacy definitions</li>
+                        <li>Monitor adoption</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Start with a <strong>metric audit</strong>: catalog every metric definition across dashboards, spreadsheets, and code. You'll likely find 3-5 different definitions of "revenue." Work with business stakeholders to agree on canonical definitions—this is the hardest part. Document not just the calculation but the business context: what questions does this metric answer? What decisions does it inform?</p>
+                <p>Implement incrementally: start with <strong>5-10 core metrics</strong> that have the most conflicts or highest visibility. Get those working end-to-end before expanding. Each metric should have automated tests (expected ranges, comparison to legacy) and documentation. Use <strong>feature flags</strong> or parallel dashboards during migration so users can compare old vs. new definitions and build trust in the semantic layer.</p>
+            </div>
+        </section>
+
+        <!-- GOVERNANCE -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Semantic Layer Governance</h2>
+                    <p>Maintaining quality and trust at scale</p>
+                </div>
+            </div>
+            <div class="governance-grid">
+                <div class="gov-card">
+                    <div class="gov-icon">👤</div>
+                    <div class="gov-title">Metric Ownership</div>
+                    <div class="gov-desc">Every metric needs a business owner responsible for its definition and accuracy.</div>
+                    <ul class="gov-list">
+                        <li>Assign domain owners</li>
+                        <li>Define approval workflows</li>
+                        <li>Review proposed changes</li>
+                        <li>Certify production metrics</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">📋</div>
+                    <div class="gov-title">Documentation</div>
+                    <div class="gov-desc">Clear descriptions, business context, and lineage for every metric.</div>
+                    <ul class="gov-list">
+                        <li>Business definition</li>
+                        <li>Calculation logic</li>
+                        <li>Valid dimensions</li>
+                        <li>Known limitations</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">✅</div>
+                    <div class="gov-title">Quality Assurance</div>
+                    <div class="gov-desc">Automated testing and monitoring to ensure metrics remain accurate.</div>
+                    <ul class="gov-list">
+                        <li>Range/threshold tests</li>
+                        <li>Period-over-period checks</li>
+                        <li>Reconciliation with sources</li>
+                        <li>Anomaly detection</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Metric ownership</strong> prevents the "nobody's responsible" problem. Assign each metric domain (revenue metrics, customer metrics) to a business owner who approves definition changes and a technical owner who implements them. Use <strong>certification tiers</strong>: experimental (untested), verified (tested), certified (production-ready) to signal trust level.</p>
+                <p>Treat semantic models like <strong>code</strong>: version control, pull request reviews, automated testing, and CI/CD deployment. Every metric change should be reviewed by both business (does this match our intent?) and technical (does the SQL work correctly?) stakeholders. Monitor metrics in production—anomalies might indicate calculation bugs or upstream data quality issues.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective semantic modeling</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with business requirements, not technical capabilities</li>
+                        <li>Use business-friendly names (Revenue, not sum_order_amt)</li>
+                        <li>Document calculation logic and business context</li>
+                        <li>Version control all semantic model definitions</li>
+                        <li>Test metrics against known values and edge cases</li>
+                        <li>Create a glossary of canonical dimension values</li>
+                        <li>Implement row-level security at the semantic layer</li>
+                        <li>Plan for performance with caching and pre-aggregation</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Allow multiple definitions of the same metric to coexist</li>
+                        <li>Skip stakeholder alignment on metric definitions</li>
+                        <li>Expose raw database column names to business users</li>
+                        <li>Create metrics without clear ownership</li>
+                        <li>Forget to handle NULL values and edge cases</li>
+                        <li>Ignore performance until dashboards are slow</li>
+                        <li>Assume users understand metric limitations</li>
+                        <li>Deploy without automated testing and monitoring</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The biggest semantic modeling mistake is <strong>building in isolation from the business</strong>. The semantic layer succeeds or fails based on whether it reflects how the business actually thinks about data. Involve finance, sales, marketing in defining metrics—their buy-in is essential for adoption.</p>
+                <p><strong>Performance matters</strong>: a semantic layer that takes 30 seconds to return results won't be used. Design for performance from the start: identify high-cardinality dimensions that need special handling, pre-aggregate common query patterns, and implement intelligent caching. Monitor query patterns to optimize the metrics people actually use, not the ones you think they should use.</p>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered semantic layer management</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🧊</div>
+                    <div class="agent-name">SemanticAgent</div>
+                    <div class="agent-role">Metrics & Modeling Specialist</div>
+                    <div class="agent-desc">Automates semantic layer tasks including metric discovery, definition generation, conflict detection, and natural language query translation.</div>
+                    <ul class="agent-capabilities">
+                        <li>Generate metric definitions from SQL queries</li>
+                        <li>Detect conflicting metric definitions</li>
+                        <li>Translate natural language to semantic queries</li>
+                        <li>Suggest missing dimensions and hierarchies</li>
+                        <li>Auto-document metrics from code comments</li>
+                        <li>Validate metric calculations against test data</li>
+                        <li>Identify unused or duplicate metrics</li>
+                        <li>Generate dbt/Cube/LookML from specs</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Metric Generator</div>
+                        <div class="code-tab">NL to SQL</div>
+                        <div class="code-filename">semantic_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># semantic_agent.py - Semantic Layer Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> cube_api <span class="code-keyword">import</span> CubeClient
+
+<span class="code-keyword">class</span> <span class="code-function">MetricGenerator</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, semantic_layer):
+        self.layer = semantic_layer
+        self.existing_metrics = self._load_metrics()
+    
+    <span class="code-keyword">def</span> <span class="code-function">from_sql</span>(self, sql: str) -> dict:
+        <span class="code-string">"""Generate metric definition from SQL query."""</span>
+        prompt = <span class="code-string">f"""Analyze this SQL and extract metric:
+{sql}
+
+Return YAML with:
+- name (business friendly)
+- type (simple/derived/cumulative)
+- sql (calculation)
+- dimensions (valid slice-by)
+- description"""</span>
+        
+        metric_def = llm.invoke(prompt)
+        
+        <span class="code-comment"># Check for conflicts</span>
+        conflicts = self._find_conflicts(metric_def)
+        <span class="code-keyword">if</span> conflicts:
+            metric_def[<span class="code-string">"warnings"</span>] = conflicts
+        
+        <span class="code-keyword">return</span> metric_def
+    
+    <span class="code-keyword">def</span> <span class="code-function">nl_to_query</span>(self, question: str) -> str:
+        <span class="code-string">"""Translate natural language to semantic query."""</span>
+        context = self._get_schema_context()
+        
+        prompt = <span class="code-string">f"""Given semantic model:
+{context}
+
+Question: {question}
+
+Generate Cube/SQL query using only defined metrics."""</span>
+        
+        <span class="code-keyword">return</span> llm.invoke(prompt)
+
+<span class="code-comment"># Agent definition</span>
+semantic_agent = Agent(
+    role=<span class="code-string">"Semantic Layer Architect"</span>,
+    goal=<span class="code-string">"Maintain consistent business metrics"</span>,
+    tools=[MetricGeneratorTool(), ConflictDetectorTool(),
+           NLQueryTool(), SchemaValidatorTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p3-taxonomy.html" class="related-card">
+                    <div class="related-num">Page 7.3</div>
+                    <div class="related-title">Taxonomy & Ontology</div>
+                    <div class="related-desc">Organizing business concepts</div>
+                </a>
+                <a href="cat07-p7-vector-databases.html" class="related-card">
+                    <div class="related-num">Page 7.7</div>
+                    <div class="related-title">Vector Databases</div>
+                    <div class="related-desc">AI-powered semantic search</div>
+                </a>
+                <a href="cat07-p1-knowledge-graphs.html" class="related-card">
+                    <div class="related-num">Page 7.1</div>
+                    <div class="related-title">Knowledge Graphs</div>
+                    <div class="related-desc">Entity relationships</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p5-enterprise-wikis.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.5: Enterprise Wikis</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.6 of 8</div>
+        <a href="cat07-p7-vector-databases.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.7: Vector Databases</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

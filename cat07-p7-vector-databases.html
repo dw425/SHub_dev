@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Databases | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--pink), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--purple); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        .overview-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--pink); }
+        
+        .embedding-pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; position: relative; }
+        .embedding-pipeline::before { content: ''; position: absolute; top: 50%; left: 10%; right: 10%; height: 2px; background: linear-gradient(90deg, var(--purple), var(--pink), var(--cyan), var(--green)); transform: translateY(-50%); z-index: 0; }
+        .embed-stage { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; z-index: 1; }
+        .embed-stage::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .embed-stage:nth-child(1)::before { background: var(--purple); }
+        .embed-stage:nth-child(2)::before { background: var(--pink); }
+        .embed-stage:nth-child(3)::before { background: var(--cyan); }
+        .embed-stage:nth-child(4)::before { background: var(--green); }
+        .embed-stage-num { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+        .embed-stage:nth-child(1) .embed-stage-num { color: var(--purple); }
+        .embed-stage:nth-child(2) .embed-stage-num { color: var(--pink); }
+        .embed-stage:nth-child(3) .embed-stage-num { color: var(--cyan); }
+        .embed-stage:nth-child(4) .embed-stage-num { color: var(--green); }
+        .embed-stage-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .embed-stage-content { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .embed-stage-example { font-size: 10px; padding: 10px; background: var(--bg-dark); border-radius: 6px; font-family: monospace; }
+        .embed-stage:nth-child(1) .embed-stage-example { color: var(--text-muted); }
+        .embed-stage:nth-child(2) .embed-stage-example { color: var(--pink); }
+        .embed-stage:nth-child(3) .embed-stage-example { color: var(--cyan); }
+        .embed-stage:nth-child(4) .embed-stage-example { color: var(--green); }
+        .embed-stage-tools { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+        .embed-tool-tag { font-size: 8px; padding: 3px 6px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .index-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .index-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+        .index-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .index-card:nth-child(1)::before { background: var(--green); }
+        .index-card:nth-child(2)::before { background: var(--blue); }
+        .index-card:nth-child(3)::before { background: var(--purple); }
+        .index-card:nth-child(4)::before { background: var(--pink); }
+        .index-icon { font-size: 28px; margin-bottom: 12px; }
+        .index-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .index-full { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .index-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .index-stats { display: flex; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .index-stat { font-size: 9px; color: var(--text-muted); }
+        .index-stat strong { color: var(--cat-light); }
+        
+        .platform-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .platform-header { padding: 16px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid var(--border-color); }
+        .platform-logo { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .platform-name { font-size: 16px; font-weight: 600; }
+        .platform-type { font-size: 10px; color: var(--text-muted); }
+        .platform-badge { margin-left: auto; font-size: 9px; padding: 4px 10px; border-radius: 4px; font-weight: 600; }
+        .platform-badge.managed { background: var(--green); color: #000; }
+        .platform-badge.opensource { background: var(--blue); color: #fff; }
+        .platform-badge.hybrid { background: var(--purple); color: #fff; }
+        .platform-badge.embedded { background: var(--yellow); color: #000; }
+        .platform-body { padding: 16px 20px; }
+        .platform-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .platform-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .platform-feature { font-size: 9px; padding: 4px 8px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        .platform-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .platform-metric { text-align: center; }
+        .platform-metric-value { font-size: 12px; font-weight: 700; color: var(--cat-light); }
+        .platform-metric-label { font-size: 8px; color: var(--text-muted); }
+        
+        .compare-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; font-size: 10px; }
+        .compare-table th { background: var(--bg-card-alt); padding: 10px 6px; text-align: center; font-size: 9px; border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { text-align: left; padding-left: 12px; width: 120px; }
+        .compare-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .compare-table td:first-child { text-align: left; padding-left: 12px; font-weight: 500; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .check { color: var(--green); font-weight: bold; }
+        .partial { color: var(--yellow); }
+        .none { color: var(--text-muted); }
+        .feature-category { font-size: 9px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .arch-patterns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .arch-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .arch-icon { font-size: 28px; margin-bottom: 12px; }
+        .arch-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .arch-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .arch-details { list-style: none; }
+        .arch-details li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .arch-details li::before { content: '•'; color: var(--purple); }
+        
+        .perf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .perf-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .perf-icon { font-size: 28px; margin-bottom: 12px; }
+        .perf-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .perf-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+        .perf-tip { font-size: 9px; color: var(--cyan); background: var(--bg-dark); padding: 8px; border-radius: 6px; }
+        
+        .usecase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .usecase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .usecase-icon { font-size: 28px; margin-bottom: 12px; }
+        .usecase-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .usecase-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .usecase-examples { list-style: none; }
+        .usecase-examples li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .usecase-examples li::before { content: '→'; color: var(--purple); font-size: 10px; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--purple), var(--pink)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .index-grid, .perf-grid { grid-template-columns: repeat(2, 1fr); }
+            .platform-cards, .arch-patterns, .usecase-grid, .related-pages { grid-template-columns: 1fr; }
+            .embedding-pipeline { grid-template-columns: repeat(2, 1fr); }
+            .embedding-pipeline::before { display: none; }
+            .compare-table { font-size: 8px; }
+            .compare-table th, .compare-table td { padding: 6px 3px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Vector Databases</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#embeddings"><span class="nav-icon">🔢</span> How Embeddings Work</a></li>
+            <li><a href="#indexes"><span class="nav-icon">📊</span> Index Algorithms</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🗄️</span> Platform Deep Dives</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Feature Comparison</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture Patterns</a></li>
+            <li><a href="#performance"><span class="nav-icon">⚡</span> Performance Tuning</a></li>
+            <li><a href="#usecases"><span class="nav-icon">🎯</span> Use Cases</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html" class="active"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">🗄️ Page 7.7 • RAG Infrastructure</div>
+                <h1>Vector Databases</h1>
+                <p>Purpose-built databases for storing and querying high-dimensional embeddings—the foundation of semantic search, RAG systems, and AI-powered applications.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">&lt;10ms</div>
+                    <div class="hero-metric-label">Query Latency</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Billions</div>
+                    <div class="hero-metric-label">Vector Scale</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">99%</div>
+                    <div class="hero-metric-label">Recall Accuracy</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">ANN</div>
+                    <div class="hero-metric-label">Search Algorithm</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Vector Databases</h2>
+                    <p>Specialized storage for semantic similarity search</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>Why Vector Databases?</h3>
+                <p><strong>Vector databases</strong> are purpose-built to store and query high-dimensional vectors (embeddings). Unlike traditional databases optimized for exact matches on structured data, vector databases use approximate nearest neighbor (ANN) algorithms to find semantically similar content in milliseconds—even across billions of vectors.</p>
+                <p>At their core, vector databases solve the <strong>similarity search problem</strong>: given a query vector (like an embedded question), find the K most similar vectors (like document chunks). This enables RAG systems to retrieve relevant context, recommendation engines to find similar items, and search systems to understand user intent beyond keywords.</p>
+                <p>Key capabilities include <strong>metadata filtering</strong> (narrow results by attributes before vector search), <strong>hybrid search</strong> (combining dense vectors with sparse keyword matching), and <strong>namespaces/collections</strong> (multi-tenancy for different use cases or customers). Modern vector databases also support <strong>real-time updates</strong>, allowing you to add, update, or delete vectors without full re-indexing.</p>
+            </div>
+        </section>
+
+        <!-- HOW EMBEDDINGS WORK -->
+        <section class="module" id="embeddings">
+            <div class="module-header">
+                <div class="module-icon">🔢</div>
+                <div class="module-info">
+                    <h2>How Embeddings Work</h2>
+                    <p>From text to vectors to similarity</p>
+                </div>
+            </div>
+            <div class="embedding-pipeline">
+                <div class="embed-stage">
+                    <div class="embed-stage-num">STEP 1</div>
+                    <div class="embed-stage-title">Raw Content</div>
+                    <div class="embed-stage-content">Text, images, or other content that needs to be searched semantically.</div>
+                    <div class="embed-stage-example">"How do I reset my password?"</div>
+                </div>
+                <div class="embed-stage">
+                    <div class="embed-stage-num">STEP 2</div>
+                    <div class="embed-stage-title">Embedding Model</div>
+                    <div class="embed-stage-content">Neural network that converts content into dense numerical representations.</div>
+                    <div class="embed-stage-example">text-embedding-3-small</div>
+                    <div class="embed-stage-tools">
+                        <span class="embed-tool-tag">OpenAI</span>
+                        <span class="embed-tool-tag">Cohere</span>
+                        <span class="embed-tool-tag">BGE</span>
+                        <span class="embed-tool-tag">E5</span>
+                    </div>
+                </div>
+                <div class="embed-stage">
+                    <div class="embed-stage-num">STEP 3</div>
+                    <div class="embed-stage-title">Dense Vector</div>
+                    <div class="embed-stage-content">High-dimensional array capturing semantic meaning in numerical form.</div>
+                    <div class="embed-stage-example">[0.023, -0.156, 0.891, ...]<br>1536 dimensions</div>
+                </div>
+                <div class="embed-stage">
+                    <div class="embed-stage-num">STEP 4</div>
+                    <div class="embed-stage-title">Vector Database</div>
+                    <div class="embed-stage-content">Indexed storage enabling fast approximate nearest neighbor search.</div>
+                    <div class="embed-stage-example">HNSW index → &lt;10ms queries</div>
+                    <div class="embed-stage-tools">
+                        <span class="embed-tool-tag">Pinecone</span>
+                        <span class="embed-tool-tag">Qdrant</span>
+                        <span class="embed-tool-tag">Weaviate</span>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Embeddings</strong> are dense numerical representations that capture semantic meaning. When you embed "How do I reset my password?" and "Password recovery steps", they produce similar vectors—even though they share few words. This semantic similarity powers modern search and RAG.</p>
+                <p>Popular embedding models include <strong>OpenAI text-embedding-3</strong> (1536 or 3072 dimensions), <strong>Cohere embed-v3</strong> (1024 dimensions), and open-source options like <strong>BGE</strong>, <strong>E5</strong>, and <strong>GTE</strong>. Dimension count affects both accuracy and storage/compute costs. Higher dimensions generally mean better accuracy but slower queries and more storage.</p>
+            </div>
+        </section>
+
+        <!-- INDEX ALGORITHMS -->
+        <section class="module" id="indexes">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Index Algorithms</h2>
+                    <p>How vector databases find similar vectors fast</p>
+                </div>
+            </div>
+            <div class="index-grid">
+                <div class="index-card">
+                    <div class="index-icon">🌐</div>
+                    <div class="index-name">HNSW</div>
+                    <div class="index-full">Hierarchical Navigable Small World</div>
+                    <div class="index-desc">Graph-based algorithm with multiple layers. Excellent recall and query speed. Most popular choice for production.</div>
+                    <div class="index-stats">
+                        <div class="index-stat"><strong>99%+</strong> Recall</div>
+                        <div class="index-stat"><strong>~1ms</strong> Query</div>
+                    </div>
+                </div>
+                <div class="index-card">
+                    <div class="index-icon">📦</div>
+                    <div class="index-name">IVF</div>
+                    <div class="index-full">Inverted File Index</div>
+                    <div class="index-desc">Clusters vectors into buckets, searches only relevant clusters. Good balance of build time and query speed.</div>
+                    <div class="index-stats">
+                        <div class="index-stat"><strong>95%+</strong> Recall</div>
+                        <div class="index-stat"><strong>~5ms</strong> Query</div>
+                    </div>
+                </div>
+                <div class="index-card">
+                    <div class="index-icon">🗜️</div>
+                    <div class="index-name">PQ</div>
+                    <div class="index-full">Product Quantization</div>
+                    <div class="index-desc">Compresses vectors to reduce memory footprint. Often combined with IVF for large-scale deployments.</div>
+                    <div class="index-stats">
+                        <div class="index-stat"><strong>90%+</strong> Recall</div>
+                        <div class="index-stat"><strong>8x</strong> Compression</div>
+                    </div>
+                </div>
+                <div class="index-card">
+                    <div class="index-icon">🎯</div>
+                    <div class="index-name">Flat</div>
+                    <div class="index-full">Brute Force (Exact)</div>
+                    <div class="index-desc">Compares query against every vector. 100% accurate but slow at scale. Good for small datasets or evaluation.</div>
+                    <div class="index-stats">
+                        <div class="index-stat"><strong>100%</strong> Recall</div>
+                        <div class="index-stat"><strong>O(n)</strong> Speed</div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>HNSW</strong> is the most popular algorithm in production vector databases. It builds a multi-layer graph where each node connects to its nearest neighbors. Queries start at the top layer (sparse, long-range connections) and descend to lower layers (dense, local connections), efficiently navigating to the nearest neighbors. Trade-offs are controlled by <code>M</code> (connections per node) and <code>efConstruction</code> (build-time quality).</p>
+                <p><strong>IVF-PQ</strong> combines clustering with compression for billion-scale deployments. Vectors are clustered during indexing, and only relevant clusters are searched at query time. Product Quantization compresses vectors by splitting dimensions into subspaces and quantizing each independently—achieving 4-8x memory reduction with acceptable recall loss.</p>
+            </div>
+        </section>
+
+        <!-- PLATFORM DEEP DIVES -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🗄️</div>
+                <div class="module-info">
+                    <h2>Platform Deep Dives</h2>
+                    <p>Leading vector database solutions</p>
+                </div>
+            </div>
+            <div class="platform-cards">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #1a1a2e, #000);">📌</div>
+                        <div>
+                            <div class="platform-name">Pinecone</div>
+                            <div class="platform-type">Fully Managed • Serverless</div>
+                        </div>
+                        <div class="platform-badge managed">MANAGED</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">The market leader in managed vector databases. Serverless pricing means you pay per query, not for idle infrastructure. Excellent developer experience with comprehensive SDKs and documentation.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Serverless</span>
+                            <span class="platform-feature">Hybrid Search</span>
+                            <span class="platform-feature">Namespaces</span>
+                            <span class="platform-feature">Metadata Filtering</span>
+                            <span class="platform-feature">SOC 2 Type II</span>
+                            <span class="platform-feature">99.99% SLA</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Billions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;50ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">AWS/GCP</div><div class="platform-metric-label">Regions</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #00D4AA, #008866);">🔷</div>
+                        <div>
+                            <div class="platform-name">Weaviate</div>
+                            <div class="platform-type">Open Source • GraphQL API</div>
+                        </div>
+                        <div class="platform-badge hybrid">HYBRID</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Feature-rich open-source vector database with built-in vectorization modules. Unique GraphQL API enables complex queries. Strong multi-modal support for text, images, and more.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Open Source</span>
+                            <span class="platform-feature">GraphQL</span>
+                            <span class="platform-feature">Multi-modal</span>
+                            <span class="platform-feature">Built-in Vectorizers</span>
+                            <span class="platform-feature">Generative Search</span>
+                            <span class="platform-feature">RBAC</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Billions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;100ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Self/Cloud</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Free/$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #DC382D, #AA2820);">🔶</div>
+                        <div>
+                            <div class="platform-name">Qdrant</div>
+                            <div class="platform-type">Rust • High Performance</div>
+                        </div>
+                        <div class="platform-badge hybrid">HYBRID</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">High-performance vector database written in Rust. Industry-leading query latency with advanced filtering capabilities. Rich payload storage with complex query support.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Rust Performance</span>
+                            <span class="platform-feature">Payload Filters</span>
+                            <span class="platform-feature">Quantization</span>
+                            <span class="platform-feature">Sharding</span>
+                            <span class="platform-feature">gRPC + REST</span>
+                            <span class="platform-feature">Snapshot Backup</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Billions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;10ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Self/Cloud</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Free/$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #00BFFF, #0080AA);">🌊</div>
+                        <div>
+                            <div class="platform-name">Milvus</div>
+                            <div class="platform-type">Distributed • Cloud-Native</div>
+                        </div>
+                        <div class="platform-badge opensource">OPEN SOURCE</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Cloud-native distributed vector database built for massive scale. Kubernetes-native architecture with separation of storage and compute. Powers production systems at trillion-vector scale.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Distributed</span>
+                            <span class="platform-feature">GPU Acceleration</span>
+                            <span class="platform-feature">Multi-Index</span>
+                            <span class="platform-feature">Time Travel</span>
+                            <span class="platform-feature">Kubernetes</span>
+                            <span class="platform-feature">Attu UI</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Trillions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;50ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Self/Zilliz</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Free/$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #FFD43B, #E5BE00);">🎨</div>
+                        <div>
+                            <div class="platform-name">Chroma</div>
+                            <div class="platform-type">Python-Native • Lightweight</div>
+                        </div>
+                        <div class="platform-badge embedded">EMBEDDED</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Lightweight, Python-native vector store designed for AI applications. Perfect for prototyping, local development, and small-to-medium workloads. Zero-config embedded mode.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Python Native</span>
+                            <span class="platform-feature">Embedded Mode</span>
+                            <span class="platform-feature">Simple API</span>
+                            <span class="platform-feature">LangChain</span>
+                            <span class="platform-feature">Client-Server</span>
+                            <span class="platform-feature">Collections</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Millions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;100ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Embedded</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Free</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #336791, #1a3d5c);">🐘</div>
+                        <div>
+                            <div class="platform-name">pgvector</div>
+                            <div class="platform-type">PostgreSQL Extension</div>
+                        </div>
+                        <div class="platform-badge opensource">EXTENSION</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Vector similarity search as a PostgreSQL extension. Add vectors to your existing Postgres database without new infrastructure. ACID transactions with your relational data.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">PostgreSQL</span>
+                            <span class="platform-feature">ACID</span>
+                            <span class="platform-feature">SQL Interface</span>
+                            <span class="platform-feature">Hybrid Queries</span>
+                            <span class="platform-feature">HNSW + IVF</span>
+                            <span class="platform-feature">Neon/Supabase</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Millions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;100ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Postgres</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Free</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #005571, #003344);">🔍</div>
+                        <div>
+                            <div class="platform-name">Elasticsearch</div>
+                            <div class="platform-type">Search Engine + Vectors</div>
+                        </div>
+                        <div class="platform-badge hybrid">HYBRID</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">The classic search engine now with dense vector support. Best choice when you already use Elasticsearch and need to add semantic search alongside existing keyword capabilities.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Existing Elastic</span>
+                            <span class="platform-feature">Hybrid Search</span>
+                            <span class="platform-feature">ELSER Models</span>
+                            <span class="platform-feature">Aggregations</span>
+                            <span class="platform-feature">Kibana</span>
+                            <span class="platform-feature">Enterprise</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Billions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;50ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Self/Cloud</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">$$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: linear-gradient(135deg, #FF6B35, #CC4400);">⚡</div>
+                        <div>
+                            <div class="platform-name">Vespa</div>
+                            <div class="platform-type">Yahoo • Enterprise Scale</div>
+                        </div>
+                        <div class="platform-badge hybrid">HYBRID</div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Battle-tested search platform from Yahoo. Excels at combining vectors with complex business logic, ranking, and filtering. Powers production systems at extreme scale.</div>
+                        <div class="platform-features">
+                            <span class="platform-feature">Production Scale</span>
+                            <span class="platform-feature">Custom Ranking</span>
+                            <span class="platform-feature">Real-time Updates</span>
+                            <span class="platform-feature">Multi-phase</span>
+                            <span class="platform-feature">Tensor Support</span>
+                            <span class="platform-feature">Vespa Cloud</span>
+                        </div>
+                        <div class="platform-metrics">
+                            <div class="platform-metric"><div class="platform-metric-value">Trillions</div><div class="platform-metric-label">Scale</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">&lt;10ms</div><div class="platform-metric-label">p99 Latency</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">Self/Cloud</div><div class="platform-metric-label">Deploy</div></div>
+                            <div class="platform-metric"><div class="platform-metric-value">$$$</div><div class="platform-metric-label">Pricing</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Pinecone</strong> is the easiest path to production—deploy in minutes with zero infrastructure management. <strong>Qdrant</strong> offers the best raw performance with its Rust implementation. <strong>Weaviate</strong> provides the richest feature set including built-in embedding models. <strong>Milvus</strong> scales to trillions of vectors with GPU acceleration. <strong>pgvector</strong> lets you add vectors to existing Postgres without new infrastructure.</p>
+            </div>
+        </section>
+
+        <!-- FEATURE COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Feature Comparison</h2>
+                    <p>Capabilities across 8 platforms and 14 features</p>
+                </div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Pinecone</th>
+                        <th>Weaviate</th>
+                        <th>Qdrant</th>
+                        <th>Milvus</th>
+                        <th>Chroma</th>
+                        <th>pgvector</th>
+                        <th>Elastic</th>
+                        <th>Vespa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="feature-category">Deploy</span><br>Managed Cloud</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Deploy</span><br>Self-Hosted</td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Index</span><br>HNSW</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Index</span><br>Quantization</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Search</span><br>Hybrid Search</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Search</span><br>Metadata Filtering</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Scale</span><br>Multi-tenancy</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Scale</span><br>Sharding</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Scale</span><br>Replication</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Features</span><br>GPU Acceleration</td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Features</span><br>Built-in Embedding</td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">API</span><br>REST API</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">API</span><br>gRPC</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">API</span><br>Python SDK</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Best For</strong></td>
+                        <td style="font-size: 8px;">Managed</td>
+                        <td style="font-size: 8px;">Features</td>
+                        <td style="font-size: 8px;">Speed</td>
+                        <td style="font-size: 8px;">Scale</td>
+                        <td style="font-size: 8px;">Prototype</td>
+                        <td style="font-size: 8px;">Postgres</td>
+                        <td style="font-size: 8px;">Existing ES</td>
+                        <td style="font-size: 8px;">Enterprise</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ARCHITECTURE PATTERNS -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Architecture Patterns</h2>
+                    <p>Deployment and scaling strategies</p>
+                </div>
+            </div>
+            <div class="arch-patterns">
+                <div class="arch-card">
+                    <div class="arch-icon">🎯</div>
+                    <div class="arch-title">Single Node</div>
+                    <div class="arch-desc">Simple deployment for development, testing, and small production workloads up to ~10M vectors.</div>
+                    <ul class="arch-details">
+                        <li>Fastest to deploy and iterate</li>
+                        <li>No distributed complexity</li>
+                        <li>Limited by single machine memory</li>
+                        <li>Best for: POCs, small apps</li>
+                    </ul>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">📊</div>
+                    <div class="arch-title">Sharded Cluster</div>
+                    <div class="arch-desc">Distribute vectors across multiple nodes for horizontal scaling to billions of vectors.</div>
+                    <ul class="arch-details">
+                        <li>Horizontal scaling</li>
+                        <li>Query parallelization</li>
+                        <li>Consistent hashing for routing</li>
+                        <li>Best for: High-scale production</li>
+                    </ul>
+                </div>
+                <div class="arch-card">
+                    <div class="arch-icon">🔄</div>
+                    <div class="arch-title">Replicated</div>
+                    <div class="arch-desc">Multiple copies of data for high availability and read scaling. Essential for production.</div>
+                    <ul class="arch-details">
+                        <li>Fault tolerance</li>
+                        <li>Read throughput scaling</li>
+                        <li>Leader-follower or multi-master</li>
+                        <li>Best for: HA requirements</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Most vector databases support <strong>sharding</strong> (distributing vectors across nodes) and <strong>replication</strong> (copying vectors for availability). For production, use at least 3 replicas with automatic failover. Pinecone handles this automatically; self-hosted options require explicit configuration.</p>
+                <p>Consider <strong>separation of indexing and serving</strong> at scale: index new vectors on dedicated nodes, then replicate to serving nodes. This prevents indexing load from affecting query latency. Milvus and Vespa have built-in support for this pattern.</p>
+            </div>
+        </section>
+
+        <!-- PERFORMANCE TUNING -->
+        <section class="module" id="performance">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Performance Optimization</h2>
+                    <p>Tuning for latency, throughput, and cost</p>
+                </div>
+            </div>
+            <div class="perf-grid">
+                <div class="perf-card">
+                    <div class="perf-icon">🗜️</div>
+                    <div class="perf-title">Quantization</div>
+                    <div class="perf-desc">Compress vectors to reduce memory and speed up search with minimal accuracy loss.</div>
+                    <div class="perf-tip">Use scalar quantization (SQ8) for 4x compression with ~1% recall loss</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-icon">🎚️</div>
+                    <div class="perf-title">Index Tuning</div>
+                    <div class="perf-desc">Adjust HNSW parameters M and efConstruction to balance build time, memory, and recall.</div>
+                    <div class="perf-tip">Start with M=16, efConstruction=200, increase for higher recall</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-icon">🔍</div>
+                    <div class="perf-title">Search Parameters</div>
+                    <div class="perf-desc">Tune efSearch at query time to trade latency for accuracy based on use case.</div>
+                    <div class="perf-tip">Use efSearch=50 for low latency, efSearch=200+ for high recall</div>
+                </div>
+                <div class="perf-card">
+                    <div class="perf-icon">📦</div>
+                    <div class="perf-title">Batching</div>
+                    <div class="perf-desc">Batch upserts and queries to amortize network overhead and improve throughput.</div>
+                    <div class="perf-tip">Batch 100-1000 vectors per upsert, 10-50 queries per batch</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Quantization</strong> is the highest-impact optimization for cost reduction. Scalar quantization (SQ8) reduces memory 4x by converting float32 to int8. Binary quantization (BQ) achieves 32x compression but with larger recall loss. Most databases support multiple quantization levels—test on your data to find the right trade-off.</p>
+                <p><strong>Dimension reduction</strong> is another option: Matryoshka embeddings (like OpenAI's text-embedding-3) allow truncating vectors to smaller dimensions. Reducing from 3072 to 1024 dimensions cuts storage 3x with minimal quality loss for many use cases. Always benchmark on your specific queries.</p>
+            </div>
+        </section>
+
+        <!-- USE CASES -->
+        <section class="module" id="usecases">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Use Cases</h2>
+                    <p>Applications powered by vector databases</p>
+                </div>
+            </div>
+            <div class="usecase-grid">
+                <div class="usecase-card">
+                    <div class="usecase-icon">🤖</div>
+                    <div class="usecase-title">RAG Systems</div>
+                    <div class="usecase-desc">Retrieve relevant context for LLM prompts based on semantic similarity to user queries.</div>
+                    <ul class="usecase-examples">
+                        <li>Enterprise chatbots</li>
+                        <li>Documentation Q&A</li>
+                        <li>Customer support agents</li>
+                        <li>Code assistants</li>
+                    </ul>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">🔍</div>
+                    <div class="usecase-title">Semantic Search</div>
+                    <div class="usecase-desc">Find content by meaning rather than keywords. Understand user intent and synonyms.</div>
+                    <ul class="usecase-examples">
+                        <li>E-commerce product search</li>
+                        <li>Knowledge base search</li>
+                        <li>Legal document discovery</li>
+                        <li>Academic research</li>
+                    </ul>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">💡</div>
+                    <div class="usecase-title">Recommendations</div>
+                    <div class="usecase-desc">Find similar items based on embeddings of user behavior, content, or collaborative signals.</div>
+                    <ul class="usecase-examples">
+                        <li>Product recommendations</li>
+                        <li>Content personalization</li>
+                        <li>Similar article suggestions</li>
+                        <li>Music/video discovery</li>
+                    </ul>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">🖼️</div>
+                    <div class="usecase-title">Image Search</div>
+                    <div class="usecase-desc">Search images by visual similarity using CLIP or other vision model embeddings.</div>
+                    <ul class="usecase-examples">
+                        <li>Reverse image search</li>
+                        <li>Visual product search</li>
+                        <li>Stock photo discovery</li>
+                        <li>Duplicate detection</li>
+                    </ul>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">⚠️</div>
+                    <div class="usecase-title">Anomaly Detection</div>
+                    <div class="usecase-desc">Identify outliers by finding vectors that are distant from their expected clusters.</div>
+                    <ul class="usecase-examples">
+                        <li>Fraud detection</li>
+                        <li>Network intrusion</li>
+                        <li>Quality control</li>
+                        <li>Log analysis</li>
+                    </ul>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-icon">🧬</div>
+                    <div class="usecase-title">Deduplication</div>
+                    <div class="usecase-desc">Find near-duplicate content using semantic similarity rather than exact matching.</div>
+                    <ul class="usecase-examples">
+                        <li>Content deduplication</li>
+                        <li>Resume matching</li>
+                        <li>Plagiarism detection</li>
+                        <li>Entity resolution</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for production vector databases</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Test embedding models on your specific domain data</li>
+                        <li>Use hybrid search (vectors + keywords) for best results</li>
+                        <li>Store useful metadata alongside vectors for filtering</li>
+                        <li>Implement proper chunking strategy for documents</li>
+                        <li>Monitor recall and latency in production</li>
+                        <li>Use namespaces/collections for multi-tenancy</li>
+                        <li>Benchmark quantization impact on your queries</li>
+                        <li>Plan for index rebuilds when changing parameters</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Assume all embedding models perform equally</li>
+                        <li>Use flat/brute-force search in production at scale</li>
+                        <li>Ignore the cost of high-dimensional embeddings</li>
+                        <li>Skip metadata filtering when you have structured attributes</li>
+                        <li>Embed entire documents—use smart chunking</li>
+                        <li>Forget to handle embedding model version changes</li>
+                        <li>Mix embeddings from different models in one index</li>
+                        <li>Assume managed service costs scale linearly</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered vector database operations</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🗄️</div>
+                    <div class="agent-name">VectorOps Agent</div>
+                    <div class="agent-role">Embedding & Search Specialist</div>
+                    <div class="agent-desc">Automates vector database operations including embedding generation, index optimization, query analysis, and performance tuning.</div>
+                    <ul class="agent-capabilities">
+                        <li>Generate and upsert embeddings from documents</li>
+                        <li>Optimize index parameters for recall/latency</li>
+                        <li>Analyze query patterns and suggest improvements</li>
+                        <li>Monitor and alert on search quality metrics</li>
+                        <li>Auto-chunk documents with overlap strategies</li>
+                        <li>Compare embedding models on your data</li>
+                        <li>Manage namespace/collection lifecycle</li>
+                        <li>Generate hybrid search queries</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">RAG Pipeline</div>
+                        <div class="code-tab">Index Optimizer</div>
+                        <div class="code-filename">vector_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># vector_agent.py - Vector Database Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">import</span> openai
+<span class="code-keyword">from</span> pinecone <span class="code-keyword">import</span> Pinecone
+
+<span class="code-keyword">class</span> <span class="code-function">VectorOpsAgent</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, index_name: str):
+        self.pc = Pinecone()
+        self.index = self.pc.Index(index_name)
+        self.embed_model = <span class="code-string">"text-embedding-3-small"</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">embed_and_upsert</span>(self, docs: list, namespace: str):
+        <span class="code-string">"""Embed documents and upsert to vector DB."""</span>
+        chunks = self._chunk_documents(docs)
+        
+        <span class="code-keyword">for</span> batch <span class="code-keyword">in</span> self._batches(chunks, size=100):
+            embeddings = openai.embeddings.create(
+                model=self.embed_model,
+                input=[c[<span class="code-string">"text"</span>] <span class="code-keyword">for</span> c <span class="code-keyword">in</span> batch]
+            )
+            
+            vectors = [{
+                <span class="code-string">"id"</span>: c[<span class="code-string">"id"</span>],
+                <span class="code-string">"values"</span>: e.embedding,
+                <span class="code-string">"metadata"</span>: c[<span class="code-string">"metadata"</span>]
+            } <span class="code-keyword">for</span> c, e <span class="code-keyword">in</span> zip(batch, embeddings.data)]
+            
+            self.index.upsert(vectors, namespace=namespace)
+    
+    <span class="code-keyword">def</span> <span class="code-function">hybrid_search</span>(self, query: str, filter: dict, k: int = 10):
+        <span class="code-string">"""Hybrid search with vector + metadata filtering."""</span>
+        query_vec = self._embed(query)
+        
+        results = self.index.query(
+            vector=query_vec,
+            filter=filter,
+            top_k=k,
+            include_metadata=<span class="code-keyword">True</span>
+        )
+        <span class="code-keyword">return</span> results.matches
+
+<span class="code-comment"># Agent definition</span>
+vector_agent = Agent(
+    role=<span class="code-string">"Vector Database Specialist"</span>,
+    goal=<span class="code-string">"Optimize semantic search and retrieval"</span>,
+    tools=[EmbedTool(), UpsertTool(), SearchTool(), OptimizeTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring knowledge management</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p2-rag-search.html" class="related-card">
+                    <div class="related-num">Page 7.2</div>
+                    <div class="related-title">RAG & Semantic Search</div>
+                    <div class="related-desc">Build retrieval-augmented systems</div>
+                </a>
+                <a href="cat07-p8-platform-comparison.html" class="related-card">
+                    <div class="related-num">Page 7.8</div>
+                    <div class="related-title">Platform Comparison</div>
+                    <div class="related-desc">Compare all KM platforms</div>
+                </a>
+                <a href="cat07-p1-knowledge-graphs.html" class="related-card">
+                    <div class="related-num">Page 7.1</div>
+                    <div class="related-title">Knowledge Graphs</div>
+                    <div class="related-desc">Graph + vector hybrid approaches</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p6-semantic-models.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.6: Semantic Models</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.7 of 8</div>
+        <a href="cat07-p8-platform-comparison.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.8: Platform Comparison</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

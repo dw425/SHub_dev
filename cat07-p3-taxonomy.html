@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxonomy & Ontology | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--purple)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        .overview-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        
+        .vocab-spectrum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .vocab-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; text-align: center; }
+        .vocab-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .vocab-card:nth-child(1)::before { background: var(--green); }
+        .vocab-card:nth-child(2)::before { background: var(--blue); }
+        .vocab-card:nth-child(3)::before { background: var(--purple); }
+        .vocab-card:nth-child(4)::before { background: var(--pink); }
+        .vocab-icon { font-size: 32px; margin-bottom: 12px; }
+        .vocab-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .vocab-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .vocab-example { font-size: 9px; color: var(--text-muted); font-style: italic; }
+        .vocab-complexity { display: flex; gap: 3px; justify-content: center; margin-top: 10px; }
+        .vocab-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-color); }
+        .vocab-dot.active { background: var(--cat-light); }
+        
+        .compare-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .compare-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+        .compare-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .compare-card.taxonomy::before { background: var(--blue); }
+        .compare-card.ontology::before { background: var(--purple); }
+        .compare-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .compare-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .compare-title { font-size: 16px; font-weight: 600; }
+        .compare-subtitle { font-size: 10px; color: var(--text-muted); }
+        .compare-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .compare-features { list-style: none; }
+        .compare-features li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .compare-features li:last-child { border-bottom: none; }
+        .compare-features li::before { content: '✓'; color: var(--green); }
+        
+        .relationship-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .relationship-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .relationship-title { font-size: 13px; font-weight: 600; }
+        .relationship-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .relationship-body { padding: 24px; background: var(--bg-dark); }
+        .rel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .rel-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; }
+        .rel-type { font-size: 12px; font-weight: 600; color: var(--cat-light); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .rel-arrow { font-size: 14px; }
+        .rel-examples { list-style: none; }
+        .rel-examples li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .rel-examples li::before { content: '→'; color: var(--text-muted); font-size: 10px; }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: 24px; background: var(--bg-dark); }
+        
+        .taxonomy-tree { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .taxonomy-branch { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .branch-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+        .branch-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .branch-name { font-size: 14px; font-weight: 600; }
+        .branch-items { list-style: none; }
+        .branch-item { padding: 8px 0 8px 16px; border-left: 2px solid var(--border-color); margin-left: 8px; font-size: 12px; color: var(--text-secondary); transition: all 0.2s; }
+        .branch-item:hover { border-left-color: var(--cat-primary); color: var(--text-primary); }
+        .branch-item.parent { font-weight: 500; color: var(--text-primary); }
+        .branch-subitem { padding-left: 16px; font-size: 11px; color: var(--text-muted); }
+        
+        .design-patterns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .pattern-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .pattern-icon { font-size: 24px; }
+        .pattern-name { font-size: 14px; font-weight: 600; }
+        .pattern-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; background: var(--bg-card-alt); color: var(--text-muted); margin-left: auto; }
+        .pattern-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pattern-when { font-size: 10px; color: var(--green); background: rgba(16,185,129,0.1); padding: 8px 12px; border-radius: 6px; }
+        .pattern-when strong { color: var(--green); }
+        
+        .format-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .format-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .format-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+        .format-name { font-size: 13px; font-weight: 600; }
+        .format-badge { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+        .format-badge.standard { background: var(--blue); color: #fff; }
+        .format-badge.web { background: var(--green); color: #fff; }
+        .format-code { padding: 16px; background: var(--bg-dark); font-family: 'Monaco', 'Consolas', monospace; font-size: 10px; line-height: 1.6; color: var(--text-secondary); overflow-x: auto; white-space: pre; }
+        
+        .industry-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .industry-table th { background: var(--bg-card-alt); padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .industry-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 11px; }
+        .industry-table tr:last-child td { border-bottom: none; }
+        .industry-table tr:hover td { background: var(--bg-hover); }
+        .industry-name { font-weight: 600; color: var(--cat-light); }
+        .industry-standard { font-size: 10px; padding: 2px 8px; background: var(--bg-card-alt); border-radius: 4px; }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card-alt); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 10px; }
+        .tool-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .tool-desc { font-size: 9px; color: var(--text-muted); }
+        
+        .governance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .gov-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .gov-icon { font-size: 28px; margin-bottom: 12px; }
+        .gov-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .gov-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .gov-list { list-style: none; }
+        .gov-list li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .gov-list li::before { content: '•'; color: var(--cat-light); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); margin-bottom: 4px; }
+        .metric-label { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .metric-desc { font-size: 9px; color: var(--text-secondary); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--purple)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .compare-grid, .best-practices, .agent-grid, .format-grid, .design-patterns { grid-template-columns: 1fr; }
+            .tools-grid, .related-pages, .governance-grid, .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .taxonomy-tree, .rel-grid, .vocab-spectrum { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Taxonomy & Ontology</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#spectrum"><span class="nav-icon">📊</span> Vocabulary Spectrum</a></li>
+            <li><a href="#compare"><span class="nav-icon">⚖️</span> Tax vs Ontology</a></li>
+            <li><a href="#relationships"><span class="nav-icon">🔗</span> Relationships</a></li>
+            <li><a href="#hierarchy"><span class="nav-icon">🌳</span> Hierarchy Design</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📐</span> Design Patterns</a></li>
+            <li><a href="#formats"><span class="nav-icon">📋</span> Standards</a></li>
+            <li><a href="#industry"><span class="nav-icon">🏭</span> Industry Standards</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#governance"><span class="nav-icon">👥</span> Governance</a></li>
+            <li><a href="#metrics"><span class="nav-icon">📈</span> Metrics</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html" class="active"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">🏷️ Page 7.3 • Structured Classification</div>
+                <h1>Taxonomy & Ontology</h1>
+                <p>Build structured vocabularies and semantic models that organize knowledge, enable consistent tagging, and power intelligent search and discovery.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">SKOS</div>
+                    <div class="hero-metric-label">Taxonomy Standard</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">OWL</div>
+                    <div class="hero-metric-label">Ontology Lang</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">RDF</div>
+                    <div class="hero-metric-label">Data Model</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">SPARQL</div>
+                    <div class="hero-metric-label">Query Language</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Knowledge Organization</h2>
+                    <p>Why structured vocabularies matter for enterprise knowledge</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Problem of Unstructured Knowledge</h3>
+                <p>Enterprise knowledge without structure becomes an unsearchable swamp. Documents tagged inconsistently ("ML" vs "Machine Learning" vs "machine-learning"), search returning irrelevant results, and users unable to discover related information. The cost is massive: knowledge workers spend <strong>20-30% of their time searching for information</strong>, and 50% of that search time is wasted on failed searches.</p>
+                <p><strong>Taxonomies and ontologies</strong> provide the conceptual scaffolding that makes knowledge findable, consistent, and machine-interpretable. A taxonomy organizes concepts hierarchically: "Technology → Cloud → AWS → Lambda." An ontology goes further, defining properties and relationships: "Lambda is-a Serverless Service, runs-on AWS, supports Python, triggered-by APIGateway."</p>
+                <p>The business value is concrete: <strong>40% improvement in search relevance</strong> with properly applied taxonomies, <strong>60% reduction in tagging inconsistency</strong> with controlled vocabularies, and the foundation for <strong>AI-powered features</strong> like automatic classification, intelligent recommendations, and knowledge graph construction.</p>
+            </div>
+        </section>
+
+        <!-- VOCABULARY SPECTRUM -->
+        <section class="module" id="spectrum">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>The Vocabulary Spectrum</h2>
+                    <p>From simple lists to formal ontologies</p>
+                </div>
+            </div>
+            <div class="vocab-spectrum">
+                <div class="vocab-card">
+                    <div class="vocab-icon">📝</div>
+                    <div class="vocab-name">Controlled Vocabulary</div>
+                    <div class="vocab-desc">A flat list of approved terms. No relationships, just consistency.</div>
+                    <div class="vocab-example">Status: Draft, Review, Published, Archived</div>
+                    <div class="vocab-complexity">
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot"></div>
+                        <div class="vocab-dot"></div>
+                        <div class="vocab-dot"></div>
+                    </div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-icon">🌳</div>
+                    <div class="vocab-name">Taxonomy</div>
+                    <div class="vocab-desc">Hierarchical parent-child relationships. Broader/narrower terms.</div>
+                    <div class="vocab-example">Cloud → AWS → Lambda</div>
+                    <div class="vocab-complexity">
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot"></div>
+                        <div class="vocab-dot"></div>
+                    </div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-icon">🔗</div>
+                    <div class="vocab-name">Thesaurus</div>
+                    <div class="vocab-desc">Adds synonyms, related terms, and scope notes to taxonomy.</div>
+                    <div class="vocab-example">AI = Artificial Intelligence; related: ML, NLP</div>
+                    <div class="vocab-complexity">
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot"></div>
+                    </div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-icon">🕸️</div>
+                    <div class="vocab-name">Ontology</div>
+                    <div class="vocab-desc">Rich relationships, properties, and logical rules for reasoning.</div>
+                    <div class="vocab-example">Lambda runs-on AWS, supports Python</div>
+                    <div class="vocab-complexity">
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                        <div class="vocab-dot active"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The vocabulary spectrum ranges from simple <strong>controlled vocabularies</strong> (flat term lists) to rich <strong>ontologies</strong> (formal knowledge models). Each level adds expressiveness and complexity. Start with what you need—most organizations benefit from taxonomies before investing in full ontologies.</p>
+                <p><strong>Controlled vocabularies</strong> ensure consistency ("Draft" not "draft" or "DRAFT"). <strong>Taxonomies</strong> enable hierarchical navigation and inheritance. <strong>Thesauri</strong> improve search with synonyms and related terms. <strong>Ontologies</strong> enable machine reasoning, inference, and knowledge graph schemas. Match your vocabulary type to your use case: content tagging needs taxonomies, AI applications often need ontologies.</p>
+            </div>
+        </section>
+
+        <!-- TAXONOMY VS ONTOLOGY -->
+        <section class="module" id="compare">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Taxonomy vs Ontology</h2>
+                    <p>Understanding when to use each approach</p>
+                </div>
+            </div>
+            <div class="compare-grid">
+                <div class="compare-card taxonomy">
+                    <div class="compare-header">
+                        <div class="compare-icon" style="background: rgba(59,130,246,0.2);">🌳</div>
+                        <div>
+                            <div class="compare-title">Taxonomy</div>
+                            <div class="compare-subtitle">Hierarchical Classification</div>
+                        </div>
+                    </div>
+                    <div class="compare-desc">A tree-structured vocabulary where concepts are organized by parent-child (broader/narrower) relationships. Focus is on categorization and human navigation.</div>
+                    <ul class="compare-features">
+                        <li>Hierarchical parent-child structure</li>
+                        <li>Broader/narrower term relationships</li>
+                        <li>Designed for human browsing</li>
+                        <li>Simpler to build and maintain</li>
+                        <li>Tags content into categories</li>
+                        <li>Powers faceted search and navigation</li>
+                    </ul>
+                </div>
+                <div class="compare-card ontology">
+                    <div class="compare-header">
+                        <div class="compare-icon" style="background: rgba(139,92,246,0.2);">🕸️</div>
+                        <div>
+                            <div class="compare-title">Ontology</div>
+                            <div class="compare-subtitle">Semantic Knowledge Model</div>
+                        </div>
+                    </div>
+                    <div class="compare-desc">A formal specification of concepts, properties, and relationships with logical rules enabling machine reasoning. Powers knowledge graphs and AI.</div>
+                    <ul class="compare-features">
+                        <li>Rich relationship types (is-a, has-part, uses)</li>
+                        <li>Properties and attributes on concepts</li>
+                        <li>Designed for machine reasoning</li>
+                        <li>Enables inference and validation</li>
+                        <li>Forms knowledge graph schema</li>
+                        <li>Supports SPARQL queries and reasoning</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The choice between taxonomy and ontology depends on your use case. <strong>Taxonomies excel</strong> at content classification, website navigation, and search facets—anywhere humans need to browse or filter. They're faster to build (weeks vs. months), easier to maintain, and sufficient for most content management needs.</p>
+                <p><strong>Ontologies are essential</strong> when you need machine reasoning: inferring that if "Alice manages Bob" and "Bob manages Carol," then Alice is in Carol's management chain. They power knowledge graphs, enable semantic search beyond keywords, and provide schemas for graph databases like Neo4j. Many organizations start with taxonomies and <strong>evolve toward ontologies</strong> as their knowledge management matures and AI use cases emerge.</p>
+            </div>
+        </section>
+
+        <!-- RELATIONSHIP TYPES -->
+        <section class="module" id="relationships">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Relationship Types</h2>
+                    <p>How concepts connect to each other</p>
+                </div>
+            </div>
+            <div class="relationship-viz">
+                <div class="relationship-header">
+                    <div class="relationship-title">📊 Common Relationship Types</div>
+                    <div class="relationship-badge">9 Types</div>
+                </div>
+                <div class="relationship-body">
+                    <div class="rel-grid">
+                        <div class="rel-card">
+                            <div class="rel-type"><span class="rel-arrow">↑</span> Hierarchical</div>
+                            <ul class="rel-examples">
+                                <li>broader / narrower (parent-child)</li>
+                                <li>is-a / subclass-of</li>
+                                <li>part-of / has-part</li>
+                            </ul>
+                        </div>
+                        <div class="rel-card">
+                            <div class="rel-type"><span class="rel-arrow">↔</span> Associative</div>
+                            <ul class="rel-examples">
+                                <li>related-to (symmetric)</li>
+                                <li>see-also (cross-reference)</li>
+                                <li>similar-to (near-synonyms)</li>
+                            </ul>
+                        </div>
+                        <div class="rel-card">
+                            <div class="rel-type"><span class="rel-arrow">→</span> Semantic</div>
+                            <ul class="rel-examples">
+                                <li>uses / used-by</li>
+                                <li>creates / created-by</li>
+                                <li>depends-on / enables</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Hierarchical relationships</strong> form the backbone of taxonomies: broader/narrower (SKOS) or subclass-of (OWL). Part-whole relationships (meronymy) model compositions: "Wheel part-of Car." These enable inheritance—tagging content with "Lambda" implicitly includes "AWS" and "Cloud."</p>
+                <p><strong>Associative relationships</strong> connect concepts that aren't hierarchically related but are meaningfully linked: "Python related-to Data Science." These improve search: querying "Python" also surfaces relevant "Pandas" and "NumPy" content. <strong>Semantic relationships</strong> are the power of ontologies: domain-specific predicates like "authored-by," "runs-on," or "depends-on" that enable precise queries and reasoning.</p>
+            </div>
+        </section>
+
+        <!-- HIERARCHY DESIGN -->
+        <section class="module" id="hierarchy">
+            <div class="module-header">
+                <div class="module-icon">🌳</div>
+                <div class="module-info">
+                    <h2>Taxonomy Hierarchy Design</h2>
+                    <p>Example enterprise taxonomy structure</p>
+                </div>
+            </div>
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Enterprise Knowledge Taxonomy</div>
+                    <div class="viz-badge">Faceted Design</div>
+                </div>
+                <div class="viz-canvas">
+                    <div class="taxonomy-tree">
+                        <div class="taxonomy-branch">
+                            <div class="branch-header">
+                                <div class="branch-icon" style="background: rgba(59,130,246,0.2);">💻</div>
+                                <div class="branch-name">Technology</div>
+                            </div>
+                            <ul class="branch-items">
+                                <li class="branch-item parent">Cloud Platforms</li>
+                                <li class="branch-item branch-subitem">AWS</li>
+                                <li class="branch-item branch-subitem">Azure</li>
+                                <li class="branch-item branch-subitem">GCP</li>
+                                <li class="branch-item parent">Data & Analytics</li>
+                                <li class="branch-item branch-subitem">Databricks</li>
+                                <li class="branch-item branch-subitem">Snowflake</li>
+                                <li class="branch-item parent">AI/ML</li>
+                                <li class="branch-item branch-subitem">LLMs</li>
+                                <li class="branch-item branch-subitem">MLOps</li>
+                            </ul>
+                        </div>
+                        <div class="taxonomy-branch">
+                            <div class="branch-header">
+                                <div class="branch-icon" style="background: rgba(16,185,129,0.2);">🏢</div>
+                                <div class="branch-name">Business Functions</div>
+                            </div>
+                            <ul class="branch-items">
+                                <li class="branch-item parent">Engineering</li>
+                                <li class="branch-item branch-subitem">Backend</li>
+                                <li class="branch-item branch-subitem">Frontend</li>
+                                <li class="branch-item branch-subitem">Platform</li>
+                                <li class="branch-item parent">Operations</li>
+                                <li class="branch-item branch-subitem">DevOps</li>
+                                <li class="branch-item branch-subitem">SRE</li>
+                                <li class="branch-item parent">Security</li>
+                                <li class="branch-item branch-subitem">AppSec</li>
+                                <li class="branch-item branch-subitem">Compliance</li>
+                            </ul>
+                        </div>
+                        <div class="taxonomy-branch">
+                            <div class="branch-header">
+                                <div class="branch-icon" style="background: rgba(245,158,11,0.2);">📄</div>
+                                <div class="branch-name">Content Types</div>
+                            </div>
+                            <ul class="branch-items">
+                                <li class="branch-item parent">Documentation</li>
+                                <li class="branch-item branch-subitem">How-To Guides</li>
+                                <li class="branch-item branch-subitem">Reference</li>
+                                <li class="branch-item branch-subitem">Tutorials</li>
+                                <li class="branch-item parent">Decisions</li>
+                                <li class="branch-item branch-subitem">ADRs</li>
+                                <li class="branch-item branch-subitem">RFCs</li>
+                                <li class="branch-item parent">Templates</li>
+                                <li class="branch-item branch-subitem">Project Plans</li>
+                                <li class="branch-item branch-subitem">Runbooks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Effective taxonomies balance <strong>depth vs. breadth</strong>: too shallow and categories become meaningless catch-alls, too deep and navigation becomes tedious. A good rule of thumb is <strong>3-5 levels maximum</strong>, with <strong>5-10 children per parent</strong> node. The example above shows a three-facet taxonomy: Technology (what it's about), Business Function (who it's for), and Content Type (what kind of document).</p>
+                <p><strong>Faceted taxonomies</strong> allow content to be classified on multiple dimensions simultaneously—a document can be tagged "AWS + DevOps + How-To Guide." This enables powerful filtering: "Show me all How-To Guides for the Platform team about AWS." The alternative, <strong>polyhierarchy</strong>, allows concepts to have multiple parents (Lambda appears under both "Serverless" and "AWS Services"), but this complicates maintenance and can confuse users.</p>
+            </div>
+        </section>
+
+        <!-- DESIGN PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📐</div>
+                <div class="module-info">
+                    <h2>Taxonomy Design Patterns</h2>
+                    <p>Proven approaches for common scenarios</p>
+                </div>
+            </div>
+            <div class="design-patterns">
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🎯</div>
+                        <div class="pattern-name">Single Hierarchy</div>
+                        <div class="pattern-badge">Simple</div>
+                    </div>
+                    <div class="pattern-desc">One tree structure where each concept has exactly one parent. Clean and simple but may force awkward placements.</div>
+                    <div class="pattern-when"><strong>Use when:</strong> Domain is naturally hierarchical, users need simple navigation, maintenance resources are limited.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🔷</div>
+                        <div class="pattern-name">Faceted Classification</div>
+                        <div class="pattern-badge">Recommended</div>
+                    </div>
+                    <div class="pattern-desc">Multiple independent dimensions (facets) that can be combined. Content tagged on each facet separately.</div>
+                    <div class="pattern-when"><strong>Use when:</strong> Content has multiple attributes, users filter by different criteria, flexibility is needed.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🕸️</div>
+                        <div class="pattern-name">Polyhierarchy</div>
+                        <div class="pattern-badge">Complex</div>
+                    </div>
+                    <div class="pattern-desc">Concepts can have multiple parents. "Lambda" appears under both "Serverless" and "AWS Services."</div>
+                    <div class="pattern-when"><strong>Use when:</strong> Concepts genuinely belong in multiple places, users expect to find items via different paths.</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-header">
+                        <div class="pattern-icon">🏷️</div>
+                        <div class="pattern-name">Hybrid Tagging</div>
+                        <div class="pattern-badge">Flexible</div>
+                    </div>
+                    <div class="pattern-desc">Core taxonomy plus free-form tags. Structured categories for navigation, tags for emerging concepts.</div>
+                    <div class="pattern-when"><strong>Use when:</strong> Domain evolves rapidly, user-generated content exists, you need balance of control and flexibility.</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Faceted classification</strong> is generally the recommended pattern for enterprise taxonomies. It provides the structure needed for consistent navigation while accommodating content that spans multiple categories. Each facet answers a different question: What technology? For which team? What document type? What lifecycle stage?</p>
+                <p><strong>Hybrid approaches</strong> work well when combining curated taxonomies with organic growth. The core taxonomy (managed by governance) provides stability, while free tags allow users to add emerging concepts. Regularly review popular tags for promotion into the formal taxonomy. This pattern balances <strong>control</strong> (consistency, quality) with <strong>agility</strong> (capturing new concepts quickly).</p>
+            </div>
+        </section>
+
+        <!-- STANDARDS & FORMATS -->
+        <section class="module" id="formats">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Standards & Formats</h2>
+                    <p>Industry standards for taxonomies and ontologies</p>
+                </div>
+            </div>
+            <div class="format-grid">
+                <div class="format-card">
+                    <div class="format-header">
+                        <div class="format-name">SKOS (Taxonomies)</div>
+                        <div class="format-badge standard">W3C Standard</div>
+                    </div>
+                    <div class="format-code">@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+
+:CloudPlatforms a skos:Concept ;
+    skos:prefLabel "Cloud Platforms"@en ;
+    skos:altLabel "Cloud Computing"@en ;
+    skos:narrower :AWS, :Azure, :GCP ;
+    skos:broader :Technology ;
+    skos:scopeNote "Infrastructure and services 
+        delivered over the internet"@en .
+
+:AWS a skos:Concept ;
+    skos:prefLabel "Amazon Web Services"@en ;
+    skos:altLabel "AWS"@en ;
+    skos:related :Serverless ;
+    skos:definition "Amazon's cloud platform"@en .</div>
+                </div>
+                <div class="format-card">
+                    <div class="format-header">
+                        <div class="format-name">OWL (Ontologies)</div>
+                        <div class="format-badge web">Semantic Web</div>
+                    </div>
+                    <div class="format-code">@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+
+:CloudService a owl:Class ;
+    rdfs:subClassOf :Technology ;
+    rdfs:label "Cloud Service"@en .
+
+:ServerlessService a owl:Class ;
+    rdfs:subClassOf :CloudService .
+
+:providedBy a owl:ObjectProperty ;
+    rdfs:domain :CloudService ;
+    rdfs:range :CloudProvider .
+
+:Lambda a :ServerlessService ;
+    :providedBy :AWS ;
+    :supportsLanguage :Python, :NodeJS .</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>SKOS (Simple Knowledge Organization System)</strong> is the W3C standard for representing taxonomies, thesauri, and controlled vocabularies. It defines relationships like <code>broader</code>, <code>narrower</code>, and <code>related</code>, plus labels (<code>prefLabel</code>, <code>altLabel</code>) and documentation (<code>scopeNote</code>, <code>definition</code>). SKOS is widely supported by content management systems and semantic web tools.</p>
+                <p><strong>OWL (Web Ontology Language)</strong> enables full ontological modeling with classes, properties, individuals, and logical axioms. OWL supports reasoning: define that "every Manager supervises at least one Employee," and a reasoner validates your data. OWL 2 profiles (EL, QL, RL) offer different trade-offs between expressiveness and computational complexity. <strong>RDF (Resource Description Framework)</strong> provides the underlying data model—everything is subject-predicate-object triples.</p>
+            </div>
+        </section>
+
+        <!-- INDUSTRY STANDARDS -->
+        <section class="module" id="industry">
+            <div class="module-header">
+                <div class="module-icon">🏭</div>
+                <div class="module-info">
+                    <h2>Industry Standards</h2>
+                    <p>Domain-specific vocabularies and schemas</p>
+                </div>
+            </div>
+            <table class="industry-table">
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Standard</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="industry-name">General</span></td>
+                        <td><span class="industry-standard">Schema.org</span></td>
+                        <td>Vocabulary for structured data on the web</td>
+                        <td>SEO, rich snippets, web content markup</td>
+                    </tr>
+                    <tr>
+                        <td><span class="industry-name">Content</span></td>
+                        <td><span class="industry-standard">Dublin Core</span></td>
+                        <td>Metadata terms for describing resources</td>
+                        <td>Document metadata, library cataloging</td>
+                    </tr>
+                    <tr>
+                        <td><span class="industry-name">Healthcare</span></td>
+                        <td><span class="industry-standard">SNOMED CT</span></td>
+                        <td>Clinical terminology for health records</td>
+                        <td>EHR systems, clinical decision support</td>
+                    </tr>
+                    <tr>
+                        <td><span class="industry-name">Finance</span></td>
+                        <td><span class="industry-standard">FIBO</span></td>
+                        <td>Financial Industry Business Ontology</td>
+                        <td>Regulatory reporting, data integration</td>
+                    </tr>
+                    <tr>
+                        <td><span class="industry-name">E-commerce</span></td>
+                        <td><span class="industry-standard">GS1</span></td>
+                        <td>Global product classification standards</td>
+                        <td>Product catalogs, supply chain</td>
+                    </tr>
+                    <tr>
+                        <td><span class="industry-name">Science</span></td>
+                        <td><span class="industry-standard">Gene Ontology</span></td>
+                        <td>Biological process and function terms</td>
+                        <td>Genomics research, bioinformatics</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Industry standards</strong> provide pre-built vocabularies for common domains, saving months of taxonomy development. <strong>Schema.org</strong> is essential for any web-facing content—search engines use it for rich snippets and knowledge panels. <strong>Dublin Core</strong> provides basic metadata terms (title, creator, date, subject) used across libraries, archives, and content management systems.</p>
+                <p>Regulated industries often require specific standards: <strong>SNOMED CT</strong> for healthcare interoperability, <strong>FIBO</strong> for financial regulatory compliance. Before building custom taxonomies, check if industry standards exist—you can extend them with organization-specific terms rather than starting from scratch. This improves interoperability with partners and reduces maintenance burden.</p>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Software for building and managing taxonomies</p>
+                </div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-logo">🦉</div>
+                    <div class="tool-name">Protégé</div>
+                    <div class="tool-desc">OWL ontology editor</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">📊</div>
+                    <div class="tool-name">TopBraid</div>
+                    <div class="tool-desc">Enterprise taxonomy</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🏷️</div>
+                    <div class="tool-name">PoolParty</div>
+                    <div class="tool-desc">SKOS management</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🔷</div>
+                    <div class="tool-name">Synaptica</div>
+                    <div class="tool-desc">Taxonomy software</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">📝</div>
+                    <div class="tool-name">VocBench</div>
+                    <div class="tool-desc">Open-source SKOS</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🌐</div>
+                    <div class="tool-name">Semaphore</div>
+                    <div class="tool-desc">Smart data platform</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🐍</div>
+                    <div class="tool-name">RDFLib</div>
+                    <div class="tool-desc">Python RDF library</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">☕</div>
+                    <div class="tool-name">Apache Jena</div>
+                    <div class="tool-desc">Java RDF framework</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Protégé</strong> is the gold standard open-source ontology editor, developed by Stanford. It supports OWL 2, includes reasoners (HermiT, Pellet) for validation and inference, and has a large plugin ecosystem. For pure taxonomy work, it's more complex than needed, but essential for ontology development.</p>
+                <p>For enterprise taxonomy management, commercial tools like <strong>TopBraid</strong>, <strong>PoolParty</strong>, and <strong>Synaptica</strong> offer collaborative editing, approval workflows, version control, and integration with content systems (SharePoint, Drupal, AEM). <strong>VocBench</strong> is a capable open-source alternative, particularly strong for SKOS and multilingual support. For programmatic access, <strong>RDFLib</strong> (Python) and <strong>Apache Jena</strong> (Java) provide APIs for creating, querying, and reasoning over RDF/OWL data.</p>
+            </div>
+        </section>
+
+        <!-- GOVERNANCE -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Governance & Maintenance</h2>
+                    <p>Sustaining taxonomy quality over time</p>
+                </div>
+            </div>
+            <div class="governance-grid">
+                <div class="gov-card">
+                    <div class="gov-icon">👤</div>
+                    <div class="gov-title">Ownership</div>
+                    <div class="gov-desc">Define who owns the taxonomy and who can modify it.</div>
+                    <ul class="gov-list">
+                        <li>Taxonomy Manager (full control)</li>
+                        <li>Domain Stewards (branch owners)</li>
+                        <li>Contributors (propose changes)</li>
+                        <li>Consumers (read-only access)</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">🔄</div>
+                    <div class="gov-title">Change Process</div>
+                    <div class="gov-desc">Workflow for proposing and approving modifications.</div>
+                    <ul class="gov-list">
+                        <li>Request submission form</li>
+                        <li>Impact assessment</li>
+                        <li>Steward review and approval</li>
+                        <li>Scheduled release cycles</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">📅</div>
+                    <div class="gov-title">Review Cadence</div>
+                    <div class="gov-desc">Regular audits to maintain quality and relevance.</div>
+                    <ul class="gov-list">
+                        <li>Quarterly usage analysis</li>
+                        <li>Annual comprehensive review</li>
+                        <li>Retire unused terms</li>
+                        <li>Promote popular tags</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Taxonomies without governance decay rapidly. Terms proliferate without oversight, synonyms appear as duplicates, and the structure becomes inconsistent. Establish a <strong>taxonomy governance board</strong> with representatives from major content domains; they review proposed changes, resolve conflicts, and ensure consistency.</p>
+                <p>Implement a <strong>change management process</strong>: users submit term requests through a form, stewards assess impact (what content uses related terms? what systems integrate with this branch?), and approved changes are batched into scheduled releases. <strong>Version control</strong> your taxonomy like code—track changes, maintain history, and enable rollback. Tools like PoolParty and TopBraid provide built-in workflow and versioning.</p>
+            </div>
+        </section>
+
+        <!-- METRICS -->
+        <section class="module" id="metrics">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Measuring Success</h2>
+                    <p>Key metrics for taxonomy effectiveness</p>
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">95%</div>
+                    <div class="metric-label">Tagging Consistency</div>
+                    <div class="metric-desc">Same content tagged identically by different people</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">80%</div>
+                    <div class="metric-label">Term Coverage</div>
+                    <div class="metric-desc">% of content with at least one taxonomy tag</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">&lt;5%</div>
+                    <div class="metric-label">Orphan Rate</div>
+                    <div class="metric-desc">Terms with no content or child terms</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">40%↑</div>
+                    <div class="metric-label">Search Success</div>
+                    <div class="metric-desc">Improvement in relevant search results</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Tagging consistency</strong> measures whether different people classify the same content identically—low consistency indicates unclear term definitions or overlapping categories. <strong>Term coverage</strong> tracks adoption: high-quality taxonomies are useless if content isn't tagged. Monitor both metrics regularly.</p>
+                <p><strong>Orphan rate</strong> identifies maintenance needs: terms with no associated content should be reviewed for removal or consolidation. <strong>Search success rate</strong> is the ultimate outcome metric—are users finding what they need? Track click-through on search results, failed searches (queries with no clicks), and time-to-find metrics. Compare before/after taxonomy implementation to demonstrate ROI.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective taxonomy design</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with user needs: how do people actually search and browse?</li>
+                        <li>Use clear, unambiguous term names (avoid jargon and acronyms)</li>
+                        <li>Provide synonyms and alternative labels for discovery</li>
+                        <li>Limit hierarchy depth to 3-5 levels maximum</li>
+                        <li>Include scope notes explaining when to use each term</li>
+                        <li>Plan for governance: who can add/modify terms?</li>
+                        <li>Test with real users through card sorting exercises</li>
+                        <li>Version control and track all changes</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Create overlapping categories with unclear boundaries</li>
+                        <li>Design in isolation from actual content and users</li>
+                        <li>Let the taxonomy grow without periodic review and pruning</li>
+                        <li>Use compound terms when simpler facets would work</li>
+                        <li>Neglect maintenance—stale taxonomies lose trust</li>
+                        <li>Over-engineer: start simple, evolve based on needs</li>
+                        <li>Mix classification logic within a single facet</li>
+                        <li>Ignore orphaned terms that accumulate over time</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Taxonomy design is as much <strong>organizational change</strong> as technical work. Success requires stakeholder buy-in, clear ownership, and ongoing governance. The most beautiful taxonomy is worthless if nobody uses it—invest in training, integration with content systems, and visible quick wins.</p>
+                <p><strong>User testing</strong> is essential: watch real users try to find content with your taxonomy. Where do they get stuck? What terms do they expect that don't exist? Card sorting exercises—having users group sample content into categories—reveal natural mental models that should inform your structure. Remember: <strong>the taxonomy exists to serve users, not the other way around</strong>.</p>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered taxonomy management</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🏷️</div>
+                    <div class="agent-name">TaxonomyAgent</div>
+                    <div class="agent-role">Classification & Ontology Specialist</div>
+                    <div class="agent-desc">Expert in taxonomy design, automatic classification, and ontology construction. Analyzes content to suggest categories, identifies gaps, and maintains vocabulary consistency.</div>
+                    <ul class="agent-capabilities">
+                        <li>Auto-classify documents into taxonomy categories</li>
+                        <li>Suggest new terms based on content analysis</li>
+                        <li>Identify taxonomy gaps and overlaps</li>
+                        <li>Generate SKOS/OWL from natural language</li>
+                        <li>Map between different taxonomies</li>
+                        <li>Validate ontology consistency with reasoners</li>
+                        <li>Recommend term deprecation based on usage</li>
+                        <li>Extract entities and relationships for ontology</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Auto-Classifier</div>
+                        <div class="code-tab">SKOS Generator</div>
+                        <div class="code-filename">taxonomy_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># taxonomy_agent.py - Taxonomy Management Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> rdflib <span class="code-keyword">import</span> Graph, Namespace, Literal
+<span class="code-keyword">from</span> rdflib.namespace <span class="code-keyword">import</span> SKOS, RDF
+
+<span class="code-keyword">class</span> <span class="code-function">TaxonomyClassifier</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, taxonomy_path: str):
+        self.graph = Graph()
+        self.graph.parse(taxonomy_path, format=<span class="code-string">"turtle"</span>)
+        self.concepts = self._load_concepts()
+    
+    <span class="code-keyword">def</span> <span class="code-function">classify</span>(self, document: str) -> list:
+        <span class="code-string">"""Auto-classify document into taxonomy."""</span>
+        prompt = <span class="code-string">f"""Classify this document:
+
+Taxonomy concepts: {self.concepts}
+Document: {document[:2000]}
+
+Return top 3 matching concepts with confidence:
+[{{"uri": "...", "label": "...", "confidence": 0.0-1.0}}]"""</span>
+        
+        result = llm.invoke(prompt)
+        <span class="code-keyword">return</span> self._parse_classifications(result)
+    
+    <span class="code-keyword">def</span> <span class="code-function">suggest_terms</span>(self, documents: list) -> list:
+        <span class="code-string">"""Analyze content for taxonomy gaps."""</span>
+        <span class="code-comment"># Extract key concepts from documents</span>
+        <span class="code-comment"># Compare against existing taxonomy</span>
+        <span class="code-comment"># Return suggested new terms with placement</span>
+        <span class="code-keyword">pass</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">generate_skos</span>(self, description: str) -> str:
+        <span class="code-string">"""Generate SKOS from natural language."""</span>
+        prompt = <span class="code-string">f"""Convert to SKOS Turtle:
+{description}
+
+Include prefLabel, altLabel, broader, definition."""</span>
+        <span class="code-keyword">return</span> llm.invoke(prompt)
+
+<span class="code-comment"># Agent definition</span>
+taxonomy_agent = Agent(
+    role=<span class="code-string">"Taxonomy Specialist"</span>,
+    goal=<span class="code-string">"Maintain consistent classification"</span>,
+    tools=[ClassifierTool(), SKOSGeneratorTool(), 
+           GapAnalyzerTool(), OntologyValidatorTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p1-knowledge-graphs.html" class="related-card">
+                    <div class="related-num">Page 7.1</div>
+                    <div class="related-title">Knowledge Graphs</div>
+                    <div class="related-desc">Ontologies power graph schemas</div>
+                </a>
+                <a href="cat07-p6-semantic-models.html" class="related-card">
+                    <div class="related-num">Page 7.6</div>
+                    <div class="related-title">Semantic Models</div>
+                    <div class="related-desc">Data meaning layers</div>
+                </a>
+                <a href="cat07-p4-content-lifecycle.html" class="related-card">
+                    <div class="related-num">Page 7.4</div>
+                    <div class="related-title">Content Lifecycle</div>
+                    <div class="related-desc">Taxonomy-driven organization</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p2-rag-search.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.2: RAG & Semantic Search</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.3 of 8</div>
+        <a href="cat07-p4-content-lifecycle.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.4: Content Lifecycle</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

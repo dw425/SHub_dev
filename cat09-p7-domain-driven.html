@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain-Driven Design | Architecture Patterns | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --page-color: #EC4899;
+            --page-light: #F472B6;
+            --page-glow: rgba(236, 72, 153, 0.15);
+            --cat-light: #818CF8;
+            --cat-glow: rgba(99, 102, 241, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        .hero { margin-bottom: 28px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #EC4899, #8B5CF6, #06B6D4); border-radius: 14px 14px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-color); padding: 5px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 14px; }
+        .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+        .hero > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 800px; margin-bottom: 24px; }
+        .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .hero-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .hero-stat-value { font-size: 22px; font-weight: 700; color: var(--page-light); }
+        .hero-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .business-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .business-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .business-icon { font-size: 28px; margin-bottom: 8px; }
+        .business-stat { font-size: 28px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .business-label { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .business-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        .ddd-layers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .ddd-layer { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .ddd-layer.strategic { border-top: 4px solid #EC4899; }
+        .ddd-layer.tactical { border-top: 4px solid #8B5CF6; }
+        .layer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .layer-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .ddd-layer.strategic .layer-icon { background: rgba(236, 72, 153, 0.2); }
+        .ddd-layer.tactical .layer-icon { background: rgba(139, 92, 246, 0.2); }
+        .layer-title h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .ddd-layer.strategic .layer-title h3 { color: #F472B6; }
+        .ddd-layer.tactical .layer-title h3 { color: #A78BFA; }
+        .layer-title .tagline { font-size: 11px; color: var(--text-muted); }
+        .layer-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .layer-concepts { display: flex; flex-wrap: wrap; gap: 8px; }
+        .concept-tag { font-size: 11px; padding: 6px 12px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); }
+        .architecture-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .arch-svg { width: 100%; height: auto; }
+        .concepts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .concept-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .concept-emoji { font-size: 24px; }
+        .concept-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .concept-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .code-block { background: var(--bg-dark); border-radius: 8px; padding: 16px; margin-bottom: 16px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; overflow-x: auto; }
+        .code-block .comment { color: #6A737D; }
+        .code-block .keyword { color: #FF7B72; }
+        .code-block .class { color: #F59E0B; }
+        .module { margin-bottom: 40px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .module-info h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+        .content-block { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .content-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: var(--page-light); }
+        .content-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .content-block p:last-child { margin-bottom: 0; }
+        .content-block p strong { color: var(--text-primary); }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .info-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .info-box h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .info-box h4::before { content: ''; width: 3px; height: 16px; background: var(--page-color); border-radius: 2px; }
+        .info-list { list-style: none; margin: 0; padding: 0; }
+        .info-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li strong { color: var(--text-primary); }
+        .bp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+        .bp-card { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .bp-card.do { border: 1px solid var(--green); }
+        .bp-card.dont { border: 1px solid var(--red); }
+        .bp-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .bp-card.do .bp-title { color: var(--green); }
+        .bp-card.dont .bp-title { color: var(--red); }
+        .bp-list { list-style: none; margin: 0; padding: 0; }
+        .bp-list li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: flex-start; gap: 10px; }
+        .bp-list li .icon { flex-shrink: 0; }
+        .bp-card.do .bp-list li .icon { color: var(--green); }
+        .bp-card.dont .bp-list li .icon { color: var(--red); }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 24px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, #EC4899, #8B5CF6); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-caps { list-style: none; margin: 0; padding: 0; }
+        .agent-caps li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+        .agent-caps li .icon { color: var(--page-light); }
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-tab { font-size: 12px; font-weight: 600; color: var(--page-light); }
+        .code-filename { font-size: 11px; color: var(--text-muted); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; line-height: 1.7; overflow-x: auto; }
+        .code-content pre { color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-decoration: none; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-color); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-color); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* Deep Dive Architecture Cards */
+        .arch-deep-dive { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 24px; overflow: hidden; }
+        .deep-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; }
+        .deep-header.ddd-main { background: linear-gradient(90deg, rgba(236, 72, 153, 0.15), transparent); border-bottom: 3px solid #EC4899; }
+        .deep-header.strategic { background: linear-gradient(90deg, rgba(236, 72, 153, 0.1), transparent); border-bottom: 3px solid #F472B6; }
+        .deep-header.tactical-dd { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent); border-bottom: 3px solid #8B5CF6; }
+        .deep-icon { font-size: 32px; }
+        .deep-title h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: var(--page-light); }
+        .deep-era { font-size: 11px; color: var(--text-muted); background: var(--bg-dark); padding: 2px 8px; border-radius: 4px; }
+        .deep-content { padding: 24px; }
+        .deep-definition { background: var(--bg-dark); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .deep-definition p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+        .deep-definition p strong { color: var(--text-primary); }
+        .deep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .deep-box { background: var(--bg-dark); border-radius: 8px; padding: 16px; }
+        .deep-box h4 { font-size: 13px; font-weight: 600; color: var(--page-light); margin-bottom: 12px; }
+        .deep-box ul { list-style: none; margin: 0; padding: 0; }
+        .deep-box li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .deep-box li:last-child { border-bottom: none; }
+        .deep-box li strong { color: var(--text-primary); }
+        .deep-tradeoffs { display: flex; flex-direction: column; gap: 8px; }
+        .tradeoff { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; padding: 10px; border-radius: 6px; }
+        .tradeoff.pro { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+        .tradeoff.con { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+        .tradeoff-icon { font-weight: 700; flex-shrink: 0; }
+
+        /* Context Example */
+        .context-example { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; padding: 20px; background: var(--bg-dark); border-radius: 8px; }
+        .context-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; min-width: 180px; }
+        .context-box.sales { border-top: 3px solid #10B981; }
+        .context-box.shipping { border-top: 3px solid #3B82F6; }
+        .context-box.billing { border-top: 3px solid #F59E0B; }
+        .context-box h5 { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .context-model { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .context-box ul { list-style: none; margin: 0; padding: 0; }
+        .context-box li { font-size: 10px; color: var(--text-secondary); padding: 3px 0; font-family: monospace; }
+        .context-arrow { font-size: 20px; color: var(--text-muted); }
+
+        /* Aggregate Diagram */
+        .aggregate-diagram { background: var(--bg-dark); border-radius: 8px; padding: 16px; }
+        .agg-svg { width: 100%; height: auto; }
+
+        /* Comparison Table */
+        .compare-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .compare-header { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; background: var(--bg-card-alt); padding: 16px; border-bottom: 1px solid var(--border-color); }
+        .compare-col { font-size: 12px; text-align: center; font-weight: 600; }
+        .compare-col.crud { color: #6a6a7a; }
+        .compare-col.active { color: #3B82F6; }
+        .compare-col.ddd-col { color: #EC4899; }
+        .compare-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; padding: 14px 16px; border-bottom: 1px solid var(--border-color); align-items: center; }
+        .compare-row:last-child { border-bottom: none; }
+        .compare-row .compare-col:first-child { text-align: left; font-weight: 600; font-size: 12px; color: var(--text-primary); }
+        .compare-cell { text-align: center; font-size: 11px; color: var(--text-secondary); }
+        .cell-good { color: var(--green); }
+        .cell-bad { color: var(--red); }
+        .cell-mid { color: var(--yellow); }
+
+        /* Decision Grid */
+        .decision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .decision-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .decision-card.strategic-dec { border-top: 4px solid #EC4899; }
+        .decision-card.tactical-dec { border-top: 4px solid #8B5CF6; }
+        .decision-card.skip-strategic { border-top: 4px solid #6a6a7a; }
+        .decision-card.skip-tactical { border-top: 4px solid #6a6a7a; }
+        .decision-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .decision-icon { font-size: 24px; }
+        .decision-header h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0; }
+        .decision-list { list-style: none; margin: 0 0 16px 0; padding: 0; }
+        .decision-list li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; line-height: 1.5; }
+        .decision-example { background: var(--bg-dark); border-radius: 6px; padding: 12px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+        .decision-example strong { color: var(--text-secondary); }
+
+        /* Decision Flowchart */
+        .decision-flowchart { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .decision-flowchart h4 { font-size: 14px; font-weight: 600; color: var(--page-light); margin-bottom: 16px; text-align: center; }
+        .flowchart-content { text-align: center; }
+        .flow-question { font-size: 14px; color: var(--text-primary); font-weight: 600; margin-bottom: 20px; padding: 16px; background: var(--bg-dark); border-radius: 8px; }
+        .flow-branches { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .flow-branch { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .flow-answer { font-size: 10px; padding: 6px 12px; border-radius: 4px; background: rgba(107, 114, 128, 0.2); color: var(--text-secondary); }
+        .flow-answer.yes { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .flow-answer.no { background: rgba(107, 114, 128, 0.2); color: var(--text-secondary); }
+        .flow-result { font-size: 11px; font-weight: 600; padding: 8px 16px; border-radius: 6px; }
+        .flow-result.ddd-r { background: rgba(236, 72, 153, 0.2); color: #EC4899; }
+        .flow-result.strategic-r { background: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+        .flow-result.crud-r { background: rgba(107, 114, 128, 0.2); color: #6a6a7a; }
+
+        /* Evolution Timeline */
+        .evolution-timeline { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .evolution-svg { width: 100%; height: auto; }
+        .evolution-details { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .evo-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; position: relative; }
+        .evo-num { position: absolute; top: -10px; left: 16px; width: 24px; height: 24px; background: var(--page-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .evo-card h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; margin-top: 8px; }
+        .evo-card p { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+        .evo-card p strong { color: var(--page-light); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-stats, .business-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col, .bp-grid, .agent-grid, .ddd-layers, .decision-grid { grid-template-columns: 1fr; }
+            .related-grid, .concepts-grid { grid-template-columns: 1fr; }
+            .deep-grid { grid-template-columns: 1fr; }
+            .evolution-details { grid-template-columns: repeat(2, 1fr); }
+            .compare-header, .compare-row { grid-template-columns: 1fr; gap: 8px; }
+            .compare-col { text-align: left; padding: 4px 0; }
+            .context-example { flex-direction: column; }
+            .context-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat09-architecture-overview.html">Architecture Patterns</a>
+        <span class="sep">/</span>
+        <span class="current">Domain-Driven Design</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Category 09</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat09-architecture-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat09-p1-microservices.html"><span class="nav-icon">🔲</span> 9.1 Microservices</a></li>
+            <li><a href="cat09-p2-event-driven.html"><span class="nav-icon">⚡</span> 9.2 Event-Driven</a></li>
+            <li><a href="cat09-p3-data-mesh.html"><span class="nav-icon">🕸️</span> 9.3 Data Mesh</a></li>
+            <li><a href="cat09-p4-lakehouse.html"><span class="nav-icon">🏠</span> 9.4 Data Lakehouse</a></li>
+            <li><a href="cat09-p5-api-patterns.html"><span class="nav-icon">🔌</span> 9.5 API Patterns</a></li>
+            <li><a href="cat09-p6-cqrs-eventsourcing.html"><span class="nav-icon">📚</span> 9.6 CQRS & ES</a></li>
+            <li><a href="cat09-p7-domain-driven.html" class="active"><span class="nav-icon">🎯</span> 9.7 DDD</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#business-case"><span class="nav-icon">💼</span> Business Case</a></li>
+            <li><a href="#layers"><span class="nav-icon">🏗️</span> Strategic & Tactical</a></li>
+            <li><a href="#strategic"><span class="nav-icon">🗺️</span> Strategic DDD</a></li>
+            <li><a href="#tactical"><span class="nav-icon">🔧</span> Tactical DDD</a></li>
+            <li><a href="#deep-dive"><span class="nav-icon">🔍</span> Deep Dive</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Comparison</a></li>
+            <li><a href="#decision"><span class="nav-icon">🎯</span> When to Use</a></li>
+            <li><a href="#evolution"><span class="nav-icon">📈</span> Evolution</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        <section class="hero" id="overview">
+            <div class="hero-tag">🎯 Page 9.7 • Software Modeling</div>
+            <h1>Domain-Driven Design</h1>
+            <p>An approach to software development that centers on programming a domain model with rich understanding of processes and rules. DDD tackles complexity through ubiquitous language and bounded contexts.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="hero-stat-value">🎯</div><div class="hero-stat-label">Domain Focus</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">📖</div><div class="hero-stat-label">Ubiquitous Language</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">🔲</div><div class="hero-stat-label">Bounded Contexts</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">🧱</div><div class="hero-stat-label">Building Blocks</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="business-case">
+            <div class="module-header">
+                <div class="module-icon">💼</div>
+                <div class="module-info"><h2>The Business Case for DDD</h2><p>Why domain modeling matters</p></div>
+            </div>
+            <div class="business-grid">
+                <div class="business-card"><div class="business-icon">🤝</div><div class="business-stat">∞</div><div class="business-label">Business-Tech Alignment</div><div class="business-desc">Shared language bridges developers and domain experts</div></div>
+                <div class="business-card"><div class="business-icon">🏗️</div><div class="business-stat">50%</div><div class="business-label">Reduced Complexity</div><div class="business-desc">Bounded contexts keep models focused</div></div>
+                <div class="business-card"><div class="business-icon">🔄</div><div class="business-stat">3x</div><div class="business-label">Faster Changes</div><div class="business-desc">Well-modeled domains evolve easily</div></div>
+                <div class="business-card"><div class="business-icon">🎯</div><div class="business-stat">Core</div><div class="business-label">Focus Investment</div><div class="business-desc">Invest in competitive advantage areas</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="layers">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info"><h2>Two Levels of DDD</h2><p>Strategic and tactical patterns</p></div>
+            </div>
+            <div class="ddd-layers">
+                <div class="ddd-layer strategic">
+                    <div class="layer-header"><div class="layer-icon">🗺️</div><div class="layer-title"><h3>Strategic DDD</h3><div class="tagline">The big picture — system organization</div></div></div>
+                    <div class="layer-desc">How to organize your system into bounded contexts, how teams interact, and where to invest modeling effort.</div>
+                    <div class="layer-concepts">
+                        <span class="concept-tag">Bounded Context</span><span class="concept-tag">Ubiquitous Language</span><span class="concept-tag">Context Map</span><span class="concept-tag">Core Domain</span><span class="concept-tag">Subdomains</span>
+                    </div>
+                </div>
+                <div class="ddd-layer tactical">
+                    <div class="layer-header"><div class="layer-icon">🔧</div><div class="layer-title"><h3>Tactical DDD</h3><div class="tagline">Building blocks — implementation patterns</div></div></div>
+                    <div class="layer-desc">Patterns to model the domain richly inside a bounded context. Building blocks that express domain concepts in code.</div>
+                    <div class="layer-concepts">
+                        <span class="concept-tag">Entity</span><span class="concept-tag">Value Object</span><span class="concept-tag">Aggregate</span><span class="concept-tag">Repository</span><span class="concept-tag">Domain Event</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="strategic">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info"><h2>Strategic DDD</h2><p>Organizing the problem space</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🔲</span><span class="concept-name">Bounded Context</span></div><div class="concept-desc">A boundary within which a domain model is defined. Different contexts can have different models for the same concept.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">📖</span><span class="concept-name">Ubiquitous Language</span></div><div class="concept-desc">Shared vocabulary between developers and domain experts used consistently in code and conversation.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🗺️</span><span class="concept-name">Context Map</span></div><div class="concept-desc">Visual representation of how bounded contexts relate. Shows integration patterns and team dynamics.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">⭐</span><span class="concept-name">Core Domain</span></div><div class="concept-desc">The part providing competitive advantage. Invest your best talent here.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🛡️</span><span class="concept-name">Anti-Corruption Layer</span></div><div class="concept-desc">Translation layer protecting your model from external models. Prevents concept pollution.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🤝</span><span class="concept-name">Shared Kernel</span></div><div class="concept-desc">Small shared model between two contexts. Both teams agree not to change without coordination.</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="tactical">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info"><h2>Tactical DDD</h2><p>Building blocks for domain modeling</p></div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🆔</span><span class="concept-name">Entity</span></div><div class="concept-desc">Object with unique identity that persists over time. Two entities with same attributes but different IDs are different.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">💎</span><span class="concept-name">Value Object</span></div><div class="concept-desc">Immutable object defined by attributes, not identity. Two VOs with same attributes are equal.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">🎁</span><span class="concept-name">Aggregate</span></div><div class="concept-desc">Cluster of entities/VOs with a root entity. Unit of consistency and transaction boundaries.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">💾</span><span class="concept-name">Repository</span></div><div class="concept-desc">Abstraction for retrieving and storing aggregates. Collection-like interface hiding persistence.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">📣</span><span class="concept-name">Domain Event</span></div><div class="concept-desc">Record of something that happened (OrderPlaced). Used to communicate between aggregates.</div></div>
+                <div class="concept-card"><div class="concept-header"><span class="concept-emoji">⚙️</span><span class="concept-name">Domain Service</span></div><div class="concept-desc">Stateless operations that don't belong to an entity. Operations spanning multiple aggregates.</div></div>
+            </div>
+            <div class="two-col">
+                <div class="info-box"><h4>Aggregate Design Rules</h4><ul class="info-list"><li><strong>Small aggregates:</strong> Prefer smaller, focused aggregates</li><li><strong>Reference by ID:</strong> Aggregates reference others by ID only</li><li><strong>One transaction:</strong> Update one aggregate per transaction</li><li><strong>Protect invariants:</strong> All changes go through the root</li></ul></div>
+                <div class="info-box"><h4>Value Object Benefits</h4><ul class="info-list"><li><strong>Immutable:</strong> No side effects, safe to share</li><li><strong>Self-validating:</strong> Invalid state is unrepresentable</li><li><strong>Expressive:</strong> Money is better than decimal</li><li><strong>Replaceable:</strong> Create new instead of mutating</li></ul></div>
+            </div>
+        </section>
+
+        <!-- DEEP DIVE -->
+        <section class="module" id="deep-dive">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>Understanding Domain-Driven Design</h2>
+                    <p>Deep dive into the philosophy and patterns</p>
+                </div>
+            </div>
+
+            <!-- What is DDD -->
+            <div class="arch-deep-dive">
+                <div class="deep-header ddd-main">
+                    <span class="deep-icon">🎯</span>
+                    <div class="deep-title">
+                        <h3>What is Domain-Driven Design?</h3>
+                        <span class="deep-era">Eric Evans, 2003 "Blue Book"</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> DDD is an approach to software development that centers the design around the core business domain. It's not a framework or technology—it's a way of thinking that aligns software models with business reality. The goal is to create software that domain experts can understand and validate, reducing the gap between business concepts and code.</p>
+                    </div>
+                    <div class="deep-grid">
+                        <div class="deep-box">
+                            <h4>Core Philosophy</h4>
+                            <ul>
+                                <li><strong>Domain First:</strong> Understand the business before writing code</li>
+                                <li><strong>Model as Conversation:</strong> Code reflects how experts talk about the domain</li>
+                                <li><strong>Bounded Contexts:</strong> Different parts of business = different models</li>
+                                <li><strong>Continuous Learning:</strong> Model evolves as understanding deepens</li>
+                                <li><strong>Focus Investment:</strong> Not everything needs DDD—focus on core domain</li>
+                            </ul>
+                        </div>
+                        <div class="deep-box">
+                            <h4>The Two Levels</h4>
+                            <ul>
+                                <li><strong>Strategic DDD:</strong> How to organize the problem space (bounded contexts, context maps, ubiquitous language)</li>
+                                <li><strong>Tactical DDD:</strong> How to model within a context (entities, value objects, aggregates, repositories)</li>
+                                <li><strong>Start Strategic:</strong> Always begin with strategic patterns—they have the highest ROI</li>
+                                <li><strong>Tactical is Optional:</strong> Use tactical patterns only in core domain where complexity warrants it</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="deep-tradeoffs">
+                        <div class="tradeoff pro">
+                            <span class="tradeoff-icon">✓</span>
+                            <span>Business-tech alignment, reduced complexity, maintainable systems, enables microservices, better team communication</span>
+                        </div>
+                        <div class="tradeoff con">
+                            <span class="tradeoff-icon">✗</span>
+                            <span>Steep learning curve, requires domain expert access, overkill for simple domains, upfront investment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bounded Context Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header strategic">
+                    <span class="deep-icon">🔲</span>
+                    <div class="deep-title">
+                        <h3>Bounded Context (The Most Important Pattern)</h3>
+                        <span class="deep-era">Strategic DDD</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> A bounded context is a boundary within which a particular domain model applies. The same concept (like "Customer") can mean different things in different contexts—and that's okay. In Sales, a Customer has a sales rep and pipeline stage. In Shipping, a Customer has an address and delivery preferences. These are different models for the same real-world entity.</p>
+                    </div>
+                    <div class="context-example">
+                        <div class="context-box sales">
+                            <h5>Sales Context</h5>
+                            <div class="context-model">Customer</div>
+                            <ul>
+                                <li>salesRep: SalesRep</li>
+                                <li>pipelineStage: Stage</li>
+                                <li>dealValue: Money</li>
+                                <li>nextFollowUp: Date</li>
+                            </ul>
+                        </div>
+                        <div class="context-arrow">≠</div>
+                        <div class="context-box shipping">
+                            <h5>Shipping Context</h5>
+                            <div class="context-model">Customer</div>
+                            <ul>
+                                <li>shippingAddress: Address</li>
+                                <li>deliveryPreference: Pref</li>
+                                <li>specialInstructions: String</li>
+                            </ul>
+                        </div>
+                        <div class="context-arrow">≠</div>
+                        <div class="context-box billing">
+                            <h5>Billing Context</h5>
+                            <div class="context-model">Customer</div>
+                            <ul>
+                                <li>billingAddress: Address</li>
+                                <li>paymentMethod: Payment</li>
+                                <li>creditLimit: Money</li>
+                                <li>invoicePreference: Pref</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="content-block" style="margin-top: 20px;">
+                        <h3>Why This Matters</h3>
+                        <p>Without bounded contexts, you end up with a "God Object"—a single Customer class with 100 fields trying to serve every use case. This leads to tight coupling, merge conflicts, and a model nobody understands. Bounded contexts allow each team to evolve their model independently.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aggregate Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header tactical-dd">
+                    <span class="deep-icon">🎁</span>
+                    <div class="deep-title">
+                        <h3>Aggregates (Transaction Boundaries)</h3>
+                        <span class="deep-era">Tactical DDD</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> An aggregate is a cluster of domain objects (entities and value objects) that are treated as a single unit for data changes. Every aggregate has a "root" entity—the only object external code can reference. All modifications go through the root, which enforces invariants (business rules that must always be true).</p>
+                    </div>
+                    <div class="aggregate-diagram">
+                        <svg viewBox="0 0 800 250" class="agg-svg">
+                            <defs>
+                                <marker id="aggArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#818CF8"/>
+                                </marker>
+                            </defs>
+                            
+                            <!-- Aggregate boundary -->
+                            <rect x="200" y="20" width="400" height="210" rx="16" fill="rgba(139, 92, 246, 0.1)" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="8,4"/>
+                            <text x="400" y="50" text-anchor="middle" fill="#A78BFA" font-size="12" font-weight="600">Order Aggregate</text>
+                            
+                            <!-- Aggregate Root -->
+                            <rect x="320" y="70" width="160" height="60" rx="10" fill="#12121a" stroke="#EC4899" stroke-width="3"/>
+                            <text x="400" y="95" text-anchor="middle" fill="#F472B6" font-size="11" font-weight="600">Order (Root)</text>
+                            <text x="400" y="115" text-anchor="middle" fill="#6a6a7a" font-size="9">id, status, total</text>
+                            
+                            <!-- Order Items -->
+                            <rect x="230" y="160" width="120" height="50" rx="8" fill="#12121a" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="290" y="182" text-anchor="middle" fill="#A78BFA" font-size="10">OrderItem</text>
+                            <text x="290" y="198" text-anchor="middle" fill="#6a6a7a" font-size="8">productId, qty, price</text>
+                            
+                            <!-- Shipping Address (Value Object) -->
+                            <rect x="370" y="160" width="120" height="50" rx="8" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="430" y="182" text-anchor="middle" fill="#22D3EE" font-size="10">ShippingAddress</text>
+                            <text x="430" y="198" text-anchor="middle" fill="#6a6a7a" font-size="8">Value Object</text>
+                            
+                            <!-- Money (Value Object) -->
+                            <rect x="510" y="160" width="80" height="50" rx="8" fill="#12121a" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="550" y="182" text-anchor="middle" fill="#22D3EE" font-size="10">Money</text>
+                            <text x="550" y="198" text-anchor="middle" fill="#6a6a7a" font-size="8">Value Object</text>
+                            
+                            <!-- Lines from root -->
+                            <line x1="360" y1="130" x2="290" y2="155" stroke="#818CF8" stroke-width="1.5"/>
+                            <line x1="400" y1="130" x2="430" y2="155" stroke="#818CF8" stroke-width="1.5"/>
+                            <line x1="440" y1="130" x2="550" y2="155" stroke="#818CF8" stroke-width="1.5"/>
+                            
+                            <!-- External access arrow -->
+                            <rect x="40" y="80" width="100" height="40" rx="8" fill="#12121a" stroke="#4a4a5a" stroke-width="2"/>
+                            <text x="90" y="105" text-anchor="middle" fill="#a0a0b0" font-size="10">External Code</text>
+                            <line x1="145" y1="100" x2="315" y2="100" stroke="#818CF8" stroke-width="2" marker-end="url(#aggArrow)"/>
+                            <text x="230" y="90" text-anchor="middle" fill="#10B981" font-size="9">Only access root</text>
+                            
+                            <!-- Legend -->
+                            <rect x="650" y="80" width="12" height="12" rx="2" fill="#EC4899"/>
+                            <text x="670" y="90" fill="#a0a0b0" font-size="9">Root Entity</text>
+                            <rect x="650" y="100" width="12" height="12" rx="2" fill="#8B5CF6"/>
+                            <text x="670" y="110" fill="#a0a0b0" font-size="9">Entity</text>
+                            <rect x="650" y="120" width="12" height="12" rx="2" fill="#06B6D4"/>
+                            <text x="670" y="130" fill="#a0a0b0" font-size="9">Value Object</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>DDD vs Other Approaches</h2>
+                    <p>Understanding when DDD adds value</p>
+                </div>
+            </div>
+
+            <div class="compare-table">
+                <div class="compare-header">
+                    <div class="compare-col">Criteria</div>
+                    <div class="compare-col crud">📝 CRUD/Anemic</div>
+                    <div class="compare-col active">🔧 Active Record</div>
+                    <div class="compare-col ddd-col">🎯 DDD</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Best For</div>
+                    <div class="compare-cell">Simple forms, admin panels</div>
+                    <div class="compare-cell">Rapid prototypes, MVPs</div>
+                    <div class="compare-cell">Complex business logic</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Domain Complexity</div>
+                    <div class="compare-cell cell-good">Low</div>
+                    <div class="compare-cell cell-mid">Low-Medium</div>
+                    <div class="compare-cell cell-good">High</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Learning Curve</div>
+                    <div class="compare-cell cell-good">Easy</div>
+                    <div class="compare-cell cell-good">Easy</div>
+                    <div class="compare-cell cell-bad">Steep</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Business Logic Location</div>
+                    <div class="compare-cell cell-bad">Services (scattered)</div>
+                    <div class="compare-cell cell-mid">Model (mixed)</div>
+                    <div class="compare-cell cell-good">Domain (focused)</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Testability</div>
+                    <div class="compare-cell cell-bad">Hard (DB coupled)</div>
+                    <div class="compare-cell cell-mid">Medium</div>
+                    <div class="compare-cell cell-good">Easy (isolated)</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Team Alignment</div>
+                    <div class="compare-cell cell-bad">Tech-focused</div>
+                    <div class="compare-cell cell-mid">Mixed</div>
+                    <div class="compare-cell cell-good">Business-focused</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Microservices Ready</div>
+                    <div class="compare-cell cell-bad">Difficult</div>
+                    <div class="compare-cell cell-mid">Possible</div>
+                    <div class="compare-cell cell-good">Natural fit</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DECISION FRAMEWORK -->
+        <section class="module" id="decision">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>When to Use DDD</h2>
+                    <p>Decision framework for your project</p>
+                </div>
+            </div>
+
+            <div class="decision-grid">
+                <div class="decision-card strategic-dec">
+                    <div class="decision-header">
+                        <span class="decision-icon">🗺️</span>
+                        <h4>Use Strategic DDD When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Multiple teams working on same system</li>
+                        <li>✓ Breaking apart a monolith</li>
+                        <li>✓ Designing microservices boundaries</li>
+                        <li>✓ Integration between different systems</li>
+                        <li>✓ Need shared vocabulary with business</li>
+                        <li>✓ Almost always—low cost, high value</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> Any team larger than 3-4 people, any system with multiple bounded contexts, any microservices architecture.
+                    </div>
+                </div>
+
+                <div class="decision-card tactical-dec">
+                    <div class="decision-header">
+                        <span class="decision-icon">🔧</span>
+                        <h4>Use Tactical DDD When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Complex business rules and invariants</li>
+                        <li>✓ Domain experts available to collaborate</li>
+                        <li>✓ Core domain (competitive advantage)</li>
+                        <li>✓ Long-lived system (5+ years)</li>
+                        <li>✓ Behavior-rich domain (not just data)</li>
+                        <li>✓ Team willing to invest in learning</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> Insurance claim processing, trading systems, healthcare workflows—where business rules ARE the product.
+                    </div>
+                </div>
+
+                <div class="decision-card skip-strategic">
+                    <div class="decision-header">
+                        <span class="decision-icon">⏭️</span>
+                        <h4>Skip Strategic DDD When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✗ Solo developer, single context</li>
+                        <li>✗ Throwaway prototype</li>
+                        <li>✗ No cross-team communication needed</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Reality:</strong> Strategic DDD is almost always worth it. Even solo projects benefit from thinking about bounded contexts.
+                    </div>
+                </div>
+
+                <div class="decision-card skip-tactical">
+                    <div class="decision-header">
+                        <span class="decision-icon">⏭️</span>
+                        <h4>Skip Tactical DDD When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✗ Simple CRUD operations</li>
+                        <li>✗ Supporting/generic subdomains</li>
+                        <li>✗ No domain expert access</li>
+                        <li>✗ Short-lived or disposable code</li>
+                        <li>✗ Data-centric, not behavior-centric</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> Admin panels, settings pages, reporting dashboards—use simple CRUD and save DDD for the core.
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-flowchart">
+                <h4>Quick Decision Tree</h4>
+                <div class="flowchart-content">
+                    <div class="flow-question">Is this a complex domain with significant business logic?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <span class="flow-answer yes">Yes, complex</span>
+                            <span class="flow-result ddd-r">→ Strategic + Tactical DDD</span>
+                        </div>
+                        <div class="flow-branch">
+                            <span class="flow-answer">Medium complexity</span>
+                            <span class="flow-result strategic-r">→ Strategic DDD only</span>
+                        </div>
+                        <div class="flow-branch">
+                            <span class="flow-answer no">No, simple CRUD</span>
+                            <span class="flow-result crud-r">→ Simple architecture</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVOLUTION -->
+        <section class="module" id="evolution">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Evolution of Software Design</h2>
+                    <p>From data-centric to domain-centric</p>
+                </div>
+            </div>
+
+            <div class="evolution-timeline">
+                <svg viewBox="0 0 900 200" class="evolution-svg">
+                    <defs>
+                        <linearGradient id="dddTimelineBg" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#6a6a7a" stop-opacity="0.1"/>
+                            <stop offset="33%" stop-color="#3B82F6" stop-opacity="0.1"/>
+                            <stop offset="66%" stop-color="#8B5CF6" stop-opacity="0.1"/>
+                            <stop offset="100%" stop-color="#EC4899" stop-opacity="0.1"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Background -->
+                    <rect x="0" y="70" width="900" height="60" fill="url(#dddTimelineBg)" rx="8"/>
+                    
+                    <!-- Timeline line -->
+                    <line x1="60" y1="100" x2="840" y2="100" stroke="#2a2a3e" stroke-width="3"/>
+                    
+                    <!-- Era 1: Database-Centric -->
+                    <circle cx="140" cy="100" r="32" fill="#12121a" stroke="#6a6a7a" stroke-width="3"/>
+                    <text x="140" y="108" text-anchor="middle" font-size="24">🗄️</text>
+                    <text x="140" y="150" text-anchor="middle" fill="#6a6a7a" font-size="11" font-weight="600">Database-Centric</text>
+                    <text x="140" y="167" text-anchor="middle" fill="#4a4a5a" font-size="9">1970s-1990s</text>
+                    
+                    <!-- Connector -->
+                    <line x1="175" y1="100" x2="265" y2="100" stroke="#6a6a7a" stroke-width="2"/>
+                    
+                    <!-- Era 2: Layered/N-Tier -->
+                    <circle cx="340" cy="100" r="32" fill="#12121a" stroke="#3B82F6" stroke-width="3"/>
+                    <text x="340" y="108" text-anchor="middle" font-size="24">📊</text>
+                    <text x="340" y="150" text-anchor="middle" fill="#3B82F6" font-size="11" font-weight="600">Layered/N-Tier</text>
+                    <text x="340" y="167" text-anchor="middle" fill="#6a6a7a" font-size="9">1990s-2000s</text>
+                    
+                    <!-- Connector -->
+                    <line x1="375" y1="100" x2="465" y2="100" stroke="#3B82F6" stroke-width="2"/>
+                    
+                    <!-- Era 3: Service-Oriented -->
+                    <circle cx="540" cy="100" r="32" fill="#12121a" stroke="#8B5CF6" stroke-width="3"/>
+                    <text x="540" y="108" text-anchor="middle" font-size="24">🔌</text>
+                    <text x="540" y="150" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="600">SOA/Services</text>
+                    <text x="540" y="167" text-anchor="middle" fill="#6a6a7a" font-size="9">2000s-2010s</text>
+                    
+                    <!-- Connector -->
+                    <line x1="575" y1="100" x2="665" y2="100" stroke="#8B5CF6" stroke-width="2"/>
+                    
+                    <!-- Era 4: DDD -->
+                    <circle cx="740" cy="100" r="36" fill="#12121a" stroke="#EC4899" stroke-width="4"/>
+                    <text x="740" y="108" text-anchor="middle" font-size="28">🎯</text>
+                    <text x="740" y="150" text-anchor="middle" fill="#EC4899" font-size="12" font-weight="700">Domain-Driven</text>
+                    <text x="740" y="167" text-anchor="middle" fill="#6a6a7a" font-size="9">2003-Present</text>
+                    
+                    <!-- Badge -->
+                    <rect x="695" y="175" width="90" height="18" rx="9" fill="rgba(16, 185, 129, 0.2)" stroke="#10B981" stroke-width="1"/>
+                    <text x="740" y="188" text-anchor="middle" fill="#10B981" font-size="9">✓ Domain First</text>
+                </svg>
+            </div>
+
+            <div class="evolution-details">
+                <div class="evo-card">
+                    <div class="evo-num">1</div>
+                    <h4>Database-Centric</h4>
+                    <p>Design starts with ERD. Business logic in stored procedures. <strong>Data model drives everything</strong>.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">2</div>
+                    <h4>Layered/N-Tier</h4>
+                    <p>Separate UI, business, data layers. But often just <strong>anemic models</strong>—DTOs with getters/setters.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">3</div>
+                    <h4>Service-Oriented</h4>
+                    <p>Extract services, but boundaries often <strong>technical not business</strong>. "Customer Service" serves everyone.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">4</div>
+                    <h4>Domain-Driven</h4>
+                    <p>Start with domain understanding. Model reflects <strong>business reality</strong>. Boundaries = business boundaries.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info"><h2>Best Practices</h2><p>Guidelines for effective DDD</p></div>
+            </div>
+            <div class="bp-grid">
+                <div class="bp-card do"><div class="bp-title">✓ Do</div><ul class="bp-list"><li><span class="icon">✓</span> Start with strategic DDD—understand bounded contexts first</li><li><span class="icon">✓</span> Invest in ubiquitous language—it's the foundation</li><li><span class="icon">✓</span> Focus tactical DDD on the core domain</li><li><span class="icon">✓</span> Keep aggregates small (1-3 entities typical)</li><li><span class="icon">✓</span> Use value objects liberally</li><li><span class="icon">✓</span> Pair with domain experts regularly</li></ul></div>
+                <div class="bp-card dont"><div class="bp-title">✗ Don't</div><ul class="bp-list"><li><span class="icon">✗</span> Apply tactical patterns to every bounded context</li><li><span class="icon">✗</span> Create anemic domain models (getters/setters only)</li><li><span class="icon">✗</span> Make aggregates too large</li><li><span class="icon">✗</span> Reference aggregates directly (use IDs)</li><li><span class="icon">✗</span> Skip the shared language work</li><li><span class="icon">✗</span> Treat DDD as just a folder structure</li></ul></div>
+            </div>
+        </section>
+
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info"><h2>Agent This</h2><p>AI-powered domain modeling</p></div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🎯</div>
+                    <div class="agent-name">DomainModeler</div>
+                    <div class="agent-role">DDD Modeling Agent</div>
+                    <div class="agent-desc">Analyzes requirements, identifies bounded contexts, designs aggregates, and develops ubiquitous language.</div>
+                    <ul class="agent-caps"><li><span class="icon">✦</span> Bounded context discovery</li><li><span class="icon">✦</span> Aggregate design</li><li><span class="icon">✦</span> Context mapping</li><li><span class="icon">✦</span> Event storming facilitation</li></ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header"><div class="code-tab">Domain Modeler</div><div class="code-filename">domain_modeler.py</div></div>
+                    <div class="code-content"><pre><span class="code-comment"># domain_modeler.py</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+
+domain_modeler = Agent(
+    <span class="code-string">role=</span><span class="code-string">"DDD Expert"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Model complex domains effectively"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in Domain-Driven Design,
+    strategic and tactical patterns."""</span>,
+    <span class="code-string">tools=</span>[context_mapper, aggregate_designer]
+)</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info"><h2>Related Pages</h2><p>Continue exploring</p></div>
+            </div>
+            <div class="related-grid">
+                <a href="cat09-p6-cqrs-eventsourcing.html" class="related-card"><div class="related-num">Page 9.6</div><div class="related-title">CQRS & Event Sourcing</div><div class="related-desc">Patterns that complement DDD</div></a>
+                <a href="cat09-p1-microservices.html" class="related-card"><div class="related-num">Page 9.1</div><div class="related-title">Microservices</div><div class="related-desc">Bounded contexts as services</div></a>
+                <a href="cat09-p2-event-driven.html" class="related-card"><div class="related-num">Page 9.2</div><div class="related-title">Event-Driven Architecture</div><div class="related-desc">Domain events in practice</div></a>
+            </div>
+        </section>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat09-p6-cqrs-eventsourcing.html" class="footer-link"><span>←</span><div><div class="footer-link-label">Previous Page</div><div class="footer-link-title">9.6: CQRS & Event Sourcing</div></div></a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 9.7</div>
+        <a href="cat09-architecture-overview.html" class="footer-link"><div><div class="footer-link-label">Back to</div><div class="footer-link-title">Category Overview</div></div><span>→</span></a>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Patterns | Category 09 | Strategy Hub</title>
+    <style>
+        :root {
+            /* CATEGORY 09 - ARCHITECTURE INDIGO */
+            --brand-orange: #FF9900;
+            --cat-primary: #6366F1;
+            --cat-light: #818CF8;
+            --cat-dark: #4F46E5;
+            --cat-glow: rgba(99, 102, 241, 0.15);
+            
+            /* BACKGROUNDS */
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            
+            /* TEXT */
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            
+            /* ACCENTS */
+            --success-green: #10B981;
+            --warning-yellow: #F59E0B;
+            --danger-red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            
+            /* LAYOUT */
+            --sidebar-width: 260px;
+            --header-height: 60px;
+            
+            /* SPACING */
+            --space-xs: 4px; --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px; --space-3xl: 64px;
+            
+            /* TYPOGRAPHY */
+            --font-xs: 11px; --font-sm: 13px; --font-base: 15px; --font-lg: 18px; --font-xl: 24px; --font-2xl: 32px;
+            
+            /* RADIUS */
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 20px; --radius-full: 9999px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        /* HEADER */
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: var(--space-md) var(--space-xl); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: var(--space-lg) 0; }
+        .sidebar-section { margin-bottom: var(--space-lg); }
+        .sidebar-title { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 var(--space-lg); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-sm); }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-lg); color: var(--text-secondary); text-decoration: none; font-size: var(--font-sm); border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+        
+        /* MAIN CONTENT */
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: var(--space-2xl) var(--space-xl); }
+        
+        /* HERO */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); margin-bottom: var(--space-3xl); padding: var(--space-xl); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); position: relative; overflow: hidden; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-left { display: flex; flex-direction: column; justify-content: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: var(--space-sm); background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: var(--space-xs) var(--space-md); border-radius: var(--radius-full); font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-md); width: fit-content; }
+        .hero-left h1 { font-size: var(--font-2xl); margin-bottom: var(--space-sm); line-height: 1.2; }
+        .hero-left p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-md); text-align: center; position: relative; overflow: hidden; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); }
+        .hero-metric-value { font-size: var(--font-xl); font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: var(--font-xs); color: var(--text-muted); margin-top: 2px; }
+        
+        /* MODULES */
+        .module { margin-bottom: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+        .module-icon { width: 64px; height: 64px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+        .module-info h2 { font-size: var(--font-xl); margin-bottom: var(--space-xs); }
+        .module-info p { font-size: var(--font-sm); color: var(--text-muted); }
+        
+        .description-block { margin-bottom: var(--space-xl); }
+        .description-block p { color: var(--text-secondary); margin-bottom: var(--space-md); line-height: 1.8; font-size: var(--font-base); }
+        
+        /* VIZ CONTAINERS */
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .viz-header { padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: var(--font-sm); font-weight: 600; display: flex; align-items: center; gap: var(--space-sm); }
+        .viz-badge { font-size: var(--font-xs); padding: 4px 10px; border-radius: var(--radius-full); background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .viz-svg { width: 100%; height: auto; }
+        
+        /* TOOL CARDS */
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-xl); }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); transition: all 0.3s; }
+        .tool-card:hover { border-color: var(--cat-dark); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .tool-card-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-md); }
+        .tool-card-icon { width: 44px; height: 44px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .tool-card-name { font-size: var(--font-base); font-weight: 600; }
+        .tool-card-desc { font-size: var(--font-sm); color: var(--text-secondary); line-height: 1.6; }
+        
+        /* PATTERN SHOWCASE */
+        .pattern-showcase { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-xl); }
+        .pattern-showcase-header { padding: var(--space-lg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--space-lg); }
+        .pattern-showcase-icon { font-size: 32px; }
+        .pattern-showcase-title h3 { font-size: var(--font-lg); margin-bottom: 2px; }
+        .pattern-showcase-title p { font-size: var(--font-sm); color: var(--text-secondary); }
+        .pattern-showcase-canvas { padding: var(--space-lg); background: var(--bg-dark); }
+        .pattern-showcase-svg { width: 100%; height: auto; }
+        .pattern-showcase-stats { display: flex; justify-content: center; gap: var(--space-xl); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border-top: 1px solid var(--border-color); }
+        .pattern-stat { display: flex; align-items: center; gap: var(--space-xs); }
+        .pattern-stat-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .pattern-stat-value { font-size: var(--font-sm); font-weight: 600; color: var(--cat-light); }
+        
+        /* AGENT + CODE */
+        .agent-section { margin-bottom: var(--space-xl); }
+        .agent-section-header { margin-bottom: var(--space-lg); }
+        .agent-section-tag { font-size: var(--font-xs); text-transform: uppercase; letter-spacing: 2px; color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .agent-section-title { font-size: var(--font-xl); font-weight: 600; }
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-lg); }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: var(--space-xl); }
+        .agent-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: var(--space-lg); }
+        .agent-name { font-size: var(--font-xl); font-weight: 600; margin-bottom: var(--space-xs); }
+        .agent-role { font-size: var(--font-sm); color: var(--cat-light); margin-bottom: var(--space-lg); }
+        .agent-desc { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-xl); line-height: 1.7; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) 0; font-size: var(--font-sm); color: var(--text-secondary); }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); margin-right: var(--space-xs); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; }
+        .code-header { display: flex; align-items: center; padding: 0; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tabs { display: flex; }
+        .code-tab { padding: var(--space-md) var(--space-lg); font-size: var(--font-sm); color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .code-tab:hover { color: var(--text-secondary); }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(99,102,241,0.1); }
+        .code-filename { margin-left: auto; padding: var(--space-md) var(--space-lg); font-size: var(--font-xs); color: var(--text-muted); font-family: 'Monaco', 'Consolas', monospace; }
+        .code-content { padding: var(--space-lg); font-family: 'Monaco', 'Consolas', monospace; font-size: var(--font-sm); line-height: 1.8; overflow-x: auto; max-height: 500px; overflow-y: auto; background: var(--bg-dark); }
+        .code-content pre { margin: 0; white-space: pre; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        /* DIVIDER */
+        .module-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent); margin: var(--space-3xl) 0; }
+        
+        /* PAGES GRID */
+        .pages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+        .page-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: var(--space-lg); text-decoration: none; color: inherit; transition: all 0.3s; position: relative; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2); }
+        .page-num { font-size: var(--font-xs); color: var(--cat-light); margin-bottom: var(--space-sm); }
+        .page-title { font-size: var(--font-base); font-weight: 600; margin-bottom: var(--space-sm); }
+        .page-desc { font-size: var(--font-sm); color: var(--text-muted); line-height: 1.6; }
+        .page-arrow { position: absolute; top: var(--space-lg); right: var(--space-lg); color: var(--cat-light); opacity: 0; transition: all 0.2s; }
+        .page-card:hover .page-arrow { opacity: 1; transform: translateX(4px); }
+        
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: var(--space-lg) var(--space-xl); margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: var(--space-md); text-decoration: none; color: var(--text-secondary); padding: var(--space-md) var(--space-lg); background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: var(--radius-lg); transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: var(--font-xs); color: var(--text-muted); }
+        .footer-link-title { font-size: var(--font-sm); font-weight: 600; }
+        .footer-brand { font-size: var(--font-sm); color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+        
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: 1fr; }
+            .pages-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .pages-grid { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="#">Categories</a>
+        <span class="sep">/</span>
+        <span class="current">Architecture Patterns</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Category 09</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat09-architecture-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat09-p1-microservices.html"><span class="nav-icon">🔲</span> 9.1 Microservices</a></li>
+            <li><a href="cat09-p2-event-driven.html"><span class="nav-icon">⚡</span> 9.2 Event-Driven</a></li>
+            <li><a href="cat09-p3-data-mesh.html"><span class="nav-icon">🕸️</span> 9.3 Data Mesh</a></li>
+            <li><a href="cat09-p4-lakehouse.html"><span class="nav-icon">🏠</span> 9.4 Data Lakehouse</a></li>
+            <li><a href="cat09-p5-api-patterns.html"><span class="nav-icon">🔌</span> 9.5 API Patterns</a></li>
+            <li><a href="cat09-p6-cqrs-eventsourcing.html"><span class="nav-icon">📚</span> 9.6 CQRS & Event Sourcing</a></li>
+            <li><a href="cat09-p7-domain-driven.html"><span class="nav-icon">🎯</span> 9.7 Domain-Driven Design</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🏗️ Category 09</span>
+                <h1>Architecture Patterns</h1>
+                <p>Modern architecture patterns for building scalable, resilient, and maintainable data and application systems. From microservices to data mesh, event-driven to domain-driven.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Enterprise Adoption</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10x</div><div class="hero-metric-label">Scale Potential</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50%</div><div class="hero-metric-label">Faster Delivery</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">7</div><div class="hero-metric-label">Pattern Deep-Dives</div></div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: ARCHITECTURE LAYERS -->
+        <section class="module" id="layers">
+            <div class="module-header">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                    <h2>Modern Architecture Layers</h2>
+                    <p>From presentation to infrastructure—the building blocks of enterprise systems</p>
+                </div>
+            </div>
+            
+            <div class="description-block">
+                <p>Good architecture is the difference between systems that evolve gracefully and systems that collapse under their own complexity. These patterns aren't academic exercises—they're battle-tested solutions to the challenges every organization faces as they scale.</p>
+            </div>
+            
+            <!-- Architecture Patterns Hub -->
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">🏗️ Architecture Pattern Ecosystem</div>
+                    <div class="viz-badge">Reference Model</div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 800 340" class="viz-svg">
+                        <defs>
+                            <pattern id="archGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#archGrid)"/>
+                        
+                        <!-- Center Hub -->
+                        <circle cx="400" cy="170" r="70" fill="#6366F1" opacity="0.2" stroke="#6366F1" stroke-width="2"/>
+                        <circle cx="400" cy="170" r="50" fill="#12121a" stroke="#818CF8" stroke-width="2"/>
+                        <text x="400" y="165" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">MODERN</text>
+                        <text x="400" y="182" text-anchor="middle" fill="#818CF8" font-size="10">ARCHITECTURE</text>
+                        
+                        <!-- Connection Lines -->
+                        <line x1="350" y1="170" x2="180" y2="80" stroke="#06B6D4" stroke-width="2" opacity="0.6"/>
+                        <line x1="350" y1="170" x2="180" y2="170" stroke="#EC4899" stroke-width="2" opacity="0.6"/>
+                        <line x1="350" y1="170" x2="180" y2="260" stroke="#F59E0B" stroke-width="2" opacity="0.6"/>
+                        <line x1="450" y1="170" x2="620" y2="80" stroke="#10B981" stroke-width="2" opacity="0.6"/>
+                        <line x1="450" y1="170" x2="620" y2="170" stroke="#8B5CF6" stroke-width="2" opacity="0.6"/>
+                        <line x1="450" y1="170" x2="620" y2="260" stroke="#3B82F6" stroke-width="2" opacity="0.6"/>
+                        
+                        <!-- Left Side Patterns -->
+                        <!-- API Patterns -->
+                        <rect x="30" y="45" width="150" height="70" rx="12" fill="#06B6D4" opacity="0.15" stroke="#06B6D4" stroke-width="2"/>
+                        <text x="105" y="70" text-anchor="middle" fill="#22D3EE" font-size="13" font-weight="700">🔌 API Patterns</text>
+                        <text x="105" y="88" text-anchor="middle" fill="#a0a0b0" font-size="9">REST • GraphQL • gRPC</text>
+                        <text x="105" y="103" text-anchor="middle" fill="#6a6a7a" font-size="8">Gateway • Versioning</text>
+                        
+                        <!-- Microservices -->
+                        <rect x="30" y="135" width="150" height="70" rx="12" fill="#EC4899" opacity="0.15" stroke="#EC4899" stroke-width="2"/>
+                        <text x="105" y="160" text-anchor="middle" fill="#F472B6" font-size="13" font-weight="700">🔲 Microservices</text>
+                        <text x="105" y="178" text-anchor="middle" fill="#a0a0b0" font-size="9">Service Decomposition</text>
+                        <text x="105" y="193" text-anchor="middle" fill="#6a6a7a" font-size="8">K8s • Istio • Docker</text>
+                        
+                        <!-- Event-Driven -->
+                        <rect x="30" y="225" width="150" height="70" rx="12" fill="#F59E0B" opacity="0.15" stroke="#F59E0B" stroke-width="2"/>
+                        <text x="105" y="250" text-anchor="middle" fill="#FBBF24" font-size="13" font-weight="700">⚡ Event-Driven</text>
+                        <text x="105" y="268" text-anchor="middle" fill="#a0a0b0" font-size="9">Async Communication</text>
+                        <text x="105" y="283" text-anchor="middle" fill="#6a6a7a" font-size="8">Kafka • Pub/Sub • Streams</text>
+                        
+                        <!-- Right Side Patterns -->
+                        <!-- Data Mesh -->
+                        <rect x="620" y="45" width="150" height="70" rx="12" fill="#10B981" opacity="0.15" stroke="#10B981" stroke-width="2"/>
+                        <text x="695" y="70" text-anchor="middle" fill="#34D399" font-size="13" font-weight="700">🕸️ Data Mesh</text>
+                        <text x="695" y="88" text-anchor="middle" fill="#a0a0b0" font-size="9">Domain Data Products</text>
+                        <text x="695" y="103" text-anchor="middle" fill="#6a6a7a" font-size="8">Federated Governance</text>
+                        
+                        <!-- DDD -->
+                        <rect x="620" y="135" width="150" height="70" rx="12" fill="#8B5CF6" opacity="0.15" stroke="#8B5CF6" stroke-width="2"/>
+                        <text x="695" y="160" text-anchor="middle" fill="#A78BFA" font-size="13" font-weight="700">🎯 DDD</text>
+                        <text x="695" y="178" text-anchor="middle" fill="#a0a0b0" font-size="9">Bounded Contexts</text>
+                        <text x="695" y="193" text-anchor="middle" fill="#6a6a7a" font-size="8">Aggregates • Events</text>
+                        
+                        <!-- Lakehouse -->
+                        <rect x="620" y="225" width="150" height="70" rx="12" fill="#3B82F6" opacity="0.15" stroke="#3B82F6" stroke-width="2"/>
+                        <text x="695" y="250" text-anchor="middle" fill="#60A5FA" font-size="13" font-weight="700">🏠 Lakehouse</text>
+                        <text x="695" y="268" text-anchor="middle" fill="#a0a0b0" font-size="9">Unified Analytics</text>
+                        <text x="695" y="283" text-anchor="middle" fill="#6a6a7a" font-size="8">Delta • Iceberg • Unity</text>
+                        
+                        <!-- Bottom: CQRS/ES -->
+                        <rect x="325" y="270" width="150" height="55" rx="12" fill="#14B8A6" opacity="0.15" stroke="#14B8A6" stroke-width="2"/>
+                        <text x="400" y="292" text-anchor="middle" fill="#2DD4BF" font-size="13" font-weight="700">📚 CQRS / Event Sourcing</text>
+                        <text x="400" y="310" text-anchor="middle" fill="#a0a0b0" font-size="9">Read/Write Separation • Audit Trail</text>
+                        <line x1="400" y1="220" x2="400" y2="270" stroke="#14B8A6" stroke-width="2" opacity="0.6"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: PATTERN SHOWCASE -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">🔲</div>
+                <div class="module-info">
+                    <h2>Pattern Selection Guide</h2>
+                    <p>Choosing the right architecture pattern for your use case</p>
+                </div>
+            </div>
+            
+            <!-- Pattern Showcase -->
+            <div class="pattern-showcase">
+                <div class="pattern-showcase-header">
+                    <div class="pattern-showcase-icon">🎯</div>
+                    <div class="pattern-showcase-title">
+                        <h3>When to Use Each Pattern</h3>
+                        <p>Match patterns to organizational needs and technical requirements</p>
+                    </div>
+                </div>
+                <div class="pattern-showcase-canvas">
+                    <svg viewBox="0 0 800 320" class="pattern-showcase-svg">
+                        <defs>
+                            <pattern id="decisionGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                            </pattern>
+                        </defs>
+                        
+                        <rect width="100%" height="100%" fill="url(#decisionGrid)"/>
+                        
+                        <!-- 4 Pattern Columns -->
+                        <!-- Column 1: Microservices -->
+                        <g transform="translate(20, 20)">
+                            <!-- Header -->
+                            <rect width="180" height="50" rx="10" fill="#EC4899" opacity="0.9"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">🔲 Microservices</text>
+                            <text x="90" y="42" text-anchor="middle" fill="#FDF2F8" font-size="9">Service Decomposition</text>
+                            
+                            <!-- When to use box -->
+                            <rect y="60" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                            <text x="90" y="80" text-anchor="middle" fill="#F472B6" font-size="10" font-weight="600">WHEN TO USE</text>
+                            <text x="15" y="100" fill="#a0a0b0" font-size="9">• Large teams need autonomy</text>
+                            <text x="15" y="116" fill="#a0a0b0" font-size="9">• Independent deployments</text>
+                            <text x="15" y="132" fill="#a0a0b0" font-size="9">• Polyglot tech stacks</text>
+                            <text x="15" y="148" fill="#a0a0b0" font-size="9">• Different scaling needs</text>
+                            <text x="15" y="164" fill="#a0a0b0" font-size="9">• Conway's Law alignment</text>
+                            
+                            <!-- Pairs well with -->
+                            <rect y="190" width="180" height="45" rx="6" fill="#0a0a0f" stroke="#2a2a3e"/>
+                            <text x="90" y="210" text-anchor="middle" fill="#6a6a7a" font-size="8">PAIRS WITH</text>
+                            <text x="90" y="225" text-anchor="middle" fill="#818CF8" font-size="9">DDD • Event-Driven • K8s</text>
+                        </g>
+                        
+                        <!-- Column 2: Event-Driven -->
+                        <g transform="translate(215, 20)">
+                            <rect width="180" height="50" rx="10" fill="#F59E0B" opacity="0.9"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">⚡ Event-Driven</text>
+                            <text x="90" y="42" text-anchor="middle" fill="#FEF3C7" font-size="9">Async Communication</text>
+                            
+                            <rect y="60" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                            <text x="90" y="80" text-anchor="middle" fill="#FBBF24" font-size="10" font-weight="600">WHEN TO USE</text>
+                            <text x="15" y="100" fill="#a0a0b0" font-size="9">• Real-time data flows</text>
+                            <text x="15" y="116" fill="#a0a0b0" font-size="9">• Loose service coupling</text>
+                            <text x="15" y="132" fill="#a0a0b0" font-size="9">• Audit trail required</text>
+                            <text x="15" y="148" fill="#a0a0b0" font-size="9">• Eventual consistency OK</text>
+                            <text x="15" y="164" fill="#a0a0b0" font-size="9">• High throughput needs</text>
+                            
+                            <rect y="190" width="180" height="45" rx="6" fill="#0a0a0f" stroke="#2a2a3e"/>
+                            <text x="90" y="210" text-anchor="middle" fill="#6a6a7a" font-size="8">PAIRS WITH</text>
+                            <text x="90" y="225" text-anchor="middle" fill="#818CF8" font-size="9">CQRS • Kafka • Microservices</text>
+                        </g>
+                        
+                        <!-- Column 3: Data Mesh -->
+                        <g transform="translate(410, 20)">
+                            <rect width="180" height="50" rx="10" fill="#10B981" opacity="0.9"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">🕸️ Data Mesh</text>
+                            <text x="90" y="42" text-anchor="middle" fill="#D1FAE5" font-size="9">Domain Data Products</text>
+                            
+                            <rect y="60" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                            <text x="90" y="80" text-anchor="middle" fill="#34D399" font-size="10" font-weight="600">WHEN TO USE</text>
+                            <text x="15" y="100" fill="#a0a0b0" font-size="9">• Multiple data domains</text>
+                            <text x="15" y="116" fill="#a0a0b0" font-size="9">• Central team bottleneck</text>
+                            <text x="15" y="132" fill="#a0a0b0" font-size="9">• Domain expertise needed</text>
+                            <text x="15" y="148" fill="#a0a0b0" font-size="9">• Self-serve analytics</text>
+                            <text x="15" y="164" fill="#a0a0b0" font-size="9">• Federated governance</text>
+                            
+                            <rect y="190" width="180" height="45" rx="6" fill="#0a0a0f" stroke="#2a2a3e"/>
+                            <text x="90" y="210" text-anchor="middle" fill="#6a6a7a" font-size="8">PAIRS WITH</text>
+                            <text x="90" y="225" text-anchor="middle" fill="#818CF8" font-size="9">Lakehouse • DDD • Unity Catalog</text>
+                        </g>
+                        
+                        <!-- Column 4: Lakehouse -->
+                        <g transform="translate(605, 20)">
+                            <rect width="180" height="50" rx="10" fill="#06B6D4" opacity="0.9"/>
+                            <text x="90" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">🏠 Lakehouse</text>
+                            <text x="90" y="42" text-anchor="middle" fill="#CFFAFE" font-size="9">Unified Data Platform</text>
+                            
+                            <rect y="60" width="180" height="120" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                            <text x="90" y="80" text-anchor="middle" fill="#22D3EE" font-size="10" font-weight="600">WHEN TO USE</text>
+                            <text x="15" y="100" fill="#a0a0b0" font-size="9">• BI + ML + Streaming</text>
+                            <text x="15" y="116" fill="#a0a0b0" font-size="9">• ACID on data lake</text>
+                            <text x="15" y="132" fill="#a0a0b0" font-size="9">• Time travel needed</text>
+                            <text x="15" y="148" fill="#a0a0b0" font-size="9">• Cost optimization</text>
+                            <text x="15" y="164" fill="#a0a0b0" font-size="9">• Open table formats</text>
+                            
+                            <rect y="190" width="180" height="45" rx="6" fill="#0a0a0f" stroke="#2a2a3e"/>
+                            <text x="90" y="210" text-anchor="middle" fill="#6a6a7a" font-size="8">PAIRS WITH</text>
+                            <text x="90" y="225" text-anchor="middle" fill="#818CF8" font-size="9">Delta • Iceberg • Databricks</text>
+                        </g>
+                        
+                        <!-- Bottom tip -->
+                        <g transform="translate(200, 265)">
+                            <rect width="400" height="45" rx="10" fill="#6366F1" opacity="0.15" stroke="#6366F1" stroke-width="1"/>
+                            <text x="200" y="22" text-anchor="middle" fill="#818CF8" font-size="11" font-weight="600">💡 Most organizations combine multiple patterns</text>
+                            <text x="200" y="38" text-anchor="middle" fill="#a0a0b0" font-size="9">Example: Microservices + Event-Driven + Lakehouse for modern data platforms</text>
+                        </g>
+                    </svg>
+                </div>
+                <div class="pattern-showcase-stats">
+                    <div class="pattern-stat">
+                        <span class="pattern-stat-label">Patterns Covered:</span>
+                        <span class="pattern-stat-value">7</span>
+                    </div>
+                    <div class="pattern-stat">
+                        <span class="pattern-stat-label">Enterprise Adoption:</span>
+                        <span class="pattern-stat-value">85%+</span>
+                    </div>
+                    <div class="pattern-stat">
+                        <span class="pattern-stat-label">Avg Scale Improvement:</span>
+                        <span class="pattern-stat-value">10x</span>
+                    </div>
+                    <div class="pattern-stat">
+                        <span class="pattern-stat-label">Time-to-Market:</span>
+                        <span class="pattern-stat-value" style="color: #34D399;">50% Faster</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent + Code Section -->
+            <div class="agent-section">
+                <div class="agent-section-header">
+                    <div class="agent-section-tag">Agent This</div>
+                    <div class="agent-section-title">Architecture Advisory System</div>
+                </div>
+                <div class="agent-grid">
+                    <div class="agent-info">
+                        <div class="agent-avatar">🏗️</div>
+                        <div class="agent-name">ArchitectureCrew</div>
+                        <div class="agent-role">Enterprise Architecture Advisory</div>
+                        <p class="agent-desc">Analyzes organizational needs, evaluates architecture patterns, recommends decomposition strategies, and generates implementation roadmaps for modern distributed systems.</p>
+                        <ul class="agent-capabilities">
+                            <li>Pattern selection based on requirements</li>
+                            <li>Domain boundary identification</li>
+                            <li>Service decomposition planning</li>
+                            <li>Event storming facilitation</li>
+                            <li>Data ownership mapping</li>
+                            <li>Migration strategy generation</li>
+                            <li>Anti-pattern detection</li>
+                        </ul>
+                    </div>
+                    <div class="code-panel">
+                        <div class="code-header">
+                            <div class="code-tabs">
+                                <div class="code-tab active">Python</div>
+                                <div class="code-tab">YAML</div>
+                            </div>
+                            <div class="code-filename">architecture_crew.py</div>
+                        </div>
+                        <div class="code-content">
+                            <pre><span class="code-comment"># Architecture Advisory Crew</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew, Process
+<span class="code-keyword">from</span> langchain_anthropic <span class="code-keyword">import</span> ChatAnthropic
+
+<span class="code-comment"># Initialize LLM</span>
+llm = ChatAnthropic(model=<span class="code-string">"claude-sonnet-4-20250514"</span>)
+
+<span class="code-comment"># Define Architecture Agents</span>
+domain_analyst = Agent(
+    role=<span class="code-string">"Domain Analyst"</span>,
+    goal=<span class="code-string">"Identify bounded contexts and domain boundaries"</span>,
+    backstory=<span class="code-string">"""Expert in Domain-Driven Design, specializing
+    in strategic design and context mapping."""</span>,
+    llm=llm,
+    tools=[domain_modeler, context_mapper, event_stormer]
+)
+
+pattern_advisor = Agent(
+    role=<span class="code-string">"Pattern Advisor"</span>,
+    goal=<span class="code-string">"Recommend architecture patterns for requirements"</span>,
+    backstory=<span class="code-string">"""Architect with deep knowledge of microservices,
+    event-driven, data mesh, and lakehouse patterns."""</span>,
+    llm=llm,
+    tools=[pattern_matcher, trade_off_analyzer, decision_matrix]
+)
+
+migration_planner = Agent(
+    role=<span class="code-string">"Migration Planner"</span>,
+    goal=<span class="code-string">"Create incremental migration roadmaps"</span>,
+    backstory=<span class="code-string">"""Specialist in strangler fig pattern and 
+    legacy modernization strategies."""</span>,
+    llm=llm,
+    tools=[dependency_analyzer, risk_assessor, roadmap_generator]
+)
+
+<span class="code-comment"># Create Architecture Crew</span>
+architecture_crew = Crew(
+    agents=[domain_analyst, pattern_advisor, migration_planner],
+    process=Process.sequential,
+    verbose=<span class="code-keyword">True</span>
+)
+
+<span class="code-keyword">async def</span> <span class="code-function">analyze_architecture</span>(system_description):
+    <span class="code-string">"""Run architecture analysis and recommendations."""</span>
+    tasks = [
+        Task(description=<span class="code-string">"Map domain boundaries"</span>, agent=domain_analyst),
+        Task(description=<span class="code-string">"Recommend patterns"</span>, agent=pattern_advisor),
+        Task(description=<span class="code-string">"Create migration plan"</span>, agent=migration_planner)
+    ]
+    <span class="code-keyword">return await</span> architecture_crew.kickoff_async(tasks=tasks)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="module-divider"></div>
+
+        <!-- TOOLS SECTION -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Architecture Tools</h2>
+                    <p>Platforms and frameworks for implementing modern architectures</p>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">☸️</div>
+                        <div class="tool-card-name">Kubernetes</div>
+                    </div>
+                    <div class="tool-card-desc">Container orchestration for microservices with auto-scaling, service discovery, and self-healing.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">📊</div>
+                        <div class="tool-card-name">Apache Kafka</div>
+                    </div>
+                    <div class="tool-card-desc">Distributed event streaming platform for high-throughput, real-time data pipelines and event-driven architectures.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔷</div>
+                        <div class="tool-card-name">Databricks</div>
+                    </div>
+                    <div class="tool-card-desc">Unified lakehouse platform with Delta Lake for analytics, ML, and data engineering workloads.</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-card-header">
+                        <div class="tool-card-icon">🔗</div>
+                        <div class="tool-card-name">Istio</div>
+                    </div>
+                    <div class="tool-card-desc">Service mesh for traffic management, security (mTLS), and observability across microservices.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="pages">
+            <div class="module-header">
+                <div class="module-icon">📑</div>
+                <div class="module-info">
+                    <h2>Explore This Category</h2>
+                    <p>Deep dives into architecture patterns and practices</p>
+                </div>
+            </div>
+            
+            <div class="pages-grid">
+                <a href="cat09-p1-microservices.html" class="page-card">
+                    <div class="page-num">Page 9.1</div>
+                    <div class="page-title">Microservices Architecture</div>
+                    <div class="page-desc">Decomposing monoliths into independently deployable services with clear boundaries</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p2-event-driven.html" class="page-card">
+                    <div class="page-num">Page 9.2</div>
+                    <div class="page-title">Event-Driven Architecture</div>
+                    <div class="page-desc">Building reactive systems with events as first-class citizens for loose coupling</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p3-data-mesh.html" class="page-card">
+                    <div class="page-num">Page 9.3</div>
+                    <div class="page-title">Data Mesh</div>
+                    <div class="page-desc">Decentralized data ownership with domain-oriented data products</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p4-lakehouse.html" class="page-card">
+                    <div class="page-num">Page 9.4</div>
+                    <div class="page-title">Data Lakehouse</div>
+                    <div class="page-desc">Unifying data lakes and warehouses with Delta Lake and Apache Iceberg</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p5-api-patterns.html" class="page-card">
+                    <div class="page-num">Page 9.5</div>
+                    <div class="page-title">API Design Patterns</div>
+                    <div class="page-desc">REST, GraphQL, gRPC patterns with versioning and gateway strategies</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p6-cqrs-eventsourcing.html" class="page-card">
+                    <div class="page-num">Page 9.6</div>
+                    <div class="page-title">CQRS & Event Sourcing</div>
+                    <div class="page-desc">Separating reads from writes with events as the source of truth</div>
+                    <div class="page-arrow">→</div>
+                </a>
+                <a href="cat09-p7-domain-driven.html" class="page-card">
+                    <div class="page-num">Page 9.7</div>
+                    <div class="page-title">Domain-Driven Design</div>
+                    <div class="page-desc">Aligning software with business domains through bounded contexts and aggregates</div>
+                    <div class="page-arrow">→</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="../category-08/cat08-automation-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">08: Automation & RPA</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Category 09</div>
+        <a href="cat09-p1-microservices.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">First Page</div>
+                <div class="footer-link-title">9.1: Microservices</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

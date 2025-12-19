@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Comparison | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-primary), var(--red), var(--purple)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; }
+        .category-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .category-icon.wiki { background: linear-gradient(135deg, var(--blue), var(--purple)); }
+        .category-icon.vector { background: linear-gradient(135deg, var(--green), var(--teal)); }
+        .category-icon.graph { background: linear-gradient(135deg, var(--pink), var(--red)); }
+        .category-icon.rag { background: linear-gradient(135deg, var(--cyan), var(--blue)); }
+        .category-icon.semantic { background: linear-gradient(135deg, var(--cat-primary), var(--yellow)); }
+        .category-icon.catalog { background: linear-gradient(135deg, var(--purple), var(--indigo)); }
+        .category-title { font-size: 18px; font-weight: 600; }
+        .category-subtitle { font-size: 11px; color: var(--text-muted); }
+        .category-badge { margin-left: auto; font-size: 10px; padding: 4px 10px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .compare-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; font-size: 10px; }
+        .compare-table th { background: var(--bg-card-alt); padding: 10px 6px; text-align: center; font-size: 9px; border-bottom: 1px solid var(--border-color); }
+        .compare-table th:first-child { text-align: left; padding-left: 12px; width: 100px; }
+        .compare-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .compare-table td:first-child { text-align: left; padding-left: 12px; font-weight: 600; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: var(--bg-hover); }
+        .platform-name { color: var(--cat-light); font-size: 11px; }
+        .check { color: var(--green); font-weight: bold; }
+        .partial { color: var(--yellow); }
+        .none { color: var(--text-muted); }
+        .price-tag { font-size: 9px; padding: 2px 6px; background: var(--bg-dark); border-radius: 4px; }
+        .best-tag { font-size: 8px; padding: 2px 6px; background: var(--green); color: #000; border-radius: 4px; font-weight: 600; }
+        
+        .decision-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .decision-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .decision-scenario { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .decision-scenario-icon { font-size: 20px; }
+        .decision-pick { font-size: 16px; font-weight: 700; color: var(--cat-light); margin-bottom: 8px; }
+        .decision-stack { list-style: none; margin-bottom: 12px; }
+        .decision-stack li { font-size: 11px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .decision-stack li::before { content: '→'; color: var(--cat-light); font-size: 10px; }
+        .decision-why { font-size: 10px; color: var(--text-muted); line-height: 1.5; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        
+        .stack-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stack-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .stack-card-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; }
+        .stack-card-icon { font-size: 24px; }
+        .stack-card-title { font-size: 14px; font-weight: 600; }
+        .stack-card-price { margin-left: auto; font-size: 10px; padding: 4px 10px; background: var(--bg-dark); border-radius: 4px; color: var(--text-muted); }
+        .stack-card-body { padding: 16px 20px; }
+        .stack-layer { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .stack-layer:last-child { border-bottom: none; }
+        .stack-layer-name { font-size: 10px; color: var(--text-muted); width: 80px; }
+        .stack-layer-tool { font-size: 11px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+        .stack-layer-tool-icon { font-size: 14px; }
+        
+        .eval-criteria { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .eval-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .eval-icon { font-size: 28px; margin-bottom: 12px; }
+        .eval-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .eval-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        .eval-questions { list-style: none; margin-top: 12px; text-align: left; }
+        .eval-questions li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: flex-start; gap: 6px; }
+        .eval-questions li::before { content: '?'; color: var(--cat-light); font-weight: bold; }
+        
+        .migration-paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .migration-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .migration-from { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .migration-to { font-size: 14px; font-weight: 600; color: var(--cat-light); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .migration-arrow { color: var(--green); }
+        .migration-effort { font-size: 10px; margin-bottom: 8px; }
+        .migration-effort-bar { height: 6px; background: var(--bg-dark); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+        .migration-effort-fill { height: 100%; border-radius: 3px; }
+        .migration-effort-fill.low { width: 33%; background: var(--green); }
+        .migration-effort-fill.medium { width: 66%; background: var(--yellow); }
+        .migration-effort-fill.high { width: 100%; background: var(--red); }
+        .migration-notes { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-primary), var(--red)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .stack-cards { grid-template-columns: 1fr; }
+            .decision-grid, .migration-paths, .related-pages { grid-template-columns: 1fr; }
+            .eval-criteria { grid-template-columns: repeat(2, 1fr); }
+            .compare-table { font-size: 8px; }
+            .compare-table th, .compare-table td { padding: 6px 3px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Platform Comparison</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#wikis"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="#vectors"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="#graphs"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="#rag"><span class="nav-icon">🔍</span> RAG Frameworks</a></li>
+            <li><a href="#semantic"><span class="nav-icon">🧊</span> Semantic Layers</a></li>
+            <li><a href="#catalogs"><span class="nav-icon">📚</span> Data Catalogs</a></li>
+            <li><a href="#stacks"><span class="nav-icon">🏗️</span> Reference Stacks</a></li>
+            <li><a href="#decisions"><span class="nav-icon">🎯</span> Decision Framework</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html" class="active"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">⚖️ Page 7.8 • Tool Selection Guide</div>
+                <h1>Platform Comparison</h1>
+                <p>Comprehensive comparison of knowledge management platforms across six categories—from wikis to vector databases to semantic layers. Build your optimal KM stack.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">50+</div>
+                    <div class="hero-metric-label">Tools Compared</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">6</div>
+                    <div class="hero-metric-label">Categories</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">4</div>
+                    <div class="hero-metric-label">Reference Stacks</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">10+</div>
+                    <div class="hero-metric-label">Features Per Tool</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Knowledge Management Stack</h2>
+                    <p>Understanding the platform landscape</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Integration Challenge</h3>
+                <p>A complete <strong>enterprise knowledge management system</strong> spans multiple layers—from content creation (wikis, documentation) to semantic understanding (graphs, embeddings) to AI-powered access (RAG, agents). No single platform does everything well, so organizations must assemble a stack of best-of-breed tools.</p>
+                <p>The key is <strong>integration</strong>: your wiki content feeds into your vector database, which powers your RAG pipeline, which is grounded by your knowledge graph. Semantic layers provide consistent metric definitions, while data catalogs enable discovery across all sources. This page provides detailed comparisons across six categories to help you select the right tools for each layer.</p>
+                <p>We evaluate each platform on <strong>10+ features</strong> specific to its category, including AI capabilities, scalability, pricing model, and integration options. Use the decision framework at the end to match your requirements to the optimal stack.</p>
+            </div>
+        </section>
+
+        <!-- ENTERPRISE WIKIS -->
+        <section class="module" id="wikis">
+            <div class="category-header">
+                <div class="category-icon wiki">📖</div>
+                <div>
+                    <div class="category-title">Enterprise Wikis & Documentation</div>
+                    <div class="category-subtitle">Collaborative knowledge bases for teams</div>
+                </div>
+                <div class="category-badge">8 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Rich Editor</th>
+                        <th>Real-time</th>
+                        <th>Hierarchy</th>
+                        <th>Templates</th>
+                        <th>Search</th>
+                        <th>AI Features</th>
+                        <th>Permissions</th>
+                        <th>API</th>
+                        <th>Analytics</th>
+                        <th>Slack</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">Confluence</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Enterprise</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Notion</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Startups</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">SharePoint</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Microsoft</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">GitBook</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Developer</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Slite</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Teams</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Coda</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Databases</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Tettra</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">SMB KB</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Guru</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Verified KB</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Confluence</strong> remains the enterprise standard with deep Jira integration, robust permissions, and now AI-powered search. <strong>Notion</strong> offers the best editing experience and flexibility for startups. <strong>SharePoint</strong> dominates Microsoft shops with Copilot integration. For developer documentation, <strong>GitBook</strong> excels with Git-backed versioning. <strong>Guru</strong> specializes in verified knowledge with built-in freshness tracking—ideal for support teams.</p>
+            </div>
+        </section>
+
+        <!-- VECTOR DATABASES -->
+        <section class="module" id="vectors">
+            <div class="category-header">
+                <div class="category-icon vector">🗄️</div>
+                <div>
+                    <div class="category-title">Vector Databases</div>
+                    <div class="category-subtitle">Embedding storage for semantic search and RAG</div>
+                </div>
+                <div class="category-badge">8 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Managed</th>
+                        <th>Open Source</th>
+                        <th>Scale (vectors)</th>
+                        <th>Hybrid Search</th>
+                        <th>Filtering</th>
+                        <th>Multi-tenant</th>
+                        <th>Replication</th>
+                        <th>HNSW</th>
+                        <th>GPU</th>
+                        <th>Latency</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">Pinecone</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td>&lt;50ms</td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Easiest</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Weaviate</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>&lt;100ms</td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Features</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Qdrant</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td>&lt;20ms</td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Speed</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Milvus</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Trillions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>&lt;50ms</td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Scale</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Chroma</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Millions</td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td>&lt;100ms</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Prototyping</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">pgvector</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Millions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td>&lt;100ms</td>
+                        <td><span class="price-tag">DB cost</span></td>
+                        <td><span class="best-tag">Postgres</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Vespa</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Trillions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>&lt;10ms</td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Enterprise</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Elasticsearch</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td>&lt;50ms</td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Existing ES</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Pinecone</strong> offers the easiest managed experience—deploy in minutes with no infrastructure. <strong>Qdrant</strong> leads in raw performance with Rust-based architecture. <strong>Weaviate</strong> provides the richest features including built-in embedding models. <strong>Milvus</strong> and <strong>Vespa</strong> handle trillion-scale deployments. For existing Postgres users, <strong>pgvector</strong> adds vectors without new infrastructure. <strong>Chroma</strong> is ideal for local prototyping.</p>
+            </div>
+        </section>
+
+        <!-- KNOWLEDGE GRAPHS -->
+        <section class="module" id="graphs">
+            <div class="category-header">
+                <div class="category-icon graph">🕸️</div>
+                <div>
+                    <div class="category-title">Knowledge Graphs</div>
+                    <div class="category-subtitle">Entity-relationship databases for connected data</div>
+                </div>
+                <div class="category-badge">6 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Model</th>
+                        <th>Query Lang</th>
+                        <th>ACID</th>
+                        <th>Scale</th>
+                        <th>Viz</th>
+                        <th>ML/GNN</th>
+                        <th>Cloud</th>
+                        <th>On-Prem</th>
+                        <th>RDF</th>
+                        <th>APIs</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">Neo4j</span></td>
+                        <td>LPG</td>
+                        <td>Cypher</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">General</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Amazon Neptune</span></td>
+                        <td>Both</td>
+                        <td>Gremlin/SPARQL</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">AWS</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">TigerGraph</span></td>
+                        <td>LPG</td>
+                        <td>GSQL</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Trillions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$$</span></td>
+                        <td><span class="best-tag">Analytics</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Stardog</span></td>
+                        <td>RDF</td>
+                        <td>SPARQL</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Semantic</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">ArangoDB</span></td>
+                        <td>Multi</td>
+                        <td>AQL</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Billions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Multi-model</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">NebulaGraph</span></td>
+                        <td>LPG</td>
+                        <td>nGQL</td>
+                        <td><span class="check">✓</span></td>
+                        <td>Trillions</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Open Source</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Neo4j</strong> dominates the graph database market with the most mature ecosystem, Cypher query language, and GraphRAG integration. <strong>Amazon Neptune</strong> is ideal for AWS-native deployments with support for both property graphs and RDF. <strong>TigerGraph</strong> excels at massive-scale analytics (fraud detection, recommendations). <strong>Stardog</strong> focuses on enterprise knowledge graphs with reasoning capabilities.</p>
+            </div>
+        </section>
+
+        <!-- RAG FRAMEWORKS -->
+        <section class="module" id="rag">
+            <div class="category-header">
+                <div class="category-icon rag">🔍</div>
+                <div>
+                    <div class="category-title">RAG Frameworks</div>
+                    <div class="category-subtitle">Retrieval-augmented generation orchestration</div>
+                </div>
+                <div class="category-badge">6 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Language</th>
+                        <th>LLM Support</th>
+                        <th>Vector DBs</th>
+                        <th>Agents</th>
+                        <th>Streaming</th>
+                        <th>Memory</th>
+                        <th>Evals</th>
+                        <th>Tracing</th>
+                        <th>Production</th>
+                        <th>Community</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">LangChain</span></td>
+                        <td>Python/JS</td>
+                        <td>All</td>
+                        <td>30+</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Largest</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Ecosystem</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">LlamaIndex</span></td>
+                        <td>Python/JS</td>
+                        <td>All</td>
+                        <td>20+</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Large</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Data</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Haystack</span></td>
+                        <td>Python</td>
+                        <td>All</td>
+                        <td>15+</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Medium</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Pipelines</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Semantic Kernel</span></td>
+                        <td>C#/Python</td>
+                        <td>Azure/All</td>
+                        <td>10+</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Growing</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Microsoft</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Vercel AI SDK</span></td>
+                        <td>TypeScript</td>
+                        <td>All</td>
+                        <td>5+</td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Medium</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Frontend</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">AutoGen</span></td>
+                        <td>Python</td>
+                        <td>All</td>
+                        <td>5+</td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td>Growing</td>
+                        <td><span class="price-tag">Free</span></td>
+                        <td><span class="best-tag">Multi-Agent</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>LangChain</strong> has the largest ecosystem and community—start here unless you have specific needs. <strong>LlamaIndex</strong> excels at data ingestion and indexing strategies (especially for structured data). <strong>Haystack</strong> offers the cleanest pipeline abstractions for production systems. <strong>Semantic Kernel</strong> is Microsoft's choice for Azure-native deployments. <strong>AutoGen</strong> specializes in multi-agent orchestration.</p>
+            </div>
+        </section>
+
+        <!-- SEMANTIC LAYERS -->
+        <section class="module" id="semantic">
+            <div class="category-header">
+                <div class="category-icon semantic">🧊</div>
+                <div>
+                    <div class="category-title">Semantic Layers</div>
+                    <div class="category-subtitle">Business metric definitions and data modeling</div>
+                </div>
+                <div class="category-badge">6 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Universal</th>
+                        <th>SQL API</th>
+                        <th>Metrics</th>
+                        <th>Caching</th>
+                        <th>Pre-Agg</th>
+                        <th>Access Ctrl</th>
+                        <th>Lineage</th>
+                        <th>Git/VCS</th>
+                        <th>REST API</th>
+                        <th>AI/NL</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">Cube</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Headless BI</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">dbt Metrics</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">dbt Users</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">AtScale</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$$</span></td>
+                        <td><span class="best-tag">Enterprise</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">LookML</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Looker</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Power BI</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Microsoft</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">MetricFlow</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">dbt Cloud</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Cube</strong> offers the best universal semantic layer with caching, pre-aggregation, and multi-tool support. <strong>dbt Metrics/MetricFlow</strong> integrates naturally with dbt workflows but lacks caching. <strong>AtScale</strong> provides enterprise-grade OLAP capabilities. <strong>LookML</strong> remains the most mature but requires Looker. <strong>Power BI</strong> datasets work well within the Microsoft ecosystem.</p>
+            </div>
+        </section>
+
+        <!-- DATA CATALOGS -->
+        <section class="module" id="catalogs">
+            <div class="category-header">
+                <div class="category-icon catalog">📚</div>
+                <div>
+                    <div class="category-title">Data Catalogs & Discovery</div>
+                    <div class="category-subtitle">Metadata management and data discovery</div>
+                </div>
+                <div class="category-badge">6 platforms</div>
+            </div>
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Search</th>
+                        <th>Lineage</th>
+                        <th>Glossary</th>
+                        <th>Profiling</th>
+                        <th>Quality</th>
+                        <th>Auto-tag</th>
+                        <th>Social</th>
+                        <th>APIs</th>
+                        <th>dbt</th>
+                        <th>OSS</th>
+                        <th>Pricing</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="platform-name">Alation</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="price-tag">$$$$</span></td>
+                        <td><span class="best-tag">Enterprise</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Collibra</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="price-tag">$$$$</span></td>
+                        <td><span class="best-tag">Governance</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Atlan</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="price-tag">$$$</span></td>
+                        <td><span class="best-tag">Modern</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">DataHub</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">Free/$$</span></td>
+                        <td><span class="best-tag">Open Source</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">OpenMetadata</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="price-tag">Free/$$</span></td>
+                        <td><span class="best-tag">Full-Featured OSS</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="platform-name">Select Star</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="price-tag">$$</span></td>
+                        <td><span class="best-tag">Lineage-First</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Alation</strong> and <strong>Collibra</strong> are enterprise leaders with comprehensive governance capabilities. <strong>Atlan</strong> offers a modern, collaborative experience popular with data teams. For open source, <strong>DataHub</strong> (LinkedIn) and <strong>OpenMetadata</strong> provide production-ready alternatives. <strong>Select Star</strong> focuses on automated lineage with minimal setup.</p>
+            </div>
+        </section>
+
+        <!-- REFERENCE STACKS -->
+        <section class="module" id="stacks">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Reference Stacks</h2>
+                    <p>Recommended tool combinations by use case</p>
+                </div>
+            </div>
+            <div class="stack-cards">
+                <div class="stack-card">
+                    <div class="stack-card-header">
+                        <div class="stack-card-icon">🚀</div>
+                        <div class="stack-card-title">Startup / SMB Stack</div>
+                        <div class="stack-card-price">~$500/mo</div>
+                    </div>
+                    <div class="stack-card-body">
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Wiki</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📚</span> Notion</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Vector DB</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📌</span> Pinecone</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">RAG</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🦜</span> LangChain</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Warehouse</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">❄️</span> Snowflake</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Transform</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🔶</span> dbt Cloud</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-card-header">
+                        <div class="stack-card-icon">🏢</div>
+                        <div class="stack-card-title">Enterprise Stack</div>
+                        <div class="stack-card-price">~$5K/mo</div>
+                    </div>
+                    <div class="stack-card-body">
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Wiki</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📘</span> Confluence</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Vector DB</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🔷</span> Weaviate</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Graph</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🕸️</span> Neo4j</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Semantic</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🧊</span> Cube</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Catalog</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📚</span> Atlan</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-card-header">
+                        <div class="stack-card-icon">🔵</div>
+                        <div class="stack-card-title">Microsoft Stack</div>
+                        <div class="stack-card-price">M365 + Azure</div>
+                    </div>
+                    <div class="stack-card-body">
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Wiki</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📁</span> SharePoint</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Vector DB</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🔍</span> Azure AI Search</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">RAG</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🧠</span> Semantic Kernel</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Semantic</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📈</span> Power BI</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Catalog</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📋</span> Purview</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-card-header">
+                        <div class="stack-card-icon">🆓</div>
+                        <div class="stack-card-title">Open Source Stack</div>
+                        <div class="stack-card-price">Self-hosted</div>
+                    </div>
+                    <div class="stack-card-body">
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Wiki</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📝</span> Wiki.js / Outline</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Vector DB</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🔷</span> Qdrant / Milvus</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Graph</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🕸️</span> NebulaGraph</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">RAG</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">🦙</span> LlamaIndex</div>
+                        </div>
+                        <div class="stack-layer">
+                            <div class="stack-layer-name">Catalog</div>
+                            <div class="stack-layer-tool"><span class="stack-layer-tool-icon">📊</span> OpenMetadata</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>These reference stacks represent tested combinations that work well together. The <strong>Startup Stack</strong> prioritizes simplicity and managed services. The <strong>Enterprise Stack</strong> adds knowledge graphs and data catalogs for governance. The <strong>Microsoft Stack</strong> leverages existing M365 investments. The <strong>Open Source Stack</strong> provides full control with self-hosting.</p>
+            </div>
+        </section>
+
+        <!-- DECISION FRAMEWORK -->
+        <section class="module" id="decisions">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Decision Framework</h2>
+                    <p>Match your requirements to the right tools</p>
+                </div>
+            </div>
+            <div class="eval-criteria">
+                <div class="eval-card">
+                    <div class="eval-icon">👥</div>
+                    <div class="eval-title">Team Size</div>
+                    <div class="eval-desc">How many users will access the system?</div>
+                    <ul class="eval-questions">
+                        <li>&lt;50: Notion, Chroma</li>
+                        <li>50-500: Confluence, Pinecone</li>
+                        <li>500+: Enterprise tools</li>
+                    </ul>
+                </div>
+                <div class="eval-card">
+                    <div class="eval-icon">💰</div>
+                    <div class="eval-title">Budget</div>
+                    <div class="eval-desc">What's your annual KM tool budget?</div>
+                    <ul class="eval-questions">
+                        <li>&lt;$10K: Open source stack</li>
+                        <li>$10-50K: Mid-market tools</li>
+                        <li>$50K+: Enterprise platforms</li>
+                    </ul>
+                </div>
+                <div class="eval-card">
+                    <div class="eval-icon">⚙️</div>
+                    <div class="eval-title">Technical Depth</div>
+                    <div class="eval-desc">What's your team's technical capability?</div>
+                    <ul class="eval-questions">
+                        <li>Low: Managed services</li>
+                        <li>Medium: Hybrid approach</li>
+                        <li>High: Self-hosted OSS</li>
+                    </ul>
+                </div>
+                <div class="eval-card">
+                    <div class="eval-icon">🔗</div>
+                    <div class="eval-title">Integration</div>
+                    <div class="eval-desc">What's your existing ecosystem?</div>
+                    <ul class="eval-questions">
+                        <li>Microsoft: Azure/M365 stack</li>
+                        <li>Google: GCP native tools</li>
+                        <li>AWS: Neptune, Kendra</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="decision-grid">
+                <div class="decision-card">
+                    <div class="decision-scenario"><span class="decision-scenario-icon">🚀</span> "We need RAG fast"</div>
+                    <div class="decision-pick">Pinecone + LangChain</div>
+                    <ul class="decision-stack">
+                        <li>Deploy in hours, not weeks</li>
+                        <li>Managed infrastructure</li>
+                        <li>Large community for help</li>
+                    </ul>
+                    <div class="decision-why">Fastest path to production RAG with minimal DevOps overhead.</div>
+                </div>
+                <div class="decision-card">
+                    <div class="decision-scenario"><span class="decision-scenario-icon">🏢</span> "Enterprise governance"</div>
+                    <div class="decision-pick">Collibra + Neo4j</div>
+                    <ul class="decision-stack">
+                        <li>Compliance-ready catalog</li>
+                        <li>Knowledge graph lineage</li>
+                        <li>Certified data products</li>
+                    </ul>
+                    <div class="decision-why">Full governance with data stewardship and regulatory compliance.</div>
+                </div>
+                <div class="decision-card">
+                    <div class="decision-scenario"><span class="decision-scenario-icon">💰</span> "Minimize costs"</div>
+                    <div class="decision-pick">pgvector + OpenMetadata</div>
+                    <ul class="decision-stack">
+                        <li>Use existing Postgres</li>
+                        <li>Open source catalog</li>
+                        <li>Self-hosted control</li>
+                    </ul>
+                    <div class="decision-why">Leverage existing infrastructure without new licensing costs.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Platform Selection Best Practices</h2>
+                    <p>Guidelines for making the right choices</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with requirements, not features</li>
+                        <li>Run POCs with your actual data</li>
+                        <li>Evaluate total cost of ownership (TCO)</li>
+                        <li>Check integration with existing stack</li>
+                        <li>Assess vendor stability and roadmap</li>
+                        <li>Talk to reference customers</li>
+                        <li>Plan for migration and lock-in risks</li>
+                        <li>Consider operational complexity</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Choose based on feature count alone</li>
+                        <li>Ignore the hidden costs (training, ops)</li>
+                        <li>Over-engineer for future scale</li>
+                        <li>Underestimate data migration effort</li>
+                        <li>Skip security and compliance review</li>
+                        <li>Assume all "enterprise" tools work</li>
+                        <li>Forget about user adoption</li>
+                        <li>Lock into single-vendor ecosystems blindly</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered platform selection</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⚖️</div>
+                    <div class="agent-name">PlatformAdvisor</div>
+                    <div class="agent-role">Tool Selection Specialist</div>
+                    <div class="agent-desc">Analyzes your requirements, constraints, and existing stack to recommend optimal platform combinations with migration paths and TCO estimates.</div>
+                    <ul class="agent-capabilities">
+                        <li>Gather requirements through conversation</li>
+                        <li>Score platforms against your criteria</li>
+                        <li>Generate comparison matrices</li>
+                        <li>Estimate total cost of ownership</li>
+                        <li>Identify integration requirements</li>
+                        <li>Create migration roadmaps</li>
+                        <li>Draft RFP evaluation criteria</li>
+                        <li>Monitor vendor news and updates</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Requirements Analyzer</div>
+                        <div class="code-tab">Scoring Engine</div>
+                        <div class="code-filename">platform_advisor.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># platform_advisor.py - Tool Selection Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+
+<span class="code-keyword">class</span> <span class="code-function">PlatformAdvisor</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self):
+        self.platforms = self._load_platform_db()
+        self.criteria_weights = {}
+    
+    <span class="code-keyword">def</span> <span class="code-function">analyze_requirements</span>(self, answers: dict) -> dict:
+        <span class="code-string">"""Convert user answers to weighted criteria."""</span>
+        criteria = {
+            <span class="code-string">"scale"</span>: self._scale_from_team_size(answers[<span class="code-string">"team_size"</span>]),
+            <span class="code-string">"budget"</span>: self._budget_tier(answers[<span class="code-string">"annual_budget"</span>]),
+            <span class="code-string">"technical"</span>: answers[<span class="code-string">"team_expertise"</span>],
+            <span class="code-string">"ecosystem"</span>: answers[<span class="code-string">"existing_stack"</span>],
+            <span class="code-string">"compliance"</span>: answers.get(<span class="code-string">"regulations"</span>, []),
+        }
+        <span class="code-keyword">return</span> criteria
+    
+    <span class="code-keyword">def</span> <span class="code-function">score_platforms</span>(self, category: str, criteria: dict):
+        <span class="code-string">"""Score all platforms in category against criteria."""</span>
+        scores = []
+        <span class="code-keyword">for</span> platform <span class="code-keyword">in</span> self.platforms[category]:
+            score = self._calculate_fit_score(platform, criteria)
+            scores.append({
+                <span class="code-string">"name"</span>: platform[<span class="code-string">"name"</span>],
+                <span class="code-string">"score"</span>: score,
+                <span class="code-string">"strengths"</span>: self._identify_strengths(platform, criteria),
+                <span class="code-string">"gaps"</span>: self._identify_gaps(platform, criteria),
+                <span class="code-string">"tco"</span>: self._estimate_tco(platform, criteria)
+            })
+        <span class="code-keyword">return</span> sorted(scores, key=<span class="code-keyword">lambda</span> x: x[<span class="code-string">"score"</span>], reverse=True)
+
+<span class="code-comment"># Agent definition</span>
+advisor_agent = Agent(
+    role=<span class="code-string">"Platform Selection Advisor"</span>,
+    goal=<span class="code-string">"Match requirements to optimal tools"</span>,
+    tools=[RequirementsGatherer(), PlatformScorer(),
+           TCOCalculator(), MigrationPlanner()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Deep dives on specific platform categories</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p5-enterprise-wikis.html" class="related-card">
+                    <div class="related-num">Page 7.5</div>
+                    <div class="related-title">Enterprise Wikis</div>
+                    <div class="related-desc">Wiki platform deep dive</div>
+                </a>
+                <a href="cat07-p7-vector-databases.html" class="related-card">
+                    <div class="related-num">Page 7.7</div>
+                    <div class="related-title">Vector Databases</div>
+                    <div class="related-desc">Embedding storage details</div>
+                </a>
+                <a href="cat07-p6-semantic-models.html" class="related-card">
+                    <div class="related-num">Page 7.6</div>
+                    <div class="related-title">Semantic Models</div>
+                    <div class="related-desc">Metrics layer platforms</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p7-vector-databases.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.7: Vector Databases</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.8 of 8</div>
+        <a href="cat07-knowledge-overview.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Category Overview</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

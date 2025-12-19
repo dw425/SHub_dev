@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Graphs | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        .concept-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .concept-card.nodes::before { background: var(--yellow); }
+        .concept-card.edges::before { background: var(--blue); }
+        .concept-icon { font-size: 28px; margin-bottom: 12px; }
+        .concept-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .concept-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .concept-examples { list-style: none; }
+        .concept-examples li { font-size: 10px; padding: 6px 10px; background: var(--bg-card-alt); border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .concept-examples li::before { content: '→'; color: var(--cat-light); }
+        
+        .viz-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .viz-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .viz-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .viz-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .viz-canvas { padding: 20px; background: var(--bg-dark); display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+        .viz-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 20px; border-top: 1px solid var(--border-color); }
+        .viz-stat { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-card-alt); border-radius: 10px; }
+        .viz-stat-icon { width: 40px; height: 40px; background: var(--cat-glow); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .viz-stat-value { font-size: 20px; font-weight: 700; color: var(--cat-light); }
+        .viz-stat-label { font-size: 10px; color: var(--text-muted); }
+        
+        .graph-legend { display: flex; gap: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+        
+        .graph-detail { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .graph-detail-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--cat-light); display: flex; align-items: center; gap: 8px; }
+        .graph-detail-content { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .graph-detail-content p { margin-bottom: 8px; }
+        .graph-detail-placeholder { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .graph-detail-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        
+        .kg-node { cursor: pointer; transition: filter 0.2s; }
+        .kg-node:hover { filter: brightness(1.3) drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)); }
+        
+        .algo-matrix { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .algo-header { background: var(--bg-card-alt); padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .algo-header-title { font-size: 13px; font-weight: 600; }
+        .algo-table { width: 100%; border-collapse: collapse; }
+        .algo-table th { background: var(--bg-card-alt); padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .algo-table td { padding: 12px; font-size: 11px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        .algo-table tr:hover td { background: var(--bg-hover); }
+        .algo-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .algo-icon { font-size: 16px; }
+        .algo-tag { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .algo-tag.traversal { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        .algo-tag.centrality { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .algo-tag.community { background: rgba(139,92,246,0.2); color: var(--purple); }
+        .algo-tag.path { background: rgba(16,185,129,0.2); color: var(--green); }
+        .complexity-bar { height: 6px; background: var(--bg-card-alt); border-radius: 3px; overflow: hidden; width: 60px; }
+        .complexity-fill { height: 100%; border-radius: 3px; }
+        .complexity-fill.low { width: 30%; background: var(--green); }
+        .complexity-fill.medium { width: 60%; background: var(--yellow); }
+        .complexity-fill.high { width: 90%; background: var(--red); }
+        
+        .db-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .db-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+        .db-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .db-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .db-logo { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .db-name { font-size: 15px; font-weight: 600; }
+        .db-type { font-size: 10px; color: var(--cat-light); }
+        .db-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .db-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .db-feature { font-size: 9px; padding: 3px 8px; background: var(--bg-card-alt); border-radius: 9999px; color: var(--text-muted); }
+        
+        .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; transition: all 0.2s; }
+        .tool-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .tool-logo { width: 40px; height: 40px; background: var(--bg-card-alt); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 10px; }
+        .tool-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .tool-desc { font-size: 9px; color: var(--text-muted); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--cat-light)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .concept-grid, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .tools-grid, .related-pages, .db-grid { grid-template-columns: repeat(2, 1fr); }
+            .viz-canvas { grid-template-columns: 1fr; }
+            .viz-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Knowledge Graphs</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#types"><span class="nav-icon">🎯</span> Core Concepts</a></li>
+            <li><a href="#explorer"><span class="nav-icon">🕸️</span> Graph Explorer</a></li>
+            <li><a href="#algorithms"><span class="nav-icon">🔢</span> Algorithms</a></li>
+            <li><a href="#databases"><span class="nav-icon">🗄️</span> Databases</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html" class="active"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">🕸️ Page 7.1 • Connected Knowledge</div>
+                <h1>Knowledge Graphs</h1>
+                <p>Transform information into connected networks of entities and relationships for powerful discovery, reasoning, and AI-grounded responses.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Nodes</div>
+                    <div class="hero-metric-label">Entities</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Edges</div>
+                    <div class="hero-metric-label">Relationships</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Neo4j</div>
+                    <div class="hero-metric-label">Leading DB</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">GraphRAG</div>
+                    <div class="hero-metric-label">AI Integration</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Knowledge Graphs</h2>
+                    <p>Connected data for AI and discovery</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>What is a Knowledge Graph?</h3>
+                <p><strong>Knowledge graphs</strong> represent information as a network of entities (nodes) connected by relationships (edges). Unlike tabular data, graphs capture context and meaning—a "Customer" node connected to "Product" via "PURCHASED" tells a richer story than rows in a table.</p>
+                <p>In enterprise settings, knowledge graphs unify siloed data: people, documents, projects, and concepts become interconnected. This enables <strong>semantic search</strong> ("find experts who worked on similar projects"), <strong>impact analysis</strong> ("what depends on this system?"), and <strong>recommendation</strong> ("suggest relevant documents").</p>
+                <p><strong>GraphRAG</strong> combines knowledge graphs with LLMs—using graph structure to provide grounded, contextual answers. Instead of retrieving isolated text chunks, GraphRAG traverses relationships to build coherent context for generation, dramatically reducing hallucinations and improving factual accuracy.</p>
+            </div>
+        </section>
+
+        <!-- CORE CONCEPTS -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Core Concepts</h2>
+                    <p>Building blocks of knowledge graphs</p>
+                </div>
+            </div>
+            <div class="concept-grid">
+                <div class="concept-card nodes">
+                    <div class="concept-icon">🔵</div>
+                    <div class="concept-title">Nodes (Entities)</div>
+                    <div class="concept-desc">Things in your domain with properties. Each node has a label (type) and attributes that describe it. Nodes are the "nouns" of your knowledge graph.</div>
+                    <ul class="concept-examples">
+                        <li>Person {name: "Alice", role: "Engineer"}</li>
+                        <li>Document {title: "Q3 Report", date: "2024-10"}</li>
+                        <li>Project {name: "Migration", status: "Active"}</li>
+                        <li>Concept {name: "Machine Learning"}</li>
+                        <li>System {name: "Data Warehouse", tier: "Critical"}</li>
+                    </ul>
+                </div>
+                <div class="concept-card edges">
+                    <div class="concept-icon">↔️</div>
+                    <div class="concept-title">Edges (Relationships)</div>
+                    <div class="concept-desc">Connections between entities with types and properties. Relationships are directional and form the "verbs" of your graph, describing how entities interact.</div>
+                    <ul class="concept-examples">
+                        <li>Person -[AUTHORED]→ Document</li>
+                        <li>Person -[WORKS_ON]→ Project</li>
+                        <li>Document -[REFERENCES]→ Concept</li>
+                        <li>System -[DEPENDS_ON]→ System</li>
+                        <li>Project -[USES]→ Technology</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The <strong>node-edge model</strong> is deceptively simple but incredibly powerful. Unlike relational databases where relationships are implicit (foreign keys requiring JOINs), graph databases make relationships first-class citizens with their own types and properties. This enables queries like "find all people within 3 hops of Alice who authored documents about Kubernetes"—a query that would require complex recursive SQL but translates naturally to graph traversal.</p>
+                <p>When modeling your domain, think in terms of <strong>nouns (nodes)</strong> and <strong>verbs (edges)</strong>. Properties belong on the entity they describe—author name goes on the Person node, not the AUTHORED relationship. However, relationship properties are powerful for temporal or contextual data: an EMPLOYED_BY edge might have <code>start_date</code> and <code>end_date</code> properties to track job history without creating intermediate nodes.</p>
+            </div>
+        </section>
+
+        <!-- GRAPH EXPLORER -->
+        <section class="module" id="explorer">
+            <div class="module-header">
+                <div class="module-icon">🕸️</div>
+                <div class="module-info">
+                    <h2>Graph Explorer</h2>
+                    <p>Interactive knowledge graph visualization</p>
+                </div>
+            </div>
+            <div class="viz-container">
+                <div class="viz-header">
+                    <div class="viz-title">📊 Enterprise Knowledge Graph</div>
+                    <div class="graph-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--cat-primary);"></div> Knowledge Hub</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--blue);"></div> Documents</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--purple);"></div> People</div>
+                        <div class="legend-item"><div class="legend-dot" style="background: var(--teal);"></div> Projects</div>
+                    </div>
+                </div>
+                <div class="viz-canvas">
+                    <svg viewBox="0 0 500 400" style="width: 100%; height: 400px;">
+                        <!-- Edges -->
+                        <line x1="250" y1="200" x2="100" y2="80" stroke="#2a2a3e" stroke-width="2"/>
+                        <line x1="250" y1="200" x2="400" y2="80" stroke="#2a2a3e" stroke-width="2"/>
+                        <line x1="250" y1="200" x2="100" y2="320" stroke="#2a2a3e" stroke-width="2"/>
+                        <line x1="250" y1="200" x2="400" y2="320" stroke="#2a2a3e" stroke-width="2"/>
+                        <!-- Secondary edges -->
+                        <line x1="100" y1="80" x2="50" y2="40" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="100" y1="80" x2="150" y2="30" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="400" y1="80" x2="350" y2="30" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="400" y1="80" x2="450" y2="40" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="100" y1="320" x2="50" y2="360" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="100" y1="320" x2="150" y2="370" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="400" y1="320" x2="350" y2="370" stroke="#2a2a3e" stroke-width="1.5"/>
+                        <line x1="400" y1="320" x2="450" y2="360" stroke="#2a2a3e" stroke-width="1.5"/>
+                        
+                        <!-- Central Hub - KNOWLEDGE -->
+                        <circle cx="250" cy="200" r="55" fill="url(#hubGradient)" class="kg-node" onclick="showDetail('hub')"/>
+                        <text x="250" y="195" text-anchor="middle" fill="white" font-size="12" font-weight="700">KNOWLEDGE</text>
+                        <text x="250" y="210" text-anchor="middle" fill="white" font-size="10">HUB</text>
+                        
+                        <!-- Category: Data Engineering -->
+                        <circle cx="100" cy="80" r="42" fill="#3B82F6" class="kg-node" onclick="showDetail('dataeng')"/>
+                        <text x="100" y="75" text-anchor="middle" fill="white" font-size="11" font-weight="600">Data</text>
+                        <text x="100" y="90" text-anchor="middle" fill="white" font-size="11">Engineering</text>
+                        
+                        <!-- Category: AI/ML -->
+                        <circle cx="400" cy="80" r="42" fill="#8B5CF6" class="kg-node" onclick="showDetail('aiml')"/>
+                        <text x="400" y="75" text-anchor="middle" fill="white" font-size="11" font-weight="600">AI/ML</text>
+                        <text x="400" y="90" text-anchor="middle" fill="white" font-size="11">Ops</text>
+                        
+                        <!-- Category: Cloud Platforms -->
+                        <circle cx="100" cy="320" r="42" fill="#06B6D4" class="kg-node" onclick="showDetail('cloud')"/>
+                        <text x="100" y="315" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloud</text>
+                        <text x="100" y="330" text-anchor="middle" fill="white" font-size="11">Platforms</text>
+                        
+                        <!-- Category: Security -->
+                        <circle cx="400" cy="320" r="42" fill="#14B8A6" class="kg-node" onclick="showDetail('security')"/>
+                        <text x="400" y="315" text-anchor="middle" fill="white" font-size="11" font-weight="600">Security</text>
+                        <text x="400" y="330" text-anchor="middle" fill="white" font-size="11">Compliance</text>
+                        
+                        <!-- Leaf nodes - Documents -->
+                        <circle cx="50" cy="40" r="22" fill="#3B82F6" opacity="0.8" class="kg-node" onclick="showDetail('doc1')"/>
+                        <text x="50" y="45" text-anchor="middle" fill="white" font-size="16">📄</text>
+                        
+                        <circle cx="450" cy="40" r="22" fill="#3B82F6" opacity="0.8" class="kg-node" onclick="showDetail('doc2')"/>
+                        <text x="450" y="45" text-anchor="middle" fill="white" font-size="16">📄</text>
+                        
+                        <circle cx="150" cy="370" r="22" fill="#3B82F6" opacity="0.8" class="kg-node" onclick="showDetail('doc3')"/>
+                        <text x="150" y="375" text-anchor="middle" fill="white" font-size="16">📄</text>
+                        
+                        <!-- Leaf nodes - People -->
+                        <circle cx="150" cy="30" r="22" fill="#8B5CF6" opacity="0.8" class="kg-node" onclick="showDetail('person1')"/>
+                        <text x="150" y="35" text-anchor="middle" fill="white" font-size="16">👤</text>
+                        
+                        <circle cx="350" cy="30" r="22" fill="#8B5CF6" opacity="0.8" class="kg-node" onclick="showDetail('person2')"/>
+                        <text x="350" y="35" text-anchor="middle" fill="white" font-size="16">👤</text>
+                        
+                        <circle cx="450" cy="360" r="22" fill="#8B5CF6" opacity="0.8" class="kg-node" onclick="showDetail('person3')"/>
+                        <text x="450" y="365" text-anchor="middle" fill="white" font-size="16">👤</text>
+                        
+                        <!-- Leaf nodes - Projects -->
+                        <circle cx="50" cy="360" r="22" fill="#14B8A6" opacity="0.8" class="kg-node" onclick="showDetail('project1')"/>
+                        <text x="50" y="365" text-anchor="middle" fill="white" font-size="16">🎯</text>
+                        
+                        <circle cx="350" cy="370" r="22" fill="#14B8A6" opacity="0.8" class="kg-node" onclick="showDetail('project2')"/>
+                        <text x="350" y="375" text-anchor="middle" fill="white" font-size="16">🎯</text>
+                        
+                        <defs>
+                            <linearGradient id="hubGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#F59E0B"/>
+                                <stop offset="100%" style="stop-color:#D97706"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="graph-detail" id="detail-panel">
+                        <div class="graph-detail-placeholder">
+                            <div class="graph-detail-icon">👆</div>
+                            <div>Click any node to explore its details and connections</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="viz-stats">
+                    <div class="viz-stat">
+                        <div class="viz-stat-icon">🔵</div>
+                        <div>
+                            <div class="viz-stat-value">2,847</div>
+                            <div class="viz-stat-label">Nodes</div>
+                        </div>
+                    </div>
+                    <div class="viz-stat">
+                        <div class="viz-stat-icon">↔️</div>
+                        <div>
+                            <div class="viz-stat-value">12,453</div>
+                            <div class="viz-stat-label">Edges</div>
+                        </div>
+                    </div>
+                    <div class="viz-stat">
+                        <div class="viz-stat-icon">📄</div>
+                        <div>
+                            <div class="viz-stat-value">1,204</div>
+                            <div class="viz-stat-label">Documents</div>
+                        </div>
+                    </div>
+                    <div class="viz-stat">
+                        <div class="viz-stat-icon">🔍</div>
+                        <div>
+                            <div class="viz-stat-value">8.2K</div>
+                            <div class="viz-stat-label">Queries/Day</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The interactive graph above represents a simplified enterprise knowledge graph with <strong>four domain categories</strong> radiating from a central Knowledge Hub. Each category node (Data Engineering, AI/ML Ops, Cloud Platforms, Security & Compliance) represents a major knowledge domain containing hundreds of interconnected documents, people, and projects.</p>
+                <p>Click any node to explore its metadata and connections. In production knowledge graphs, these traversals power semantic search ("find all documents authored by people who worked on Project X"), impact analysis ("what systems depend on this component?"), and AI-grounded responses. The statistics bar shows real-time metrics: node counts, edge density, document coverage, and query throughput—key indicators of graph health and utilization.</p>
+            </div>
+        </section>
+
+        <!-- GRAPH ALGORITHMS -->
+        <section class="module" id="algorithms">
+            <div class="module-header">
+                <div class="module-icon">🔢</div>
+                <div class="module-info">
+                    <h2>Graph Algorithms</h2>
+                    <p>Essential algorithms for knowledge graph analysis</p>
+                </div>
+            </div>
+            <div class="algo-matrix">
+                <div class="algo-header">
+                    <div class="algo-header-title">Algorithm Reference Matrix</div>
+                </div>
+                <table class="algo-table">
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Category</th>
+                            <th>Use Case</th>
+                            <th>Complexity</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">📊</span> PageRank</span></td>
+                            <td><span class="algo-tag centrality">Centrality</span></td>
+                            <td>Find influential nodes</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>Identify key experts</td>
+                        </tr>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">🔀</span> Shortest Path</span></td>
+                            <td><span class="algo-tag path">Path</span></td>
+                            <td>Find connection routes</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>Degrees of separation</td>
+                        </tr>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">🏘️</span> Louvain</span></td>
+                            <td><span class="algo-tag community">Community</span></td>
+                            <td>Detect communities</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>Find topic clusters</td>
+                        </tr>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">🌳</span> BFS/DFS</span></td>
+                            <td><span class="algo-tag traversal">Traversal</span></td>
+                            <td>Explore graph structure</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill low"></div></div></td>
+                            <td>Find all related docs</td>
+                        </tr>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">🎯</span> Betweenness</span></td>
+                            <td><span class="algo-tag centrality">Centrality</span></td>
+                            <td>Find bridge nodes</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill high"></div></div></td>
+                            <td>Critical connectors</td>
+                        </tr>
+                        <tr>
+                            <td><span class="algo-name"><span class="algo-icon">🔗</span> Node Similarity</span></td>
+                            <td><span class="algo-tag community">Community</span></td>
+                            <td>Find similar entities</td>
+                            <td><div class="complexity-bar"><div class="complexity-fill medium"></div></div></td>
+                            <td>Recommend content</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="overview-content">
+                <p>Graph algorithms transform raw knowledge graphs into actionable insights. <strong>Centrality algorithms</strong> like PageRank and Betweenness identify the most influential or critical nodes—use these to find subject matter experts, key documents, or single points of failure. <strong>Community detection</strong> algorithms like Louvain automatically cluster related entities, revealing hidden organizational structures or topic groupings without manual tagging.</p>
+                <p><strong>Path algorithms</strong> power "degrees of separation" queries and dependency analysis, while <strong>traversal algorithms</strong> (BFS/DFS) form the foundation for exploring graph neighborhoods. The complexity column indicates computational cost at scale—PageRank runs efficiently on billion-node graphs, while Betweenness becomes expensive and may require sampling strategies. Choose algorithms based on your query patterns and performance requirements.</p>
+            </div>
+        </section>
+
+        <!-- DATABASES -->
+        <section class="module" id="databases">
+            <div class="module-header">
+                <div class="module-icon">🗄️</div>
+                <div class="module-info">
+                    <h2>Graph Databases</h2>
+                    <p>Platform comparison for knowledge graphs</p>
+                </div>
+            </div>
+            <div class="db-grid">
+                <div class="db-card">
+                    <div class="db-header">
+                        <div class="db-logo" style="background: linear-gradient(135deg, #008CC1, #00648C);">🔷</div>
+                        <div>
+                            <div class="db-name">Neo4j</div>
+                            <div class="db-type">Native Graph Database</div>
+                        </div>
+                    </div>
+                    <div class="db-desc">Market leader with native graph storage, Cypher query language, and enterprise features including clustering and RBAC.</div>
+                    <div class="db-features">
+                        <span class="db-feature">Cypher</span>
+                        <span class="db-feature">APOC</span>
+                        <span class="db-feature">GDS Library</span>
+                        <span class="db-feature">Aura Cloud</span>
+                    </div>
+                </div>
+                <div class="db-card">
+                    <div class="db-header">
+                        <div class="db-logo" style="background: linear-gradient(135deg, #FF9900, #CC7A00);">🔶</div>
+                        <div>
+                            <div class="db-name">Amazon Neptune</div>
+                            <div class="db-type">Managed Graph Service</div>
+                        </div>
+                    </div>
+                    <div class="db-desc">AWS-managed graph database supporting both property graphs (openCypher) and RDF (SPARQL) with serverless options.</div>
+                    <div class="db-features">
+                        <span class="db-feature">openCypher</span>
+                        <span class="db-feature">SPARQL</span>
+                        <span class="db-feature">Serverless</span>
+                        <span class="db-feature">Neptune ML</span>
+                    </div>
+                </div>
+                <div class="db-card">
+                    <div class="db-header">
+                        <div class="db-logo" style="background: linear-gradient(135deg, #E8490F, #C43D0D);">🐯</div>
+                        <div>
+                            <div class="db-name">TigerGraph</div>
+                            <div class="db-type">Parallel Analytics</div>
+                        </div>
+                    </div>
+                    <div class="db-desc">Designed for massive-scale analytics with parallel graph algorithms, real-time deep link analysis, and ML workbench.</div>
+                    <div class="db-features">
+                        <span class="db-feature">GSQL</span>
+                        <span class="db-feature">Real-time</span>
+                        <span class="db-feature">ML Workbench</span>
+                        <span class="db-feature">Cloud</span>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Neo4j</strong> dominates the enterprise knowledge graph market with its native graph storage engine, mature Cypher query language, and extensive algorithm library (GDS). It's the default choice for most knowledge graph projects, offering both self-hosted and managed cloud (Aura) options. <strong>Amazon Neptune</strong> appeals to AWS-native organizations, providing serverless scaling and dual support for property graphs and RDF—ideal if you need SPARQL compatibility for semantic web standards.</p>
+                <p><strong>TigerGraph</strong> excels at massive-scale analytics where you need to traverse billions of edges in real-time—common in fraud detection, supply chain, and recommendation systems. Its parallel processing architecture outperforms competitors on deep-link queries (10+ hops). For most enterprise knowledge management use cases, start with Neo4j; consider Neptune for AWS integration or TigerGraph for extreme scale requirements.</p>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Libraries</h2>
+                    <p>Essential tools for building knowledge graphs</p>
+                </div>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-logo">🔗</div>
+                    <div class="tool-name">LangChain</div>
+                    <div class="tool-desc">GraphQA chains</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🦜</div>
+                    <div class="tool-name">LlamaIndex</div>
+                    <div class="tool-desc">Graph RAG pipelines</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🐍</div>
+                    <div class="tool-name">NetworkX</div>
+                    <div class="tool-desc">Python graph analysis</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">📊</div>
+                    <div class="tool-name">PyVis</div>
+                    <div class="tool-desc">Graph visualization</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🧠</div>
+                    <div class="tool-name">spaCy</div>
+                    <div class="tool-desc">Entity extraction</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🔍</div>
+                    <div class="tool-name">Rebel</div>
+                    <div class="tool-desc">Relation extraction</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">🌐</div>
+                    <div class="tool-name">RDFLib</div>
+                    <div class="tool-desc">RDF/OWL handling</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-logo">📦</div>
+                    <div class="tool-name">Grapher</div>
+                    <div class="tool-desc">Graph embeddings</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Building knowledge graphs requires a toolkit spanning <strong>entity extraction</strong>, <strong>graph construction</strong>, <strong>querying</strong>, and <strong>visualization</strong>. LangChain and LlamaIndex provide high-level abstractions for GraphRAG pipelines—connecting LLMs to graph databases for grounded question answering. spaCy handles named entity recognition (NER), while Rebel specializes in extracting relationships between entities from unstructured text.</p>
+                <p>For analysis and visualization, <strong>NetworkX</strong> offers comprehensive graph algorithms in Python (ideal for prototyping before moving to Neo4j GDS), while <strong>PyVis</strong> generates interactive browser-based visualizations. RDFLib supports semantic web standards (RDF, OWL, SPARQL) for interoperability with linked data ecosystems. Graph embeddings (via libraries like PyTorch Geometric or Grapher) enable machine learning on graph structures—useful for link prediction and node classification tasks.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective knowledge graph design</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Design your ontology before building—define node types, relationships, and constraints upfront</li>
+                        <li>Use descriptive relationship names that read naturally: Person-[AUTHORED]→Document</li>
+                        <li>Create indexes on frequently queried properties for performance</li>
+                        <li>Combine with vector embeddings for GraphRAG semantic search</li>
+                        <li>Version your schema and maintain backward compatibility</li>
+                        <li>Use parameterized queries to prevent injection attacks</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Use generic relationship names like "RELATED" or "CONNECTED"—be specific</li>
+                        <li>Store large blobs (documents, images) in node properties—use references</li>
+                        <li>Create super-nodes with millions of relationships—partition or aggregate</li>
+                        <li>Skip testing with realistic data volumes—graphs behave differently at scale</li>
+                        <li>Ignore relationship direction—it affects query semantics</li>
+                        <li>Embed business logic in queries—keep graphs as pure data models</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The practices above reflect hard-won lessons from production knowledge graph deployments. <strong>Ontology-first design</strong> is critical—retrofitting schema changes to a populated graph is painful and error-prone. Invest time upfront defining your node labels, relationship types, and property constraints. Descriptive relationship names like <code>AUTHORED</code>, <code>REPORTS_TO</code>, or <code>DEPENDS_ON</code> make queries self-documenting and reduce cognitive load for developers.</p>
+                <p>The <strong>super-node problem</strong> deserves special attention: nodes with millions of relationships (e.g., a "Company" node connected to all employees) destroy query performance. Solutions include intermediate grouping nodes, relationship properties for filtering, or pre-computed aggregations. Finally, always test with production-scale data—graph performance characteristics change dramatically as data grows, and queries that work fine on 10K nodes may timeout on 10M.</p>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered assistant for knowledge graphs</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🕸️</div>
+                    <div class="agent-name">KnowledgeGraphAgent</div>
+                    <div class="agent-role">Graph Builder & Query Specialist</div>
+                    <div class="agent-desc">Expert in knowledge graph construction, entity extraction, relationship inference, and natural language to Cypher translation. Automates graph building from unstructured data and optimizes query performance.</div>
+                    <ul class="agent-capabilities">
+                        <li>Extract entities and relationships from documents</li>
+                        <li>Translate natural language to Cypher queries</li>
+                        <li>Identify missing connections and data gaps</li>
+                        <li>Run and interpret graph algorithms</li>
+                        <li>Generate interactive graph visualizations</li>
+                        <li>Optimize graph schema and indexes</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Agent Definition</div>
+                        <div class="code-tab">Graph Builder</div>
+                        <div class="code-filename">knowledge_graph_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># knowledge_graph_agent.py - Knowledge Graph Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+<span class="code-keyword">from</span> langchain_community.graphs <span class="code-keyword">import</span> Neo4jGraph
+
+graph = Neo4jGraph(url=<span class="code-string">"bolt://localhost:7687"</span>)
+
+<span class="code-function">kg_agent</span> = Agent(
+    role=<span class="code-string">"Knowledge Graph Specialist"</span>,
+    goal=<span class="code-string">"Build and query enterprise knowledge graphs"</span>,
+    backstory=<span class="code-string">"""Expert in graph databases, entity extraction,
+    and semantic modeling. Deep knowledge of Cypher and
+    graph algorithms."""</span>,
+    tools=[
+        EntityExtractor(),
+        CypherTranslator(),
+        GraphQueryTool(graph),
+        OntologyValidator(),
+    ]
+)
+
+<span class="code-keyword">class</span> <span class="code-function">KnowledgeGraphBuilder</span>:
+    <span class="code-keyword">def</span> <span class="code-function">extract_entities</span>(self, text: str) -> list:
+        <span class="code-string">"""Extract entities using NER + LLM."""</span>
+        prompt = <span class="code-string">f"Extract entities: {text}"</span>
+        <span class="code-keyword">return</span> llm.invoke(prompt)
+    
+    <span class="code-keyword">def</span> <span class="code-function">infer_relationships</span>(self, entities: list) -> list:
+        <span class="code-string">"""Infer relationships between entities."""</span>
+        prompt = <span class="code-string">f"Infer relations: {entities}"</span>
+        <span class="code-keyword">return</span> llm.invoke(prompt)
+    
+    <span class="code-keyword">def</span> <span class="code-function">to_cypher</span>(self, entities, rels) -> str:
+        <span class="code-string">"""Generate Cypher MERGE statements."""</span>
+        stmts = []
+        <span class="code-keyword">for</span> e <span class="code-keyword">in</span> entities:
+            stmts.append(<span class="code-string">f"MERGE (:{e['type']} {{name: '{e['name']}'}})"</span>)
+        <span class="code-keyword">return</span> <span class="code-string">"\n"</span>.join(stmts)
+
+<span class="code-comment"># Execute</span>
+builder = KnowledgeGraphBuilder()
+entities = builder.extract_entities(document)
+cypher = builder.to_cypher(entities, rels)
+graph.query(cypher)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p2-rag-search.html" class="related-card">
+                    <div class="related-num">Page 7.2</div>
+                    <div class="related-title">RAG & Semantic Search</div>
+                    <div class="related-desc">Graph-powered retrieval for LLM responses</div>
+                </a>
+                <a href="cat07-p3-taxonomy.html" class="related-card">
+                    <div class="related-num">Page 7.3</div>
+                    <div class="related-title">Taxonomy & Ontology</div>
+                    <div class="related-desc">Schema design patterns for graphs</div>
+                </a>
+                <a href="cat07-p7-vector-databases.html" class="related-card">
+                    <div class="related-num">Page 7.7</div>
+                    <div class="related-title">Vector Databases</div>
+                    <div class="related-desc">Combine graphs with embeddings</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-knowledge-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Back to</div>
+                <div class="footer-link-title">Knowledge Management Overview</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.1 of 8</div>
+        <a href="cat07-p2-rag-search.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.2: RAG & Semantic Search</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+<script>
+function showDetail(nodeId) {
+    const panel = document.getElementById('detail-panel');
+    const details = {
+        hub: {
+            icon: '🕸️',
+            title: 'Knowledge Hub',
+            content: '<p><strong>Type:</strong> Central Node</p><p><strong>Connections:</strong> 4 categories, 2,847 total nodes</p><p><strong>Description:</strong> Root of the enterprise knowledge graph connecting all domains and enabling cross-functional discovery.</p>'
+        },
+        dataeng: {
+            icon: '🔧',
+            title: 'Data Engineering',
+            content: '<p><strong>Type:</strong> Category</p><p><strong>Nodes:</strong> 847 documents, 124 people</p><p><strong>Topics:</strong> Spark, Databricks, dbt, Airflow, Delta Lake</p><p><strong>Key Connections:</strong> 234 links to AI/ML, 156 to Cloud</p>'
+        },
+        aiml: {
+            icon: '🤖',
+            title: 'AI/ML Ops',
+            content: '<p><strong>Type:</strong> Category</p><p><strong>Nodes:</strong> 623 documents, 89 people</p><p><strong>Topics:</strong> MLflow, Feature Stores, Model Registry, LLMOps</p><p><strong>Key Connections:</strong> 234 links to Data Eng, 98 to Security</p>'
+        },
+        cloud: {
+            icon: '☁️',
+            title: 'Cloud Platforms',
+            content: '<p><strong>Type:</strong> Category</p><p><strong>Nodes:</strong> 512 documents, 76 people</p><p><strong>Topics:</strong> AWS, Azure, GCP, Kubernetes, Terraform</p><p><strong>Key Connections:</strong> 156 links to Data Eng, 112 to Security</p>'
+        },
+        security: {
+            icon: '🔒',
+            title: 'Security & Compliance',
+            content: '<p><strong>Type:</strong> Category</p><p><strong>Nodes:</strong> 298 documents, 45 people</p><p><strong>Topics:</strong> IAM, Encryption, SOC2, GDPR, Zero Trust</p><p><strong>Key Connections:</strong> 112 links to Cloud, 98 to AI/ML</p>'
+        },
+        doc1: {
+            icon: '📄',
+            title: 'Spark Best Practices Guide',
+            content: '<p><strong>Type:</strong> Document</p><p><strong>Author:</strong> Sarah Chen</p><p><strong>Last Updated:</strong> 2024-10-15</p><p><strong>References:</strong> 12 other documents</p>'
+        },
+        doc2: {
+            icon: '📄',
+            title: 'MLOps Pipeline Architecture',
+            content: '<p><strong>Type:</strong> Document</p><p><strong>Author:</strong> Marcus Johnson</p><p><strong>Last Updated:</strong> 2024-11-02</p><p><strong>References:</strong> 8 other documents</p>'
+        },
+        doc3: {
+            icon: '📄',
+            title: 'Cloud Migration Runbook',
+            content: '<p><strong>Type:</strong> Document</p><p><strong>Author:</strong> DevOps Team</p><p><strong>Last Updated:</strong> 2024-09-28</p><p><strong>References:</strong> 15 other documents</p>'
+        },
+        person1: {
+            icon: '👤',
+            title: 'Sarah Chen',
+            content: '<p><strong>Type:</strong> Person</p><p><strong>Role:</strong> Senior Data Engineer</p><p><strong>Expertise:</strong> Spark, Databricks, Delta Lake</p><p><strong>Documents:</strong> 23 authored</p>'
+        },
+        person2: {
+            icon: '👤',
+            title: 'Marcus Johnson',
+            content: '<p><strong>Type:</strong> Person</p><p><strong>Role:</strong> ML Platform Lead</p><p><strong>Expertise:</strong> MLflow, Kubeflow, Feature Stores</p><p><strong>Documents:</strong> 18 authored</p>'
+        },
+        person3: {
+            icon: '👤',
+            title: 'Emily Rodriguez',
+            content: '<p><strong>Type:</strong> Person</p><p><strong>Role:</strong> Security Architect</p><p><strong>Expertise:</strong> IAM, Zero Trust, Compliance</p><p><strong>Documents:</strong> 14 authored</p>'
+        },
+        project1: {
+            icon: '🎯',
+            title: 'Cloud Migration 2024',
+            content: '<p><strong>Type:</strong> Project</p><p><strong>Status:</strong> Active</p><p><strong>Team:</strong> 12 members</p><p><strong>Documents:</strong> 45 associated</p>'
+        },
+        project2: {
+            icon: '🎯',
+            title: 'ML Platform Modernization',
+            content: '<p><strong>Type:</strong> Project</p><p><strong>Status:</strong> Active</p><p><strong>Team:</strong> 8 members</p><p><strong>Documents:</strong> 32 associated</p>'
+        }
+    };
+    
+    const detail = details[nodeId] || details.hub;
+    panel.innerHTML = '<div class="graph-detail-title">' + detail.icon + ' ' + detail.title + '</div><div class="graph-detail-content">' + detail.content + '</div>';
+}
+</script>
+
+</body>
+</html>

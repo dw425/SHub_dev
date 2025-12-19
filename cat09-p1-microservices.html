@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices Architecture | Architecture Patterns | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #6366F1;
+            --cat-light: #818CF8;
+            --cat-dark: #4F46E5;
+            --cat-glow: rgba(99, 102, 241, 0.15);
+            --page-primary: #6366F1;
+            --page-light: #818CF8;
+            --page-glow: rgba(99, 102, 241, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 28px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 12px; font-weight: 600; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        /* Hero Compact */
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; align-items: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--page-glow); border: 1px solid var(--page-primary); padding: 6px 14px; border-radius: 9999px; font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .hero-left h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+        .hero-left > p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .hero-metric { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-metric-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .hero-metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Module */
+        .module { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; margin-bottom: 24px; }
+        .module-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 48px; height: 48px; background: var(--page-glow); border: 2px solid var(--page-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .module-info h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-secondary); }
+
+        /* Overview Content */
+        .overview-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .overview-content h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--page-light); }
+        .overview-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-full { grid-column: 1 / -1; }
+
+        /* Monolith vs Microservices Visual */
+        .arch-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .arch-compare-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .arch-compare-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; text-align: center; }
+        .arch-compare-card.monolith h4 { color: var(--yellow); }
+        .arch-compare-card.microservices h4 { color: var(--green); }
+
+        .monolith-visual { background: var(--bg-card-alt); border: 2px solid var(--yellow); border-radius: 12px; padding: 20px; text-align: center; }
+        .monolith-layers { display: flex; flex-direction: column; gap: 8px; }
+        .monolith-layer { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--yellow); border-radius: 6px; padding: 10px; font-size: 11px; color: var(--text-secondary); }
+
+        .micro-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .micro-service { background: var(--bg-card-alt); border: 2px solid var(--green); border-radius: 8px; padding: 12px 8px; text-align: center; }
+        .micro-service-icon { font-size: 18px; margin-bottom: 4px; }
+        .micro-service-name { font-size: 10px; color: var(--text-secondary); }
+
+        .arch-compare-pros { margin-top: 16px; }
+        .arch-compare-pros h5 { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .arch-compare-pros ul { list-style: none; font-size: 12px; color: var(--text-secondary); }
+        .arch-compare-pros li { padding: 4px 0; padding-left: 16px; position: relative; }
+        .arch-compare-pros li::before { content: '•'; position: absolute; left: 0; color: var(--text-muted); }
+
+        /* Service Characteristics */
+        .char-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .char-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .char-icon { font-size: 28px; margin-bottom: 12px; }
+        .char-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .char-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Communication Patterns */
+        .comm-patterns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .comm-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .comm-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .comm-card .comm-type { font-size: 11px; color: var(--page-light); margin-bottom: 12px; }
+        .comm-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+        .comm-examples { display: flex; flex-wrap: wrap; gap: 6px; }
+        .comm-example { font-size: 10px; padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-muted); }
+        .comm-pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+        .comm-pros, .comm-cons { font-size: 11px; }
+        .comm-pros span, .comm-cons span { display: block; font-weight: 600; margin-bottom: 4px; }
+        .comm-pros span { color: var(--green); }
+        .comm-cons span { color: var(--red); }
+        .comm-pros ul, .comm-cons ul { list-style: none; color: var(--text-secondary); }
+        .comm-pros li::before { content: '✓ '; color: var(--green); }
+        .comm-cons li::before { content: '✗ '; color: var(--red); }
+
+        /* Service Mesh Diagram */
+        .mesh-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .mesh-diagram h4 { font-size: 14px; font-weight: 600; margin-bottom: 20px; text-align: center; color: var(--page-light); }
+        .mesh-layers { display: flex; flex-direction: column; gap: 16px; }
+        .mesh-layer { display: flex; align-items: center; gap: 16px; }
+        .mesh-layer-label { width: 100px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: right; }
+        .mesh-layer-content { flex: 1; display: flex; gap: 12px; }
+        .mesh-box { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; }
+        .mesh-box.control { border-color: var(--cyan); background: rgba(6, 182, 212, 0.1); }
+        .mesh-box.proxy { border-color: var(--pink); background: rgba(236, 72, 153, 0.1); }
+        .mesh-box.service { border-color: var(--green); }
+        .mesh-box-name { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .mesh-box-desc { font-size: 9px; color: var(--text-muted); }
+
+        /* Decomposition Strategies */
+        .decomp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .decomp-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-top: 3px solid var(--page-primary); }
+        .decomp-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .decomp-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .decomp-example { font-size: 11px; color: var(--text-muted); padding: 10px; background: var(--bg-card); border-radius: 6px; }
+        .decomp-example strong { color: var(--page-light); display: block; margin-bottom: 4px; }
+
+        /* Platform Profiles */
+        .platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .platform-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .platform-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .platform-logo { width: 44px; height: 44px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        .platform-name { font-size: 16px; font-weight: 600; }
+        .platform-type { font-size: 11px; color: var(--text-muted); }
+        .platform-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .platform-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .platform-feature { font-size: 10px; padding: 4px 10px; background: var(--page-glow); border: 1px solid var(--page-primary); border-radius: 4px; color: var(--page-light); }
+        .platform-best { font-size: 11px; color: var(--text-muted); padding: 12px; background: var(--bg-card); border-radius: 8px; }
+        .platform-best strong { color: var(--green); }
+
+        /* Comparison Table */
+        .comparison-table { overflow-x: auto; margin-bottom: 24px; }
+        .comparison-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .comparison-table th { background: var(--bg-dark); padding: 14px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid var(--page-primary); }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .comparison-table .check { color: var(--green); }
+        .comparison-table .partial { color: var(--yellow); }
+        .comparison-table .cross { color: var(--red); }
+
+        /* Anti-Patterns */
+        .anti-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .anti-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; border-left: 3px solid var(--red); }
+        .anti-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--red); }
+        .anti-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .anti-fix { font-size: 11px; padding: 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--green); border-radius: 6px; }
+        .anti-fix strong { color: var(--green); }
+
+        /* Best Practices */
+        .best-practices { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .practices-do, .practices-dont { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .practices-do { border: 1px solid var(--green); }
+        .practices-dont { border: 1px solid var(--red); }
+        .practices-do h3, .practices-dont h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .practices-do h3 { color: var(--green); }
+        .practices-dont h3 { color: var(--red); }
+        .practice-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); }
+        .practice-item .practice-icon { flex-shrink: 0; }
+        .practices-do .practice-icon { color: var(--green); }
+        .practices-dont .practice-icon { color: var(--red); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .agent-info h3 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+        .agent-info > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+        .agent-capabilities { display: flex; flex-direction: column; gap: 10px; }
+        .agent-capability { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; }
+        .capability-icon { font-size: 18px; }
+        .agent-code { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; line-height: 1.6; overflow-x: auto; color: var(--text-secondary); }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+
+        /* Related Pages */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-primary); transform: translateY(-2px); }
+        .related-icon { font-size: 24px; margin-bottom: 12px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 12px; color: var(--text-secondary); }
+
+        /* Footer */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .overview-content, .arch-compare, .comm-patterns, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .char-grid, .decomp-grid { grid-template-columns: repeat(2, 1fr); }
+            .platform-grid, .anti-grid, .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat09-architecture-overview.html">Architecture Patterns</a>
+        <span class="sep">/</span>
+        <span class="current">Microservices</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Architecture Patterns</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat09-architecture-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat09-p1-microservices.html" class="active"><span class="nav-icon">🔲</span> 9.1 Microservices</a></li>
+            <li><a href="cat09-p2-event-driven.html"><span class="nav-icon">⚡</span> 9.2 Event-Driven</a></li>
+            <li><a href="cat09-p3-data-mesh.html"><span class="nav-icon">🕸️</span> 9.3 Data Mesh</a></li>
+            <li><a href="cat09-p4-lakehouse.html"><span class="nav-icon">🏠</span> 9.4 Data Lakehouse</a></li>
+            <li><a href="cat09-p5-api-patterns.html"><span class="nav-icon">🔌</span> 9.5 API Patterns</a></li>
+            <li><a href="cat09-p6-cqrs-eventsourcing.html"><span class="nav-icon">📚</span> 9.6 CQRS & Event Sourcing</a></li>
+            <li><a href="cat09-p7-domain-driven.html"><span class="nav-icon">🎯</span> 9.7 Domain-Driven Design</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📋</span> Overview</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Monolith vs Micro</a></li>
+            <li><a href="#communication"><span class="nav-icon">📡</span> Communication</a></li>
+            <li><a href="#decomposition"><span class="nav-icon">✂️</span> Decomposition</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🛠️</span> Platforms</a></li>
+            <li><a href="#antipatterns"><span class="nav-icon">⚠️</span> Anti-Patterns</a></li>
+            <li><a href="#bestpractices"><span class="nav-icon">✅</span> Best Practices</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- Hero -->
+        <section class="hero-compact">
+            <div class="hero-left">
+                <span class="hero-tag">🔲 Page 9.1</span>
+                <h1>Microservices Architecture</h1>
+                <p>Decompose monolithic applications into independently deployable services. Each service owns its data, scales independently, and communicates through well-defined APIs—enabling teams to move fast without breaking things.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric"><div class="hero-metric-value">85%</div><div class="hero-metric-label">Enterprise Adoption</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">10x</div><div class="hero-metric-label">Deploy Frequency</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">200+</div><div class="hero-metric-label">Services @ Netflix</div></div>
+                <div class="hero-metric"><div class="hero-metric-value">50%</div><div class="hero-metric-label">Faster Time-to-Market</div></div>
+            </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="module" id="overview">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Understanding Microservices</h2>
+                    <p>The architectural style that powers modern cloud-native applications</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div>
+                    <h3>What Are Microservices?</h3>
+                    <p>Microservices architecture structures an application as a collection of loosely coupled, independently deployable services. Each service is organized around a business capability, owns its data, and communicates with other services through lightweight protocols.</p>
+                    <p>The key insight: instead of one big application that does everything, you have many small applications that each do one thing well.</p>
+                </div>
+                <div>
+                    <h3>Why Microservices Matter</h3>
+                    <p><strong>Independent Deployment:</strong> Deploy one service without deploying the whole system. Teams can ship features faster with less coordination.</p>
+                    <p><strong>Technology Freedom:</strong> Use the right tool for each job. One service in Python for ML, another in Go for performance, another in Node for real-time.</p>
+                    <p><strong>Organizational Alignment:</strong> Small teams own small services. Conway's Law works for you instead of against you.</p>
+                </div>
+                <div class="overview-full">
+                    <h3>Key Characteristics</h3>
+                    <div class="char-grid">
+                        <div class="char-card">
+                            <div class="char-icon">📦</div>
+                            <div class="char-name">Single Responsibility</div>
+                            <div class="char-desc">Each service does one thing and does it well. Clear boundaries, focused functionality.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">🗄️</div>
+                            <div class="char-name">Decentralized Data</div>
+                            <div class="char-desc">Each service owns its database. No shared state, no distributed transactions.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">🚀</div>
+                            <div class="char-name">Independent Deployment</div>
+                            <div class="char-desc">Deploy services without coordinating with other teams. Continuous delivery enabled.</div>
+                        </div>
+                        <div class="char-card">
+                            <div class="char-icon">💪</div>
+                            <div class="char-name">Fault Isolation</div>
+                            <div class="char-desc">One service failing doesn't bring down the whole system. Graceful degradation.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monolith vs Microservices -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Monolith vs. Microservices</h2>
+                    <p>Understanding the architectural trade-offs</p>
+                </div>
+            </div>
+            <div class="arch-compare">
+                <div class="arch-compare-card monolith">
+                    <h4>🏢 Monolithic Architecture</h4>
+                    <div class="monolith-visual">
+                        <div class="monolith-layers">
+                            <div class="monolith-layer">UI Layer</div>
+                            <div class="monolith-layer">Business Logic</div>
+                            <div class="monolith-layer">Data Access</div>
+                            <div class="monolith-layer">Database</div>
+                        </div>
+                    </div>
+                    <div class="arch-compare-pros">
+                        <h5>Characteristics</h5>
+                        <ul>
+                            <li>Single deployable unit</li>
+                            <li>Shared database</li>
+                            <li>In-process function calls</li>
+                            <li>Single tech stack</li>
+                            <li>Simpler development setup</li>
+                            <li>Easier debugging/tracing</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="arch-compare-card microservices">
+                    <h4>🔲 Microservices Architecture</h4>
+                    <div class="micro-visual">
+                        <div class="micro-service"><div class="micro-service-icon">👤</div><div class="micro-service-name">User Service</div></div>
+                        <div class="micro-service"><div class="micro-service-icon">📦</div><div class="micro-service-name">Order Service</div></div>
+                        <div class="micro-service"><div class="micro-service-icon">💳</div><div class="micro-service-name">Payment Service</div></div>
+                        <div class="micro-service"><div class="micro-service-icon">📧</div><div class="micro-service-name">Notification</div></div>
+                        <div class="micro-service"><div class="micro-service-icon">📊</div><div class="micro-service-name">Analytics</div></div>
+                        <div class="micro-service"><div class="micro-service-icon">🔍</div><div class="micro-service-name">Search</div></div>
+                    </div>
+                    <div class="arch-compare-pros">
+                        <h5>Characteristics</h5>
+                        <ul>
+                            <li>Multiple deployable units</li>
+                            <li>Database per service</li>
+                            <li>Network calls (APIs)</li>
+                            <li>Polyglot tech stack</li>
+                            <li>Complex distributed system</li>
+                            <li>Requires observability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Communication Patterns -->
+        <section class="module" id="communication">
+            <div class="module-header">
+                <div class="module-icon">📡</div>
+                <div class="module-info">
+                    <h2>Communication Patterns</h2>
+                    <p>How microservices talk to each other</p>
+                </div>
+            </div>
+            <div class="comm-patterns">
+                <div class="comm-card">
+                    <h4>Synchronous Communication</h4>
+                    <div class="comm-type">Request/Response Pattern</div>
+                    <p>Service A calls Service B and waits for a response. Simple to understand but creates tight coupling and latency chains.</p>
+                    <div class="comm-examples">
+                        <span class="comm-example">REST APIs</span>
+                        <span class="comm-example">gRPC</span>
+                        <span class="comm-example">GraphQL</span>
+                    </div>
+                    <div class="comm-pros-cons">
+                        <div class="comm-pros"><span>Pros</span><ul><li>Simple mental model</li><li>Immediate feedback</li><li>Easy debugging</li></ul></div>
+                        <div class="comm-cons"><span>Cons</span><ul><li>Tight coupling</li><li>Cascading failures</li><li>Latency accumulation</li></ul></div>
+                    </div>
+                </div>
+                <div class="comm-card">
+                    <h4>Asynchronous Communication</h4>
+                    <div class="comm-type">Event-Based Pattern</div>
+                    <p>Services communicate through events/messages without waiting. Loose coupling, better resilience, but eventual consistency.</p>
+                    <div class="comm-examples">
+                        <span class="comm-example">Kafka</span>
+                        <span class="comm-example">RabbitMQ</span>
+                        <span class="comm-example">AWS SQS/SNS</span>
+                    </div>
+                    <div class="comm-pros-cons">
+                        <div class="comm-pros"><span>Pros</span><ul><li>Loose coupling</li><li>Better resilience</li><li>Natural scaling</li></ul></div>
+                        <div class="comm-cons"><span>Cons</span><ul><li>Eventual consistency</li><li>Complex debugging</li><li>Message ordering</li></ul></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Mesh -->
+            <div class="mesh-diagram">
+                <h4>Service Mesh Architecture</h4>
+                <div class="mesh-layers">
+                    <div class="mesh-layer">
+                        <div class="mesh-layer-label">Control Plane</div>
+                        <div class="mesh-layer-content">
+                            <div class="mesh-box control"><div class="mesh-box-name">Istio / Linkerd</div><div class="mesh-box-desc">Config, policy, telemetry</div></div>
+                        </div>
+                    </div>
+                    <div class="mesh-layer">
+                        <div class="mesh-layer-label">Data Plane</div>
+                        <div class="mesh-layer-content">
+                            <div class="mesh-box proxy"><div class="mesh-box-name">Sidecar Proxy</div><div class="mesh-box-desc">Envoy</div></div>
+                            <div class="mesh-box service"><div class="mesh-box-name">Service A</div><div class="mesh-box-desc">Business logic</div></div>
+                            <div class="mesh-box proxy"><div class="mesh-box-name">Sidecar Proxy</div><div class="mesh-box-desc">Envoy</div></div>
+                            <div class="mesh-box service"><div class="mesh-box-name">Service B</div><div class="mesh-box-desc">Business logic</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decomposition Strategies -->
+        <section class="module" id="decomposition">
+            <div class="module-header">
+                <div class="module-icon">✂️</div>
+                <div class="module-info">
+                    <h2>Decomposition Strategies</h2>
+                    <p>How to break apart a monolith into microservices</p>
+                </div>
+            </div>
+            <div class="decomp-grid">
+                <div class="decomp-card">
+                    <h4>By Business Capability</h4>
+                    <p>Decompose around what the business does. Each capability becomes a service that encapsulates related business logic.</p>
+                    <div class="decomp-example">
+                        <strong>E-commerce Example:</strong>
+                        Catalog, Cart, Checkout, Shipping, Payments, Notifications
+                    </div>
+                </div>
+                <div class="decomp-card">
+                    <h4>By Subdomain (DDD)</h4>
+                    <p>Use Domain-Driven Design to identify bounded contexts. Each subdomain maps to a service with its own ubiquitous language.</p>
+                    <div class="decomp-example">
+                        <strong>Banking Example:</strong>
+                        Accounts (Core), Loans (Supporting), Reporting (Generic)
+                    </div>
+                </div>
+                <div class="decomp-card">
+                    <h4>Strangler Fig Pattern</h4>
+                    <p>Gradually migrate functionality from monolith to services. Route traffic to new services while legacy still runs.</p>
+                    <div class="decomp-example">
+                        <strong>Migration Path:</strong>
+                        Proxy → Intercept → Extract → Replace → Retire
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platforms -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Platform & Tools</h2>
+                    <p>Container orchestration and service mesh platforms</p>
+                </div>
+            </div>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">☸️</div>
+                        <div>
+                            <div class="platform-name">Kubernetes</div>
+                            <div class="platform-type">Container Orchestration</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">The de facto standard for container orchestration. Handles deployment, scaling, load balancing, service discovery, and self-healing.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Auto-scaling</span>
+                        <span class="platform-feature">Rolling Updates</span>
+                        <span class="platform-feature">Service Discovery</span>
+                        <span class="platform-feature">ConfigMaps/Secrets</span>
+                    </div>
+                    <div class="platform-best"><strong>Best for:</strong> Production workloads, multi-cloud deployments, organizations with platform teams</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">🔷</div>
+                        <div>
+                            <div class="platform-name">Istio</div>
+                            <div class="platform-type">Service Mesh</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">Full-featured service mesh providing traffic management, security (mTLS), observability, and policy enforcement without code changes.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">mTLS</span>
+                        <span class="platform-feature">Traffic Splitting</span>
+                        <span class="platform-feature">Distributed Tracing</span>
+                        <span class="platform-feature">Circuit Breaking</span>
+                    </div>
+                    <div class="platform-best"><strong>Best for:</strong> Complex service topologies, zero-trust security, canary deployments</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">🔗</div>
+                        <div>
+                            <div class="platform-name">Linkerd</div>
+                            <div class="platform-type">Service Mesh</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">Lightweight, security-focused service mesh. Simpler than Istio with automatic mTLS and golden metrics out of the box.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Lightweight</span>
+                        <span class="platform-feature">Auto mTLS</span>
+                        <span class="platform-feature">Golden Metrics</span>
+                        <span class="platform-feature">Minimal Config</span>
+                    </div>
+                    <div class="platform-best"><strong>Best for:</strong> Teams wanting simplicity, quick adoption, security-first approach</div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo">🌊</div>
+                        <div>
+                            <div class="platform-name">AWS ECS/Fargate</div>
+                            <div class="platform-type">Managed Containers</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">AWS-native container orchestration. ECS for control, Fargate for serverless containers. Deep AWS integration.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Serverless Option</span>
+                        <span class="platform-feature">AWS Integration</span>
+                        <span class="platform-feature">ALB/NLB</span>
+                        <span class="platform-feature">CloudWatch</span>
+                    </div>
+                    <div class="platform-best"><strong>Best for:</strong> AWS-centric teams, simpler requirements, avoiding K8s complexity</div>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Kubernetes</th>
+                            <th>ECS/Fargate</th>
+                            <th>Docker Swarm</th>
+                            <th>Nomad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Complexity</strong></td>
+                            <td>High</td>
+                            <td>Medium</td>
+                            <td>Low</td>
+                            <td>Medium</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ecosystem</strong></td>
+                            <td><span class="check">✓</span> Largest</td>
+                            <td>AWS only</td>
+                            <td>Limited</td>
+                            <td>Growing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Multi-cloud</strong></td>
+                            <td><span class="check">✓</span> Native</td>
+                            <td><span class="cross">✗</span> AWS only</td>
+                            <td><span class="check">✓</span> Yes</td>
+                            <td><span class="check">✓</span> Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Serverless</strong></td>
+                            <td>Via add-ons</td>
+                            <td><span class="check">✓</span> Fargate</td>
+                            <td><span class="cross">✗</span> No</td>
+                            <td>Via drivers</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Learning Curve</strong></td>
+                            <td>Steep</td>
+                            <td>Moderate</td>
+                            <td>Gentle</td>
+                            <td>Moderate</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Production Ready</strong></td>
+                            <td><span class="check">✓</span> Proven</td>
+                            <td><span class="check">✓</span> Proven</td>
+                            <td><span class="partial">~</span> Limited</td>
+                            <td><span class="check">✓</span> Proven</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Anti-Patterns -->
+        <section class="module" id="antipatterns">
+            <div class="module-header">
+                <div class="module-icon">⚠️</div>
+                <div class="module-info">
+                    <h2>Common Anti-Patterns</h2>
+                    <p>Pitfalls to avoid when building microservices</p>
+                </div>
+            </div>
+            <div class="anti-grid">
+                <div class="anti-card">
+                    <h4>Distributed Monolith</h4>
+                    <p>Services that must be deployed together, share databases, or have tight coupling. All the complexity of microservices with none of the benefits.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Ensure services have independent data stores and can be deployed separately. Use async communication.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Nano-services</h4>
+                    <p>Services that are too small, creating excessive network overhead and operational burden. Every function doesn't need to be a service.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Size services around business capabilities, not technical functions. One team should own 1-3 services.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Shared Database</h4>
+                    <p>Multiple services accessing the same database tables. Changes to schema require coordinating across teams, defeating independence.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Each service owns its data. Use APIs or events to share data, not direct database access.</div>
+                </div>
+                <div class="anti-card">
+                    <h4>Sync Chain Calls</h4>
+                    <p>Service A calls B calls C calls D synchronously. Latency multiplies, any failure cascades, and the whole chain is as slow as the slowest link.</p>
+                    <div class="anti-fix"><strong>Fix:</strong> Use async messaging for chains. Cache aggressively. Design for eventual consistency.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section class="module" id="bestpractices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidance for successful microservices</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practices-do">
+                    <h3>✓ Do</h3>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Start with a monolith—understand your domain before decomposing</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Design for failure with circuit breakers, retries, and timeouts</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Embrace eventual consistency across service boundaries</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Invest in observability—tracing, logging, and metrics</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Automate everything—CI/CD, infrastructure as code, testing</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Own your APIs as products with versioning and documentation</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Size services around business capabilities, not technical layers</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Use async messaging for inter-service communication</div>
+                    <div class="practice-item"><span class="practice-icon">✓</span> Implement consumer-driven contract testing</div>
+                </div>
+                <div class="practices-dont">
+                    <h3>✗ Don't</h3>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Share databases between services—it creates hidden coupling</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Use distributed transactions—two-phase commit doesn't scale</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Ignore network latency—function calls are now network calls</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Skip contract testing—breaking changes will reach production</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Create services per database table—encapsulate capabilities</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Go all-in immediately—use strangler pattern for migration</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Build a distributed monolith—services must deploy independently</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Create nano-services—every function doesn't need a service</div>
+                    <div class="practice-item"><span class="practice-icon">✗</span> Synchronously chain calls—latency multiplies, failures cascade</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Agent Section -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered microservices architecture assistance</p>
+                </div>
+            </div>
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <h3>MicroservicesArchitect</h3>
+                    <p>An AI agent that helps design microservices architectures, decompose monoliths, define service boundaries, and plan migration strategies.</p>
+                    <div class="agent-capabilities">
+                        <div class="agent-capability"><span class="capability-icon">✂️</span> Domain analysis and service boundary identification</div>
+                        <div class="agent-capability"><span class="capability-icon">📡</span> Communication pattern recommendations</div>
+                        <div class="agent-capability"><span class="capability-icon">🗄️</span> Data ownership and API design</div>
+                        <div class="agent-capability"><span class="capability-icon">🔄</span> Migration planning with strangler pattern</div>
+                        <div class="agent-capability"><span class="capability-icon">⚠️</span> Anti-pattern detection and remediation</div>
+                        <div class="agent-capability"><span class="capability-icon">☸️</span> Platform selection guidance</div>
+                    </div>
+                </div>
+                <div class="agent-code">
+                    <div class="code-header">microservices_architect.py</div>
+                    <div class="code-content">
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+microservices_architect = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Microservices Architect"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Design scalable microservices architectures"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in decomposing monoliths,
+    defining service boundaries using DDD principles,
+    and designing resilient distributed systems."""</span>,
+    <span class="code-string">tools=</span>[domain_analyzer, api_designer,
+           dependency_mapper, migration_planner]
+)
+
+decomposition_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Analyze this monolith and propose
+    microservices decomposition:
+    - Identify bounded contexts
+    - Define service boundaries
+    - Map data ownership
+    - Design APIs between services
+    - Create migration roadmap"""</span>,
+    <span class="code-string">agent=</span>microservices_architect
+)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Pages -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring architecture patterns</p>
+                </div>
+            </div>
+            <div class="related-grid">
+                <a href="cat09-p2-event-driven.html" class="related-card">
+                    <div class="related-icon">⚡</div>
+                    <div class="related-title">Event-Driven Architecture</div>
+                    <div class="related-desc">Async communication patterns that complement microservices</div>
+                </a>
+                <a href="cat09-p7-domain-driven.html" class="related-card">
+                    <div class="related-icon">🎯</div>
+                    <div class="related-title">Domain-Driven Design</div>
+                    <div class="related-desc">The methodology for identifying service boundaries</div>
+                </a>
+                <a href="cat09-p5-api-patterns.html" class="related-card">
+                    <div class="related-icon">🔌</div>
+                    <div class="related-title">API Design Patterns</div>
+                    <div class="related-desc">Designing the contracts between microservices</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat09-architecture-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Category Overview</div>
+                <div class="footer-link-title">09: Architecture Patterns</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 9.1</div>
+        <a href="cat09-p2-event-driven.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">9.2: Event-Driven</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

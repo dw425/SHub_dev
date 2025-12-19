@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Lifecycle | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--green)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        .overview-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        
+        .lifecycle-flow { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .lifecycle-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .lifecycle-title { font-size: 13px; font-weight: 600; }
+        .lifecycle-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .lifecycle-body { padding: 24px; background: var(--bg-dark); display: flex; align-items: stretch; gap: 8px; overflow-x: auto; }
+        .lifecycle-stage { flex: 1; min-width: 140px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 16px; position: relative; transition: all 0.2s; }
+        .lifecycle-stage:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .lifecycle-stage::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); color: var(--cat-light); font-size: 16px; z-index: 1; }
+        .lifecycle-stage:last-child::after { display: none; }
+        .stage-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 10px; }
+        .stage-name { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .stage-desc { font-size: 10px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
+        .stage-meta { font-size: 9px; color: var(--cat-light); padding-top: 8px; border-top: 1px solid var(--border-color); }
+        
+        .stage-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stage-detail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+        .stage-detail-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .stage-detail-card:nth-child(1)::before { background: var(--blue); }
+        .stage-detail-card:nth-child(2)::before { background: var(--purple); }
+        .stage-detail-card:nth-child(3)::before { background: var(--green); }
+        .stage-detail-card:nth-child(4)::before { background: var(--yellow); }
+        .stage-detail-card:nth-child(5)::before { background: var(--cyan); }
+        .stage-detail-card:nth-child(6)::before { background: var(--red); }
+        .stage-detail-icon { font-size: 28px; margin-bottom: 12px; }
+        .stage-detail-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .stage-detail-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .stage-detail-list { list-style: none; }
+        .stage-detail-list li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .stage-detail-list li::before { content: '•'; color: var(--cat-light); }
+        
+        .content-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .content-type { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .content-type-icon { font-size: 24px; margin-bottom: 8px; }
+        .content-type-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .content-type-retention { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .content-type-bar { height: 4px; background: var(--bg-dark); border-radius: 2px; overflow: hidden; }
+        .content-type-fill { height: 100%; border-radius: 2px; }
+        
+        .retention-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .retention-table th { background: var(--bg-card-alt); padding: 12px 16px; text-align: left; font-size: 10px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
+        .retention-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 11px; }
+        .retention-table tr:last-child td { border-bottom: none; }
+        .retention-table tr:hover td { background: var(--bg-hover); }
+        .retention-type { font-weight: 600; color: var(--cat-light); }
+        .retention-badge { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
+        .retention-badge.legal { background: var(--red); color: #fff; }
+        .retention-badge.business { background: var(--blue); color: #fff; }
+        .retention-badge.operational { background: var(--green); color: #fff; }
+        
+        .workflow-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .workflow-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .workflow-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .workflow-icon { font-size: 24px; }
+        .workflow-name { font-size: 14px; font-weight: 600; }
+        .workflow-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .workflow-steps { list-style: none; }
+        .workflow-steps li { font-size: 10px; color: var(--text-muted); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .workflow-steps li:last-child { border-bottom: none; }
+        .workflow-step-num { width: 18px; height: 18px; background: var(--cat-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--cat-light); }
+        
+        .freshness-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .freshness-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .freshness-title { font-size: 13px; font-weight: 600; }
+        .freshness-body { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .freshness-card { background: var(--bg-dark); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .freshness-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .freshness-card.fresh::before { background: var(--green); }
+        .freshness-card.aging::before { background: var(--yellow); }
+        .freshness-card.stale::before { background: var(--cat-primary); }
+        .freshness-card.expired::before { background: var(--red); }
+        .freshness-percent { font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+        .freshness-card.fresh .freshness-percent { color: var(--green); }
+        .freshness-card.aging .freshness-percent { color: var(--yellow); }
+        .freshness-card.stale .freshness-percent { color: var(--cat-primary); }
+        .freshness-card.expired .freshness-percent { color: var(--red); }
+        .freshness-docs { font-size: 14px; color: var(--text-primary); margin-bottom: 8px; }
+        .freshness-range { font-size: 11px; color: var(--text-muted); }
+        .freshness-icon { font-size: 24px; margin-bottom: 12px; }
+        
+        .tools-compare { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; font-size: 11px; }
+        .tools-compare th { background: var(--bg-card-alt); padding: 12px 10px; text-align: center; font-size: 10px; border-bottom: 1px solid var(--border-color); }
+        .tools-compare th:first-child { text-align: left; padding-left: 16px; }
+        .tools-compare td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .tools-compare td:first-child { text-align: left; padding-left: 16px; font-weight: 500; }
+        .tools-compare tr:last-child td { border-bottom: none; }
+        .tools-compare tr:hover td { background: var(--bg-hover); }
+        .tool-head { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tool-head-icon { font-size: 20px; }
+        .tool-head-name { font-weight: 600; font-size: 10px; }
+        .check { color: var(--green); font-weight: bold; }
+        .partial { color: var(--yellow); }
+        .none { color: var(--text-muted); }
+        .feature-name { color: var(--text-secondary); }
+        .feature-category { font-size: 9px; color: var(--cat-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .version-control { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .version-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .version-icon { font-size: 28px; margin-bottom: 12px; }
+        .version-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .version-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .version-example { font-size: 10px; color: var(--text-muted); background: var(--bg-dark); padding: 10px; border-radius: 6px; font-family: monospace; }
+        
+        
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .metric-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); margin-bottom: 4px; }
+        .metric-label { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
+        .metric-desc { font-size: 9px; color: var(--text-secondary); }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--cat-dark), var(--green)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .workflow-grid { grid-template-columns: 1fr; }
+            .related-pages, .metrics-grid, .content-types, .freshness-body { grid-template-columns: repeat(2, 1fr); }
+            .stage-details, .version-control { grid-template-columns: 1fr; }
+            .lifecycle-body { flex-wrap: wrap; }
+            .tools-compare { font-size: 9px; }
+            .tools-compare th, .tools-compare td { padding: 6px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Content Lifecycle</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#stages"><span class="nav-icon">🔄</span> Lifecycle Stages</a></li>
+            <li><a href="#details"><span class="nav-icon">📋</span> Stage Details</a></li>
+            <li><a href="#types"><span class="nav-icon">📁</span> Content Types</a></li>
+            <li><a href="#retention"><span class="nav-icon">⏰</span> Retention Policies</a></li>
+            <li><a href="#workflows"><span class="nav-icon">⚙️</span> Workflows</a></li>
+            <li><a href="#freshness"><span class="nav-icon">🌱</span> Freshness</a></li>
+            <li><a href="#versioning"><span class="nav-icon">📊</span> Version Control</a></li>
+            <li><a href="#tools"><span class="nav-icon">🛠️</span> Tools</a></li>
+            <li><a href="#metrics"><span class="nav-icon">📈</span> Metrics</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html" class="active"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">📄 Page 7.4 • Document Management</div>
+                <h1>Content Lifecycle</h1>
+                <p>Manage knowledge from creation through retirement with structured workflows, retention policies, and automated governance.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">6</div>
+                    <div class="hero-metric-label">Lifecycle Stages</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">90%</div>
+                    <div class="hero-metric-label">Fresh Content</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">7yr</div>
+                    <div class="hero-metric-label">Max Retention</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">Auto</div>
+                    <div class="hero-metric-label">Archive Trigger</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2">Understanding Content Lifecycle</h2>
+                    <p>Why managed content beats document chaos</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Cost of Unmanaged Content</h3>
+                <p>Enterprise content without lifecycle management becomes a liability. Documents proliferate without review, outdated information misleads decisions, and storage costs spiral. Research shows <strong>30% of enterprise content is ROT</strong> (Redundant, Outdated, Trivial)—costing organizations $2-5 per gigabyte annually in storage, backup, and compliance risk.</p>
+                <p><strong>Content lifecycle management (CLM)</strong> treats documents as assets with defined stages: creation, review, publication, maintenance, archive, and disposal. Each stage has owners, triggers, and actions. The result is content that stays accurate, compliant, and discoverable—while stale content is systematically retired.</p>
+                <p>Modern CLM integrates with knowledge management: <strong>taxonomy-based classification</strong> routes content to appropriate review workflows, <strong>freshness scoring</strong> identifies stale documents for update or retirement, and <strong>retention policies</strong> ensure compliance with legal and regulatory requirements. AI now automates much of this—detecting staleness, suggesting updates, and flagging compliance risks.</p>
+            </div>
+        </section>
+
+        <!-- LIFECYCLE STAGES -->
+        <section class="module" id="stages">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Lifecycle Stages</h2>
+                    <p>The six-stage content journey</p>
+                </div>
+            </div>
+            <div class="lifecycle-flow">
+                <div class="lifecycle-header">
+                    <div class="lifecycle-title">📊 Content Lifecycle Flow</div>
+                    <div class="lifecycle-badge">6 Stages</div>
+                </div>
+                <div class="lifecycle-body">
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(59,130,246,0.2);">✏️</div>
+                        <div class="stage-name">Create</div>
+                        <div class="stage-desc">Author drafts content with metadata and classification</div>
+                        <div class="stage-meta">Owner: Author</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(139,92,246,0.2);">👁️</div>
+                        <div class="stage-name">Review</div>
+                        <div class="stage-desc">SME and editorial review for accuracy and quality</div>
+                        <div class="stage-meta">Owner: Reviewer</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(16,185,129,0.2);">🚀</div>
+                        <div class="stage-name">Publish</div>
+                        <div class="stage-desc">Approved content goes live with full visibility</div>
+                        <div class="stage-meta">Owner: Publisher</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(245,158,11,0.2);">🔧</div>
+                        <div class="stage-name">Maintain</div>
+                        <div class="stage-desc">Periodic review keeps content current and accurate</div>
+                        <div class="stage-meta">Owner: Author</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(6,182,212,0.2);">📦</div>
+                        <div class="stage-name">Archive</div>
+                        <div class="stage-desc">Inactive content preserved for compliance/history</div>
+                        <div class="stage-meta">Owner: System</div>
+                    </div>
+                    <div class="lifecycle-stage">
+                        <div class="stage-icon" style="background: rgba(239,68,68,0.2);">🗑️</div>
+                        <div class="stage-name">Retire</div>
+                        <div class="stage-desc">Content deleted per retention policy</div>
+                        <div class="stage-meta">Owner: System</div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Content moves through stages based on <strong>triggers</strong>: time-based (review due after 90 days), event-based (product deprecated), or metric-based (zero views in 6 months). Each transition should be auditable—who approved publication? Why was content archived? This audit trail is essential for compliance.</p>
+                <p>The <strong>Maintain stage</strong> is often neglected but critical. Set review cadences based on content type: policies quarterly, technical docs every 6 months, evergreen content annually. Assign content owners who receive automated reminders. Content without a responsible owner should be flagged for immediate review or archival.</p>
+            </div>
+        </section>
+
+        <!-- STAGE DETAILS -->
+        <section class="module" id="details">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Stage Details</h2>
+                    <p>What happens at each lifecycle stage</p>
+                </div>
+            </div>
+            <div class="stage-details">
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">✏️</div>
+                    <div class="stage-detail-name">Create</div>
+                    <div class="stage-detail-desc">Authors draft content with required metadata, taxonomy tags, and ownership assignment.</div>
+                    <ul class="stage-detail-list">
+                        <li>Assign content owner</li>
+                        <li>Apply taxonomy tags</li>
+                        <li>Set review cadence</li>
+                        <li>Define audience scope</li>
+                        <li>Link related content</li>
+                    </ul>
+                </div>
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">👁️</div>
+                    <div class="stage-detail-name">Review</div>
+                    <div class="stage-detail-desc">Subject matter experts validate accuracy; editors check quality and style compliance.</div>
+                    <ul class="stage-detail-list">
+                        <li>Technical accuracy check</li>
+                        <li>Editorial/style review</li>
+                        <li>Legal/compliance sign-off</li>
+                        <li>Accessibility validation</li>
+                        <li>Metadata verification</li>
+                    </ul>
+                </div>
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">🚀</div>
+                    <div class="stage-detail-name">Publish</div>
+                    <div class="stage-detail-desc">Approved content is released to target audience with full discoverability.</div>
+                    <ul class="stage-detail-list">
+                        <li>Set publication date</li>
+                        <li>Configure visibility/permissions</li>
+                        <li>Index for search</li>
+                        <li>Notify subscribers</li>
+                        <li>Update related pages</li>
+                    </ul>
+                </div>
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">🔧</div>
+                    <div class="stage-detail-name">Maintain</div>
+                    <div class="stage-detail-desc">Periodic reviews ensure content stays accurate, relevant, and useful.</div>
+                    <ul class="stage-detail-list">
+                        <li>Scheduled review reminders</li>
+                        <li>Staleness detection</li>
+                        <li>Broken link checks</li>
+                        <li>Analytics review</li>
+                        <li>Update or confirm current</li>
+                    </ul>
+                </div>
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">📦</div>
+                    <div class="stage-detail-name">Archive</div>
+                    <div class="stage-detail-desc">Inactive content is preserved but removed from primary navigation and search.</div>
+                    <ul class="stage-detail-list">
+                        <li>Remove from navigation</li>
+                        <li>Lower search ranking</li>
+                        <li>Add archive banner</li>
+                        <li>Preserve for compliance</li>
+                        <li>Redirect links if needed</li>
+                    </ul>
+                </div>
+                <div class="stage-detail-card">
+                    <div class="stage-detail-icon">🗑️</div>
+                    <div class="stage-detail-name">Retire</div>
+                    <div class="stage-detail-desc">Content is permanently deleted after retention period expires.</div>
+                    <ul class="stage-detail-list">
+                        <li>Verify retention complete</li>
+                        <li>Check legal holds</li>
+                        <li>Remove all copies</li>
+                        <li>Update referencing content</li>
+                        <li>Log deletion for audit</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Each stage has <strong>entry criteria</strong> (what must be true to enter), <strong>activities</strong> (what happens during), and <strong>exit criteria</strong> (what must be satisfied to proceed). Document these formally—they become the basis for workflow automation and compliance audits.</p>
+                <p>The <strong>Archive vs. Retire</strong> distinction is important: archived content is hidden from normal use but preserved for compliance or historical reference. Retired content is permanently deleted. Some regulated industries require 7+ year retention, making proper archival critical. Legal holds can prevent retirement even after retention periods expire.</p>
+            </div>
+        </section>
+
+        <!-- CONTENT TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">📁</div>
+                <div class="module-info">
+                    <h2>Content Types & Review Cadence</h2>
+                    <p>Different content needs different treatment</p>
+                </div>
+            </div>
+            <div class="content-types">
+                <div class="content-type">
+                    <div class="content-type-icon">📜</div>
+                    <div class="content-type-name">Policies</div>
+                    <div class="content-type-retention">Quarterly Review</div>
+                    <div class="content-type-bar"><div class="content-type-fill" style="width: 25%; background: var(--red);"></div></div>
+                </div>
+                <div class="content-type">
+                    <div class="content-type-icon">⚙️</div>
+                    <div class="content-type-name">Technical Docs</div>
+                    <div class="content-type-retention">6 Month Review</div>
+                    <div class="content-type-bar"><div class="content-type-fill" style="width: 50%; background: var(--yellow);"></div></div>
+                </div>
+                <div class="content-type">
+                    <div class="content-type-icon">📚</div>
+                    <div class="content-type-name">Training</div>
+                    <div class="content-type-retention">Annual Review</div>
+                    <div class="content-type-bar"><div class="content-type-fill" style="width: 75%; background: var(--blue);"></div></div>
+                </div>
+                <div class="content-type">
+                    <div class="content-type-icon">🌿</div>
+                    <div class="content-type-name">Evergreen</div>
+                    <div class="content-type-retention">18 Month Review</div>
+                    <div class="content-type-bar"><div class="content-type-fill" style="width: 100%; background: var(--green);"></div></div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Review frequency should match content volatility. <strong>Policies</strong> change with regulations and business strategy—quarterly reviews catch compliance gaps early. <strong>Technical documentation</strong> tracks product releases—review after each major version. <strong>Training materials</strong> need annual refresh to stay current. <strong>Evergreen content</strong> (company history, foundational concepts) changes slowly but still needs periodic validation.</p>
+                <p>Automate review scheduling based on content type. When authors create content, the system should automatically set the next review date based on type classification. Send reminders 2 weeks before due, escalate to managers if overdue, and auto-flag for archival if repeatedly ignored.</p>
+            </div>
+        </section>
+
+        <!-- RETENTION POLICIES -->
+        <section class="module" id="retention">
+            <div class="module-header">
+                <div class="module-icon">⏰</div>
+                <div class="module-info">
+                    <h2>Retention Policies</h2>
+                    <p>How long to keep different content</p>
+                </div>
+            </div>
+            <table class="retention-table">
+                <thead>
+                    <tr>
+                        <th>Content Type</th>
+                        <th>Retention Period</th>
+                        <th>Driver</th>
+                        <th>After Expiry</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="retention-type">Financial Records</span></td>
+                        <td>7 years</td>
+                        <td><span class="retention-badge legal">Legal</span></td>
+                        <td>Secure deletion</td>
+                    </tr>
+                    <tr>
+                        <td><span class="retention-type">Employment Records</span></td>
+                        <td>7 years post-termination</td>
+                        <td><span class="retention-badge legal">Legal</span></td>
+                        <td>Secure deletion</td>
+                    </tr>
+                    <tr>
+                        <td><span class="retention-type">Contracts</span></td>
+                        <td>Term + 6 years</td>
+                        <td><span class="retention-badge legal">Legal</span></td>
+                        <td>Archive then delete</td>
+                    </tr>
+                    <tr>
+                        <td><span class="retention-type">Project Documentation</span></td>
+                        <td>3 years post-completion</td>
+                        <td><span class="retention-badge business">Business</span></td>
+                        <td>Archive</td>
+                    </tr>
+                    <tr>
+                        <td><span class="retention-type">Meeting Notes</span></td>
+                        <td>1 year</td>
+                        <td><span class="retention-badge operational">Operational</span></td>
+                        <td>Auto-delete</td>
+                    </tr>
+                    <tr>
+                        <td><span class="retention-type">Email Archives</span></td>
+                        <td>3 years</td>
+                        <td><span class="retention-badge business">Business</span></td>
+                        <td>Archive then delete</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p>Retention policies are driven by <strong>legal requirements</strong> (SOX, GDPR, HIPAA), <strong>business needs</strong> (institutional knowledge, audit trails), and <strong>operational efficiency</strong> (reducing clutter). Work with Legal and Compliance to define policies for each content type. Document the rationale—"why 7 years?"—to support future policy reviews.</p>
+                <p><strong>Legal holds</strong> override retention policies during litigation or regulatory investigation. Content under hold cannot be modified or deleted regardless of retention expiry. Implement hold mechanisms that prevent accidental deletion and track all held content. When holds are released, content should resume normal retention processing.</p>
+            </div>
+        </section>
+
+        <!-- WORKFLOWS -->
+        <section class="module" id="workflows">
+            <div class="module-header">
+                <div class="module-icon">⚙️</div>
+                <div class="module-info">
+                    <h2>Workflow Automation</h2>
+                    <p>Automating lifecycle transitions</p>
+                </div>
+            </div>
+            <div class="workflow-grid">
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <div class="workflow-icon">📝</div>
+                        <div class="workflow-name">Review Workflow</div>
+                    </div>
+                    <div class="workflow-desc">Multi-stage approval process for new or updated content before publication.</div>
+                    <ul class="workflow-steps">
+                        <li><span class="workflow-step-num">1</span> Author submits for review</li>
+                        <li><span class="workflow-step-num">2</span> SME validates accuracy</li>
+                        <li><span class="workflow-step-num">3</span> Editor checks quality</li>
+                        <li><span class="workflow-step-num">4</span> Legal reviews (if flagged)</li>
+                        <li><span class="workflow-step-num">5</span> Publisher approves release</li>
+                    </ul>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <div class="workflow-icon">🔔</div>
+                        <div class="workflow-name">Freshness Workflow</div>
+                    </div>
+                    <div class="workflow-desc">Automated alerts and escalations for content approaching staleness.</div>
+                    <ul class="workflow-steps">
+                        <li><span class="workflow-step-num">1</span> Review date approaches (-14d)</li>
+                        <li><span class="workflow-step-num">2</span> Owner receives reminder</li>
+                        <li><span class="workflow-step-num">3</span> Overdue escalates to manager</li>
+                        <li><span class="workflow-step-num">4</span> 30d+ overdue flags for archive</li>
+                        <li><span class="workflow-step-num">5</span> System archives if unactioned</li>
+                    </ul>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <div class="workflow-icon">📦</div>
+                        <div class="workflow-name">Archive Workflow</div>
+                    </div>
+                    <div class="workflow-desc">Graceful transition of inactive content to archived state.</div>
+                    <ul class="workflow-steps">
+                        <li><span class="workflow-step-num">1</span> Trigger detected (stale/deprecated)</li>
+                        <li><span class="workflow-step-num">2</span> Owner notified for confirmation</li>
+                        <li><span class="workflow-step-num">3</span> Archive banner added</li>
+                        <li><span class="workflow-step-num">4</span> Removed from navigation</li>
+                        <li><span class="workflow-step-num">5</span> Redirects configured</li>
+                    </ul>
+                </div>
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <div class="workflow-icon">🗑️</div>
+                        <div class="workflow-name">Retirement Workflow</div>
+                    </div>
+                    <div class="workflow-desc">Permanent deletion after retention period with compliance checks.</div>
+                    <ul class="workflow-steps">
+                        <li><span class="workflow-step-num">1</span> Retention period expires</li>
+                        <li><span class="workflow-step-num">2</span> Check for legal holds</li>
+                        <li><span class="workflow-step-num">3</span> Verify no active references</li>
+                        <li><span class="workflow-step-num">4</span> Execute secure deletion</li>
+                        <li><span class="workflow-step-num">5</span> Log for audit trail</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Workflow automation transforms lifecycle management from manual overhead to systematic governance. Most CMS platforms (SharePoint, Confluence, AEM) support workflow configuration—use them. The key is <strong>minimal friction for authors</strong> while ensuring <strong>consistent execution</strong> of governance requirements.</p>
+                <p>Design workflows with <strong>escape valves</strong>: what happens when the approver is on vacation? What if content is urgent? Build in delegation rules, expedited paths for critical updates, and reasonable timeout defaults. Monitor workflow metrics (time in each stage, rejection rates, bottlenecks) to continuously improve.</p>
+            </div>
+        </section>
+
+        <!-- FRESHNESS -->
+        <section class="module" id="freshness">
+            <div class="module-header">
+                <div class="module-icon">🌱</div>
+                <div class="module-info">
+                    <h2>Content Freshness</h2>
+                    <p>Measuring and maintaining content health</p>
+                </div>
+            </div>
+            <div class="freshness-viz">
+                <div class="freshness-header">
+                    <div class="freshness-title">📊 Content Freshness Dashboard</div>
+                </div>
+                <div class="freshness-body">
+                    <div class="freshness-card fresh">
+                        <div class="freshness-icon">🌱</div>
+                        <div class="freshness-percent">65%</div>
+                        <div class="freshness-docs">2,340 docs</div>
+                        <div class="freshness-range">Fresh (0-90 days)</div>
+                    </div>
+                    <div class="freshness-card aging">
+                        <div class="freshness-icon">🍂</div>
+                        <div class="freshness-percent">20%</div>
+                        <div class="freshness-docs">720 docs</div>
+                        <div class="freshness-range">Aging (90-180 days)</div>
+                    </div>
+                    <div class="freshness-card stale">
+                        <div class="freshness-icon">⚠️</div>
+                        <div class="freshness-percent">10%</div>
+                        <div class="freshness-docs">360 docs</div>
+                        <div class="freshness-range">Stale (180-365 days)</div>
+                    </div>
+                    <div class="freshness-card expired">
+                        <div class="freshness-icon">🚨</div>
+                        <div class="freshness-percent">5%</div>
+                        <div class="freshness-docs">180 docs</div>
+                        <div class="freshness-range">Expired (365+ days)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Freshness scoring</strong> combines multiple signals: time since last update, time until next scheduled review, page view trends, broken link count, and AI-detected staleness indicators (outdated product names, deprecated APIs, changed organizational references). A composite score helps prioritize which content needs attention most urgently.</p>
+                <p>Set <strong>freshness targets</strong> by content area: "90% of technical docs should be fresh (reviewed within cadence)." Track trends over time—is freshness improving or declining? Dashboard these metrics for content owners and leadership. Gamification (leaderboards, freshness badges) can drive adoption when combined with accountability.</p>
+            </div>
+        </section>
+
+        <!-- VERSION CONTROL -->
+        <section class="module" id="versioning">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Version Control</h2>
+                    <p>Tracking changes and managing history</p>
+                </div>
+            </div>
+            <div class="version-control">
+                <div class="version-card">
+                    <div class="version-icon">🔢</div>
+                    <div class="version-title">Semantic Versioning</div>
+                    <div class="version-desc">Major.Minor.Patch format for clear change significance.</div>
+                    <div class="version-example">v2.1.3 → v2.2.0 (minor)<br>v2.2.0 → v3.0.0 (major)</div>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon">📝</div>
+                    <div class="version-title">Change Tracking</div>
+                    <div class="version-desc">Detailed diff views showing exactly what changed between versions.</div>
+                    <div class="version-example">+ Added new section<br>- Removed deprecated info<br>~ Modified paragraph 3</div>
+                </div>
+                <div class="version-card">
+                    <div class="version-icon">⏪</div>
+                    <div class="version-title">Rollback Capability</div>
+                    <div class="version-desc">Ability to revert to any previous version instantly.</div>
+                    <div class="version-example">Current: v2.3.1<br>Restore: v2.2.0<br>Compare: v2.1.0 vs v2.3.1</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Version control for documents follows similar principles to code: <strong>every change is tracked</strong>, <strong>previous versions are accessible</strong>, and <strong>changes can be compared</strong>. Most enterprise CMS platforms provide built-in versioning, but policies around version retention, major vs. minor changes, and mandatory comments vary.</p>
+                <p>Define what constitutes a <strong>major version</strong> (significant content restructuring, policy changes) vs. <strong>minor version</strong> (corrections, clarifications, formatting). Major versions might require full review workflow; minor versions might be author-approved. Consider <strong>version retention limits</strong>—keeping 100 versions of a frequently-edited page consumes storage and complicates history browsing.</p>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
+        <section class="module" id="tools">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Tools & Platforms</h2>
+                    <p>Software for content lifecycle management</p>
+                </div>
+            </div>
+            <table class="tools-compare">
+                <thead>
+                    <tr>
+                        <th style="width: 180px;">Feature</th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📘</span><span class="tool-head-name">Confluence</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📁</span><span class="tool-head-name">SharePoint</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🔷</span><span class="tool-head-name">Box</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📄</span><span class="tool-head-name">Google Drive</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🎨</span><span class="tool-head-name">AEM</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">📚</span><span class="tool-head-name">Notion</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🗂️</span><span class="tool-head-name">M-Files</span></div></th>
+                        <th><div class="tool-head"><span class="tool-head-icon">🔐</span><span class="tool-head-name">Veeva Vault</span></div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="feature-category">Core</span><br><span class="feature-name">Version Control</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Core</span><br><span class="feature-name">Workflow Automation</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Core</span><br><span class="feature-name">Retention Policies</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Legal Hold</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Audit Trail</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Compliance (21 CFR)</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Content</span><br><span class="feature-name">Metadata/Taxonomy</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Content</span><br><span class="feature-name">Auto-Classification (AI)</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Search</span><br><span class="feature-name">Full-Text Search</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Integration</span><br><span class="feature-name">API/Extensibility</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Best For</strong></td>
+                        <td style="font-size: 9px;">Wiki/KB</td>
+                        <td style="font-size: 9px;">Enterprise</td>
+                        <td style="font-size: 9px;">Files/Gov</td>
+                        <td style="font-size: 9px;">Collab</td>
+                        <td style="font-size: 9px;">Web CMS</td>
+                        <td style="font-size: 9px;">Teams</td>
+                        <td style="font-size: 9px;">Auto-class</td>
+                        <td style="font-size: 9px;">Regulated</td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Pricing</strong></td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$</td>
+                        <td style="font-size: 9px;">$$$$</td>
+                        <td style="font-size: 9px;">$</td>
+                        <td style="font-size: 9px;">$$$</td>
+                        <td style="font-size: 9px;">$$$$</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p>The scorecard above compares platforms across 10 essential lifecycle management capabilities. <span class="check" style="color: var(--green);">✓</span> indicates full native support, <span class="partial" style="color: var(--yellow);">◐</span> indicates partial support or requires add-ons, and <span class="none" style="color: var(--text-muted);">—</span> indicates no native capability. <strong>Regulated industries</strong> (pharma, life sciences, finance) should prioritize platforms with 21 CFR Part 11 compliance—Veeva Vault and M-Files are purpose-built for this.</p>
+                <p><strong>SharePoint</strong> offers the most complete enterprise feature set when paired with Microsoft 365, including retention labels, eDiscovery, and compliance center integration. <strong>Confluence</strong> excels as a knowledge wiki but requires third-party apps for advanced governance. <strong>Box</strong> provides strong governance for file-centric workflows. For teams prioritizing collaboration and ease of use over formal governance, <strong>Notion</strong> and <strong>Google Drive</strong> offer simpler experiences at lower cost. Choose based on your compliance requirements, existing ecosystem, and governance maturity.</p>
+            </div>
+        </section>
+
+        <!-- METRICS -->
+        <section class="module" id="metrics">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Success Metrics</h2>
+                    <p>Measuring lifecycle management effectiveness</p>
+                </div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">90%</div>
+                    <div class="metric-label">Fresh Content</div>
+                    <div class="metric-desc">Content reviewed within cadence</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">&lt;5%</div>
+                    <div class="metric-label">Orphan Content</div>
+                    <div class="metric-desc">No assigned owner</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">48hr</div>
+                    <div class="metric-label">Review Cycle</div>
+                    <div class="metric-desc">Average time to publish</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Retention Compliance</div>
+                    <div class="metric-desc">Content following policy</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Freshness rate</strong> is the primary health indicator: what percentage of content was reviewed within its scheduled cadence? Target 90%+ for critical content areas. <strong>Orphan rate</strong> catches governance gaps—content without owners tends to decay fastest. <strong>Review cycle time</strong> measures workflow efficiency; long cycles discourage content creation.</p>
+                <p><strong>Retention compliance</strong> should be 100%—any gap is audit risk. Track content by retention category and flag items approaching policy expiration. Monitor <strong>archive and deletion rates</strong> to ensure the system is actively managing content, not just accumulating it indefinitely. Dashboards should be visible to content owners and leadership alike.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for effective lifecycle management</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Assign an owner to every piece of content at creation time</li>
+                        <li>Set review cadence based on content type and volatility</li>
+                        <li>Automate reminders, escalations, and archival triggers</li>
+                        <li>Use taxonomy to route content to appropriate workflows</li>
+                        <li>Track freshness metrics and make them visible</li>
+                        <li>Define clear retention policies with Legal input</li>
+                        <li>Archive gracefully with banners and redirects</li>
+                        <li>Audit compliance regularly and remediate gaps</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Create content without metadata and classification</li>
+                        <li>Let content accumulate indefinitely without review</li>
+                        <li>Delete content without checking legal holds</li>
+                        <li>Make workflows so complex that authors bypass them</li>
+                        <li>Archive content without notification to stakeholders</li>
+                        <li>Ignore orphan content hoping someone will claim it</li>
+                        <li>Treat all content types with identical lifecycle rules</li>
+                        <li>Rely on manual processes for compliance-critical actions</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The biggest failure mode is <strong>governance theater</strong>: policies exist on paper but aren't enforced in practice. Combat this with automation (systems enforce policies, not people), visibility (dashboards show compliance status), and accountability (owners are responsible for their content's health).</p>
+                <p>Start with <strong>high-value content</strong>: policies, customer-facing docs, compliance materials. Get lifecycle management working well there before expanding to all content. Quick wins build momentum and demonstrate value. Remember that the goal is <strong>useful, accurate content</strong>—not bureaucratic overhead for its own sake.</p>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered lifecycle automation</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📄</div>
+                    <div class="agent-name">LifecycleAgent</div>
+                    <div class="agent-role">Content Governance Specialist</div>
+                    <div class="agent-desc">Automates content lifecycle management with AI-powered staleness detection, smart archival recommendations, and compliance monitoring.</div>
+                    <ul class="agent-capabilities">
+                        <li>Detect stale content using semantic analysis</li>
+                        <li>Identify outdated references (products, people, links)</li>
+                        <li>Recommend archive vs. update vs. delete</li>
+                        <li>Flag retention policy violations</li>
+                        <li>Generate freshness reports by owner/team</li>
+                        <li>Suggest content consolidation opportunities</li>
+                        <li>Monitor compliance with legal holds</li>
+                        <li>Auto-draft update suggestions for stale docs</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Staleness Detector</div>
+                        <div class="code-tab">Compliance Monitor</div>
+                        <div class="code-filename">lifecycle_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># lifecycle_agent.py - Content Lifecycle Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime, timedelta
+
+<span class="code-keyword">class</span> <span class="code-function">StalenessDetector</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, content_store):
+        self.store = content_store
+        self.stale_indicators = [
+            <span class="code-string">"deprecated"</span>, <span class="code-string">"legacy"</span>, <span class="code-string">"old version"</span>,
+            <span class="code-string">"no longer supported"</span>, <span class="code-string">"outdated"</span>
+        ]
+    
+    <span class="code-keyword">def</span> <span class="code-function">analyze</span>(self, doc_id: str) -> dict:
+        <span class="code-string">"""Compute staleness score for document."""</span>
+        doc = self.store.get(doc_id)
+        
+        <span class="code-comment"># Time-based signals</span>
+        days_since_update = (datetime.now() - doc.updated).days
+        days_until_review = (doc.next_review - datetime.now()).days
+        
+        <span class="code-comment"># Content-based signals</span>
+        broken_links = self._check_links(doc.content)
+        stale_refs = self._find_stale_references(doc.content)
+        
+        <span class="code-comment"># Engagement signals</span>
+        view_trend = self._calculate_view_trend(doc_id)
+        
+        score = self._compute_score(
+            days_since_update, days_until_review,
+            broken_links, stale_refs, view_trend
+        )
+        
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"doc_id"</span>: doc_id,
+            <span class="code-string">"staleness_score"</span>: score,
+            <span class="code-string">"recommendation"</span>: self._recommend(score),
+            <span class="code-string">"issues"</span>: stale_refs + broken_links
+        }
+    
+    <span class="code-keyword">def</span> <span class="code-function">_recommend</span>(self, score: float) -> str:
+        <span class="code-keyword">if</span> score > 0.8: <span class="code-keyword">return</span> <span class="code-string">"ARCHIVE"</span>
+        <span class="code-keyword">if</span> score > 0.5: <span class="code-keyword">return</span> <span class="code-string">"UPDATE_URGENT"</span>
+        <span class="code-keyword">if</span> score > 0.3: <span class="code-keyword">return</span> <span class="code-string">"REVIEW"</span>
+        <span class="code-keyword">return</span> <span class="code-string">"HEALTHY"</span>
+
+<span class="code-comment"># Agent definition</span>
+lifecycle_agent = Agent(
+    role=<span class="code-string">"Content Lifecycle Manager"</span>,
+    goal=<span class="code-string">"Maintain content freshness and compliance"</span>,
+    tools=[StalenessDetectorTool(), ComplianceCheckerTool(),
+           ArchiveRecommenderTool(), FreshnessReporterTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p3-taxonomy.html" class="related-card">
+                    <div class="related-num">Page 7.3</div>
+                    <div class="related-title">Taxonomy & Ontology</div>
+                    <div class="related-desc">Classification drives workflows</div>
+                </a>
+                <a href="cat07-p5-enterprise-wikis.html" class="related-card">
+                    <div class="related-num">Page 7.5</div>
+                    <div class="related-title">Enterprise Wikis</div>
+                    <div class="related-desc">Where content lives</div>
+                </a>
+                <a href="cat07-p2-rag-search.html" class="related-card">
+                    <div class="related-num">Page 7.2</div>
+                    <div class="related-title">RAG & Semantic Search</div>
+                    <div class="related-desc">Fresh content powers AI</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p3-taxonomy.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.3: Taxonomy & Ontology</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.4 of 8</div>
+        <a href="cat07-p5-enterprise-wikis.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.5: Enterprise Wikis</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

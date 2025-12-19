@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Mining | Automation & RPA | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --teal: #14B8A6;
+            --orange: #F97316;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--cat-primary), var(--green)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        
+        /* VALUE CHAIN VISUALIZATION */
+        .value-chain { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .value-chain-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .value-chain-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .value-chain-body { padding: 24px; }
+        .chain-flow { display: flex; align-items: stretch; gap: 0; margin-bottom: 24px; }
+        .chain-stage { flex: 1; padding: 20px; text-align: center; position: relative; background: var(--bg-dark); }
+        .chain-stage::after { content: ''; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); border: 12px solid transparent; border-left-color: var(--bg-dark); z-index: 2; }
+        .chain-stage:last-child::after { display: none; }
+        .chain-stage:nth-child(1) { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1)); border-left: 3px solid var(--blue); }
+        .chain-stage:nth-child(2) { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1)); border-left: 3px solid var(--cat-primary); }
+        .chain-stage:nth-child(3) { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1)); border-left: 3px solid var(--yellow); }
+        .chain-stage:nth-child(4) { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1)); border-left: 3px solid var(--green); }
+        .chain-stage:nth-child(1)::after { border-left-color: rgba(59, 130, 246, 0.15); }
+        .chain-stage:nth-child(2)::after { border-left-color: rgba(139, 92, 246, 0.15); }
+        .chain-stage:nth-child(3)::after { border-left-color: rgba(245, 158, 11, 0.15); }
+        .chain-icon { font-size: 32px; margin-bottom: 12px; }
+        .chain-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .chain-desc { font-size: 10px; color: var(--text-muted); }
+        .chain-outputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .chain-output { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; }
+        .chain-output-icon { font-size: 20px; margin-bottom: 6px; }
+        .chain-output-name { font-size: 10px; font-weight: 600; margin-bottom: 2px; }
+        .chain-output-detail { font-size: 9px; color: var(--text-muted); }
+        
+        /* SUCCESS STORIES */
+        .success-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .success-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .success-card.featured { grid-column: span 2; }
+        .success-header { padding: 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .success-logo { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
+        .success-logo.siemens { background: linear-gradient(135deg, #009999, #006666); }
+        .success-logo.uber { background: linear-gradient(135deg, #000000, #333333); }
+        .success-logo.jpmorgan { background: linear-gradient(135deg, #0D4C92, #1B6BB2); }
+        .success-logo.accenture { background: linear-gradient(135deg, #A100FF, #7B00C0); }
+        .success-logo.pepsico { background: linear-gradient(135deg, #004B93, #C41230); }
+        .success-logo.kraft { background: linear-gradient(135deg, #ED1C24, #9B1B30); }
+        .success-info h3 { font-size: 16px; margin-bottom: 4px; }
+        .success-industry { font-size: 11px; color: var(--text-muted); }
+        .success-body { padding: 20px; }
+        .success-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .success-card.featured .success-metrics { grid-template-columns: repeat(4, 1fr); }
+        .success-metric { background: var(--bg-dark); border-radius: 8px; padding: 12px; text-align: center; }
+        .success-metric-value { font-size: 18px; font-weight: 700; color: var(--green); }
+        .success-metric-label { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+        .success-quote { font-size: 12px; color: var(--text-secondary); font-style: italic; line-height: 1.6; margin-bottom: 12px; padding-left: 16px; border-left: 3px solid var(--cat-primary); }
+        .success-details { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+        .success-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+        .success-tag { font-size: 9px; padding: 4px 8px; background: var(--bg-dark); border-radius: 4px; color: var(--text-muted); }
+        
+        /* BUSINESS UNDERSTANDING FRAMEWORK */
+        .understanding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .understanding-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .understanding-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .understanding-card:nth-child(1)::before { background: var(--blue); }
+        .understanding-card:nth-child(2)::before { background: var(--cat-primary); }
+        .understanding-card:nth-child(3)::before { background: var(--green); }
+        .understanding-icon { font-size: 32px; margin-bottom: 12px; }
+        .understanding-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .understanding-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .understanding-questions { list-style: none; }
+        .understanding-questions li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: flex-start; gap: 6px; }
+        .understanding-questions li::before { content: '?'; color: var(--cat-light); font-weight: bold; }
+        
+        /* CONFORMANCE VISUALIZATION */
+        .conformance-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .conformance-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .conformance-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .conformance-stats { display: flex; gap: 16px; }
+        .conformance-stat { text-align: center; }
+        .conformance-stat-value { font-size: 18px; font-weight: 700; }
+        .conformance-stat-value.good { color: var(--green); }
+        .conformance-stat-value.warning { color: var(--yellow); }
+        .conformance-stat-value.bad { color: var(--red); }
+        .conformance-stat-label { font-size: 9px; color: var(--text-muted); }
+        .conformance-body { padding: 20px; }
+        .conformance-flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .conf-node { padding: 12px 16px; border-radius: 8px; text-align: center; min-width: 90px; }
+        .conf-node.compliant { background: rgba(16, 185, 129, 0.15); border: 2px solid var(--green); }
+        .conf-node.deviation { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--red); }
+        .conf-node.skipped { background: rgba(245, 158, 11, 0.15); border: 2px dashed var(--yellow); }
+        .conf-node.expected { background: var(--bg-dark); border: 2px solid var(--border-color); }
+        .conf-node-name { font-size: 10px; font-weight: 600; }
+        .conf-node-status { font-size: 8px; margin-top: 4px; }
+        .conf-node.compliant .conf-node-status { color: var(--green); }
+        .conf-node.deviation .conf-node-status { color: var(--red); }
+        .conf-node.skipped .conf-node-status { color: var(--yellow); }
+        .conf-arrow { color: var(--text-muted); font-size: 14px; }
+        .conf-arrow.violation { color: var(--red); font-weight: bold; }
+        .deviation-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .deviation-item { background: var(--bg-dark); border-radius: 8px; padding: 12px; display: flex; align-items: flex-start; gap: 10px; }
+        .deviation-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .deviation-icon.skip { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .deviation-icon.extra { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+        .deviation-icon.wrong { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+        .deviation-icon.loop { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+        .deviation-info h4 { font-size: 11px; font-weight: 600; margin-bottom: 2px; }
+        .deviation-info p { font-size: 10px; color: var(--text-muted); }
+        .deviation-count { font-size: 11px; font-weight: 600; color: var(--yellow); margin-left: auto; }
+        
+        /* ROOT CAUSE ANALYSIS */
+        .rootcause-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .rootcause-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .rootcause-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .rootcause-body { padding: 20px; }
+        .rootcause-tree { display: flex; flex-direction: column; gap: 12px; }
+        .rootcause-branch { display: flex; align-items: stretch; gap: 12px; }
+        .rootcause-problem { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 16px; min-width: 200px; }
+        .rootcause-problem-label { font-size: 9px; color: var(--red); text-transform: uppercase; margin-bottom: 4px; }
+        .rootcause-problem-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+        .rootcause-problem-impact { font-size: 11px; color: var(--text-secondary); }
+        .rootcause-connector { display: flex; align-items: center; color: var(--text-muted); font-size: 20px; }
+        .rootcause-causes { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .rootcause-cause { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; }
+        .rootcause-cause-correlation { font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+        .rootcause-cause-correlation.high { color: var(--red); }
+        .rootcause-cause-correlation.medium { color: var(--yellow); }
+        .rootcause-cause-correlation.low { color: var(--text-muted); }
+        .rootcause-cause-name { font-size: 11px; margin-bottom: 2px; }
+        .rootcause-cause-detail { font-size: 9px; color: var(--text-muted); }
+        
+        /* EVENT LOG VISUALIZATION */
+        .event-log-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .event-log-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .event-log-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .event-log-badge { font-size: 10px; padding: 4px 10px; background: var(--blue); color: white; border-radius: 4px; }
+        .event-log-body { padding: 20px; background: var(--bg-dark); }
+        .log-table { width: 100%; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; }
+        .log-table th { text-align: left; padding: 8px 12px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); }
+        .log-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-color); }
+        .log-table tr:last-child td { border-bottom: none; }
+        .log-timestamp { color: var(--text-muted); }
+        .log-case { color: var(--cyan); }
+        .log-activity { color: var(--text-primary); }
+        .log-resource { color: var(--cat-light); }
+        .log-highlight { background: rgba(139, 92, 246, 0.1); }
+        .log-bottleneck { background: rgba(245, 158, 11, 0.15); }
+        
+        /* PROCESS MAP */
+        .process-map { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .process-map-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        .process-map-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .process-map-body { padding: 24px; }
+        .process-flow { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .process-node { background: var(--bg-dark); border: 2px solid var(--border-color); border-radius: 8px; padding: 12px 16px; text-align: center; min-width: 100px; }
+        .process-node.start { border-color: var(--green); background: rgba(16, 185, 129, 0.1); }
+        .process-node.end { border-color: var(--cyan); background: rgba(6, 182, 212, 0.1); }
+        .process-node.bottleneck { border-color: var(--yellow); background: rgba(245, 158, 11, 0.15); box-shadow: 0 0 12px rgba(245, 158, 11, 0.3); }
+        .process-node-name { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+        .process-node-stat { font-size: 9px; color: var(--text-muted); }
+        .process-arrow { color: var(--text-muted); font-size: 16px; }
+        .process-arrow.slow { color: var(--yellow); font-weight: bold; }
+        .variant-legend { display: flex; gap: 20px; justify-content: center; }
+        .variant-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+        .variant-line { width: 30px; height: 3px; border-radius: 2px; }
+        .variant-line.main { background: var(--cat-primary); }
+        .variant-line.alt { background: var(--yellow); opacity: 0.6; }
+        .variant-line.rare { background: var(--red); opacity: 0.4; }
+        
+        /* OPPORTUNITY SCORING */
+        .opportunity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .opportunity-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; position: relative; }
+        .opportunity-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+        .opportunity-card.high::before { background: var(--green); }
+        .opportunity-card.medium::before { background: var(--yellow); }
+        .opportunity-card.low::before { background: var(--text-muted); }
+        .opportunity-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .opportunity-name { font-size: 14px; font-weight: 600; }
+        .opportunity-score { font-size: 20px; font-weight: 700; }
+        .opportunity-card.high .opportunity-score { color: var(--green); }
+        .opportunity-card.medium .opportunity-score { color: var(--yellow); }
+        .opportunity-card.low .opportunity-score { color: var(--text-muted); }
+        .opportunity-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        .opp-metric { background: var(--bg-dark); border-radius: 6px; padding: 10px; text-align: center; }
+        .opp-metric-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .opp-metric-label { font-size: 9px; color: var(--text-muted); }
+        .opportunity-factors { list-style: none; }
+        .opportunity-factors li { font-size: 10px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .opportunity-factors li::before { content: '✓'; color: var(--green); font-size: 10px; }
+        .opportunity-card.low .opportunity-factors li::before { content: '○'; color: var(--text-muted); }
+        
+        /* PLATFORM COMPARISON */
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .platform-header { padding: 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .platform-logo { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .platform-logo.celonis { background: linear-gradient(135deg, #00D4AA, #0099FF); }
+        .platform-logo.microsoft { background: linear-gradient(135deg, #0078D4, #00BCF2); }
+        .platform-logo.uipath { background: linear-gradient(135deg, #FA4616, #FF8C00); }
+        .platform-name { font-size: 16px; font-weight: 600; }
+        .platform-type { font-size: 11px; color: var(--text-muted); }
+        .platform-body { padding: 20px; }
+        .platform-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .platform-features { list-style: none; margin-bottom: 16px; }
+        .platform-features li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .platform-features li:last-child { border-bottom: none; }
+        .platform-features li::before { content: '✦'; color: var(--cat-light); }
+        .platform-pricing { font-size: 10px; color: var(--text-muted); padding: 10px; background: var(--bg-dark); border-radius: 6px; text-align: center; }
+        
+        /* REFERENCE GUIDE */
+        .reference-guide { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .guide-header { padding: 16px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .guide-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .guide-subtitle { font-size: 11px; color: var(--text-muted); }
+        .guide-body { padding: 20px; }
+        .guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .guide-item { background: var(--bg-dark); border-radius: 8px; padding: 14px; }
+        .guide-item-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        .guide-item-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        /* USE CASES */
+        .usecase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .usecase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .usecase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .usecase-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--cat-glow); }
+        .usecase-title { font-size: 14px; font-weight: 600; }
+        .usecase-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .usecase-benefits { display: flex; flex-wrap: wrap; gap: 6px; }
+        .benefit-tag { font-size: 9px; padding: 4px 8px; background: var(--bg-dark); border-radius: 4px; color: var(--text-muted); }
+        
+        /* BEST PRACTICES */
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        /* ROI CALCULATOR */
+        .roi-calculator { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+        .roi-header { padding: 16px 20px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(139, 92, 246, 0.2)); border-bottom: 1px solid var(--border-color); }
+        .roi-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .roi-body { padding: 20px; }
+        .roi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+        .roi-metric { background: var(--bg-dark); border-radius: 8px; padding: 16px; text-align: center; }
+        .roi-metric-value { font-size: 24px; font-weight: 700; color: var(--green); }
+        .roi-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        .roi-formula { background: var(--bg-dark); border-radius: 8px; padding: 16px; font-family: monospace; font-size: 11px; color: var(--text-secondary); text-align: center; }
+        
+        /* AGENT */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--blue), var(--cat-primary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(139,92,246,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid, .usecase-grid, .success-grid { grid-template-columns: 1fr; }
+            .success-card.featured { grid-column: span 1; }
+            .opportunity-grid, .platform-grid, .understanding-grid { grid-template-columns: repeat(2, 1fr); }
+            .related-pages, .guide-grid, .chain-outputs, .roi-grid { grid-template-columns: 1fr; }
+            .chain-flow { flex-direction: column; }
+            .chain-stage::after { display: none; }
+            .rootcause-branch { flex-direction: column; }
+            .rootcause-causes { grid-template-columns: 1fr; }
+            .deviation-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat08-automation-overview.html">Automation & RPA</a>
+        <span class="sep">/</span>
+        <span class="current">Process Mining</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">⚡ Category 08</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat08-automation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat08-p1-automation-maturity.html"><span class="nav-icon">📊</span> 8.1 Automation Maturity</a></li>
+            <li><a href="cat08-p2-bot-orchestration.html"><span class="nav-icon">🤖</span> 8.2 Bot Orchestration</a></li>
+            <li><a href="cat08-p3-process-mining.html" class="active"><span class="nav-icon">⛏️</span> 8.3 Process Mining</a></li>
+            <li><a href="cat08-p4-power-platform.html"><span class="nav-icon">⚡</span> 8.4 Power Platform</a></li>
+            <li><a href="cat08-p5-rpa-platforms.html"><span class="nav-icon">🔧</span> 8.5 RPA Platforms</a></li>
+            <li><a href="cat08-p6-document-processing.html"><span class="nav-icon">📄</span> 8.6 Document Processing</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#value-chain"><span class="nav-icon">🔄</span> Value Chain</a></li>
+            <li><a href="#success-stories"><span class="nav-icon">🏆</span> Success Stories</a></li>
+            <li><a href="#business-understanding"><span class="nav-icon">🔍</span> Business Understanding</a></li>
+            <li><a href="#event-logs"><span class="nav-icon">📋</span> Event Logs</a></li>
+            <li><a href="#process-map"><span class="nav-icon">🗺️</span> Process Maps</a></li>
+            <li><a href="#conformance"><span class="nav-icon">✅</span> Conformance</a></li>
+            <li><a href="#rootcause"><span class="nav-icon">🔬</span> Root Cause Analysis</a></li>
+            <li><a href="#scoring"><span class="nav-icon">📊</span> Opportunity Scoring</a></li>
+            <li><a href="#roi"><span class="nav-icon">💰</span> ROI & Business Case</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🔧</span> Platforms</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">⛏️ Page 8.3 • Discovery & Analysis</div>
+                <h1>Process Mining</h1>
+                <p>Discover how processes actually work by analyzing event logs from enterprise systems. Identify automation opportunities, bottlenecks, compliance issues, and root causes with data-driven insights that reveal the truth about your operations.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">383%</div>
+                    <div class="hero-metric-label">Avg ROI (Forrester)</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">6 mo</div>
+                    <div class="hero-metric-label">Payback Period</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">10-50x</div>
+                    <div class="hero-metric-label">More Variants Found</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">$44M</div>
+                    <div class="hero-metric-label">Avg Benefits (Study)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>What is Process Mining?</h2>
+                    <p>Data-driven process discovery and analysis</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>From Event Logs to Process Intelligence</h3>
+                <p><strong>Process mining</strong> extracts knowledge from event logs recorded by enterprise systems. Every time someone creates an invoice, approves a purchase order, or updates a customer record, the system logs that event with a timestamp. Process mining tools analyze millions of these events to reconstruct how processes actually execute—not how they're documented, but how they truly work in practice.</p>
+                <p>The power of process mining lies in its <strong>objectivity</strong>. Traditional process discovery relies on interviews and workshops where people describe what they think happens. Process mining shows what actually happens, revealing the gap between documented procedures and reality. Organizations typically discover 10-50x more process variants than expected, along with bottlenecks, rework loops, and compliance violations invisible to manual analysis.</p>
+                <p>Process mining serves three primary purposes: <strong>Discovery</strong> (understanding current state), <strong>Conformance</strong> (comparing actual vs expected behavior), and <strong>Enhancement</strong> (identifying improvement opportunities). For automation programs, it's invaluable for finding the right processes to automate, quantifying the business case before investing in development, and ensuring automations are built on optimized processes rather than broken ones.</p>
+            </div>
+        </section>
+
+        <!-- VALUE CHAIN -->
+        <section class="module" id="value-chain">
+            <div class="module-header">
+                <div class="module-icon">🔄</div>
+                <div class="module-info">
+                    <h2>Process Mining Value Chain</h2>
+                    <p>End-to-end journey from data to business impact</p>
+                </div>
+            </div>
+            
+            <div class="value-chain">
+                <div class="value-chain-header">
+                    <div class="value-chain-title">⛏️ From Raw Data to Business Value</div>
+                </div>
+                <div class="value-chain-body">
+                    <div class="chain-flow">
+                        <div class="chain-stage">
+                            <div class="chain-icon">📊</div>
+                            <div class="chain-name">Extract</div>
+                            <div class="chain-desc">Pull event logs from source systems</div>
+                        </div>
+                        <div class="chain-stage">
+                            <div class="chain-icon">🔍</div>
+                            <div class="chain-name">Discover</div>
+                            <div class="chain-desc">Reconstruct process flows automatically</div>
+                        </div>
+                        <div class="chain-stage">
+                            <div class="chain-icon">📈</div>
+                            <div class="chain-name">Analyze</div>
+                            <div class="chain-desc">Identify bottlenecks, variants, root causes</div>
+                        </div>
+                        <div class="chain-stage">
+                            <div class="chain-icon">🎯</div>
+                            <div class="chain-name">Act</div>
+                            <div class="chain-desc">Automate, optimize, or redesign</div>
+                        </div>
+                    </div>
+                    <div class="chain-outputs">
+                        <div class="chain-output">
+                            <div class="chain-output-icon">🗺️</div>
+                            <div class="chain-output-name">Process Maps</div>
+                            <div class="chain-output-detail">Visual flow with variants</div>
+                        </div>
+                        <div class="chain-output">
+                            <div class="chain-output-icon">⏱️</div>
+                            <div class="chain-output-name">Cycle Times</div>
+                            <div class="chain-output-detail">Duration analysis</div>
+                        </div>
+                        <div class="chain-output">
+                            <div class="chain-output-icon">✅</div>
+                            <div class="chain-output-name">Conformance</div>
+                            <div class="chain-output-detail">Deviation detection</div>
+                        </div>
+                        <div class="chain-output">
+                            <div class="chain-output-icon">💰</div>
+                            <div class="chain-output-name">Business Cases</div>
+                            <div class="chain-output-detail">ROI quantification</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Understanding the Value Chain</h3>
+                <p>The <strong>Extract</strong> phase pulls event data from source systems—ERP (SAP, Oracle), CRM (Salesforce), service management (ServiceNow), and databases. Each event must have a Case ID (unique process instance), Activity (what happened), Timestamp (when), and Resource (who/what). Data quality here determines everything downstream; organizations typically spend 60% of project time on data preparation.</p>
+                <p>In the <strong>Discover</strong> phase, algorithms analyze event sequences to reconstruct process flows. The output is a process map showing all paths cases take, frequency of each path, and where processes diverge. <strong>Analysis</strong> goes deeper: identifying bottlenecks (activities with long wait times), root causes of delays, compliance violations, and automation opportunities. Finally, <strong>Act</strong> translates insights into improvements—automating high-volume steps, redesigning broken processes, or standardizing variants.</p>
+            </div>
+        </section>
+
+        <!-- SUCCESS STORIES -->
+        <section class="module" id="success-stories">
+            <div class="module-header">
+                <div class="module-icon">🏆</div>
+                <div class="module-info">
+                    <h2>Enterprise Success Stories</h2>
+                    <p>Real-world results from process mining implementations</p>
+                </div>
+            </div>
+            
+            <div class="success-grid">
+                <div class="success-card featured">
+                    <div class="success-header">
+                        <div class="success-logo siemens">S</div>
+                        <div class="success-info">
+                            <h3>Siemens</h3>
+                            <div class="success-industry">Industrial Manufacturing • 385,000 employees</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">10M+</div>
+                                <div class="success-metric-label">Activities Reduced</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">30 min</div>
+                                <div class="success-metric-label">Saved per PO</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">30TB</div>
+                                <div class="success-metric-label">Data Lake Size</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">€10M+</div>
+                                <div class="success-metric-label">Annual Savings</div>
+                            </div>
+                        </div>
+                        <div class="success-quote">"The system gives you the tools to dig in to understand what is going on and where you are going wrong. You used to have the case where management thinks you can do better, but nobody knows where to start. With these tools it shows you where the problem is."</div>
+                        <div class="success-details">Siemens built a 30TB data lake extracting from 60+ ERP systems. They identified 70 different activities in their order-to-cash process and reduced total activities by more than 10 million through optimization. Process mining revealed bottlenecks in supplier payments, logistics, and order processing that were invisible to manual analysis.</div>
+                        <div class="success-tags">
+                            <span class="success-tag">Order-to-Cash</span>
+                            <span class="success-tag">Purchase-to-Pay</span>
+                            <span class="success-tag">Logistics</span>
+                            <span class="success-tag">SAP Integration</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-card">
+                    <div class="success-header">
+                        <div class="success-logo uber">U</div>
+                        <div class="success-info">
+                            <h3>Uber</h3>
+                            <div class="success-industry">Technology / Transportation</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">$20M+</div>
+                                <div class="success-metric-label">Productivity Gains</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">700+</div>
+                                <div class="success-metric-label">Cities Analyzed</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">65</div>
+                                <div class="success-metric-label">Countries</div>
+                            </div>
+                        </div>
+                        <div class="success-details">Process mining enabled Uber to understand variation in customer support processes across 700+ cities on 6 continents, driving process standardization and harmonization at massive scale.</div>
+                        <div class="success-tags">
+                            <span class="success-tag">Customer Support</span>
+                            <span class="success-tag">Global Ops</span>
+                            <span class="success-tag">Standardization</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-card">
+                    <div class="success-header">
+                        <div class="success-logo accenture">A</div>
+                        <div class="success-info">
+                            <h3>Accenture</h3>
+                            <div class="success-industry">Professional Services</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">$35M</div>
+                                <div class="success-metric-label">Working Capital</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">75%</div>
+                                <div class="success-metric-label">Cycle Time Cut</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">30%</div>
+                                <div class="success-metric-label">Faster Approval</div>
+                            </div>
+                        </div>
+                        <div class="success-details">Accenture's Procurement Plus team used process mining to address a 60-hour average requisition approval cycle time in one country, reducing it to just 15 hours—a 75% improvement through fact-based conversations and targeted automation.</div>
+                        <div class="success-tags">
+                            <span class="success-tag">Procure-to-Pay</span>
+                            <span class="success-tag">Accounts Payable</span>
+                            <span class="success-tag">Working Capital</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-card">
+                    <div class="success-header">
+                        <div class="success-logo pepsico">P</div>
+                        <div class="success-info">
+                            <h3>PepsiCo</h3>
+                            <div class="success-industry">Consumer Goods</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">86%</div>
+                                <div class="success-metric-label">Fewer Rejected Orders</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">9</div>
+                                <div class="success-metric-label">Processes Covered</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">$M+</div>
+                                <div class="success-metric-label">AR Unlocked</div>
+                            </div>
+                        </div>
+                        <div class="success-details">Starting with Accounts Payable in 2019, PepsiCo expanded to nine processes including AR, AP, Procure-to-Pay, Order-to-Cash, and Make-to-Deploy. "Celonis is the genie in a bottle we've all been waiting for."</div>
+                        <div class="success-tags">
+                            <span class="success-tag">Order-to-Cash</span>
+                            <span class="success-tag">Make-to-Deploy</span>
+                            <span class="success-tag">9 Processes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-card">
+                    <div class="success-header">
+                        <div class="success-logo kraft">K</div>
+                        <div class="success-info">
+                            <h3>Kraft Heinz</h3>
+                            <div class="success-industry">Food & Beverage</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">30%</div>
+                                <div class="success-metric-label">Fewer Overdue</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">E2E</div>
+                                <div class="success-metric-label">AR Visibility</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">Better</div>
+                                <div class="success-metric-label">Cash Discounts</div>
+                            </div>
+                        </div>
+                        <div class="success-details">Kraft Heinz reduced overdue payments by 30% and gained end-to-end visibility across Accounts Receivable, enabling better renegotiation of cash discounts in a highly competitive market.</div>
+                        <div class="success-tags">
+                            <span class="success-tag">Accounts Receivable</span>
+                            <span class="success-tag">Cash Management</span>
+                            <span class="success-tag">Collections</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-card">
+                    <div class="success-header">
+                        <div class="success-logo" style="background: linear-gradient(135deg, #003366, #0066CC);">HP</div>
+                        <div class="success-info">
+                            <h3>HP Inc.</h3>
+                            <div class="success-industry">Technology / Hardware</div>
+                        </div>
+                    </div>
+                    <div class="success-body">
+                        <div class="success-metrics">
+                            <div class="success-metric">
+                                <div class="success-metric-value">$1B</div>
+                                <div class="success-metric-label">Cashflow Opportunity</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">AP</div>
+                                <div class="success-metric-label">First Win</div>
+                            </div>
+                            <div class="success-metric">
+                                <div class="success-metric-value">L2C</div>
+                                <div class="success-metric-label">Expansion Target</div>
+                            </div>
+                        </div>
+                        <div class="success-details">HP's journey began during a major SAP migration when they realized they weren't clear on exactly how processes worked in legacy systems. In Accounts Payable alone, they found up to a billion dollars of cashflow opportunity.</div>
+                        <div class="success-tags">
+                            <span class="success-tag">SAP Migration</span>
+                            <span class="success-tag">Accounts Payable</span>
+                            <span class="success-tag">Lead-to-Cash</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>What These Success Stories Teach Us</h3>
+                <p>Several patterns emerge from enterprise process mining deployments. First, <strong>start with high-value processes</strong>—Accounts Payable and Order-to-Cash are common starting points because they directly impact cash flow and have clear, measurable outcomes. Second, <strong>the data lake matters</strong>—Siemens' 30TB data lake from 60+ systems enabled insights impossible with siloed analysis. Third, <strong>scale comes from success</strong>—PepsiCo started with one process and expanded to nine as value was demonstrated.</p>
+                <p>Most importantly, these companies used process mining not just for discovery but for <strong>continuous improvement</strong>. The technology reveals problems; organizational change fixes them. Accenture's 75% cycle time reduction came from "fact-based conversations" enabled by visualizations that made problems undeniable. Process mining transforms subjective debates into objective analysis.</p>
+            </div>
+        </section>
+
+        <!-- BUSINESS UNDERSTANDING -->
+        <section class="module" id="business-understanding">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>How Process Mining Reveals Business Operations</h2>
+                    <p>Three lenses for understanding how your business actually works</p>
+                </div>
+            </div>
+            
+            <div class="understanding-grid">
+                <div class="understanding-card">
+                    <div class="understanding-icon">🗺️</div>
+                    <div class="understanding-title">Process Discovery</div>
+                    <div class="understanding-desc">Automatically reconstruct how processes actually execute, revealing the gap between documented procedures and reality. See all variants, not just the "happy path."</div>
+                    <ul class="understanding-questions">
+                        <li>How does our process actually work vs how we think it works?</li>
+                        <li>How many different paths do cases take through the process?</li>
+                        <li>What percentage follows the standard path?</li>
+                        <li>Where do processes diverge from expectations?</li>
+                        <li>Which activities are most common? Most rare?</li>
+                    </ul>
+                </div>
+                
+                <div class="understanding-card">
+                    <div class="understanding-icon">⏱️</div>
+                    <div class="understanding-title">Performance Analysis</div>
+                    <div class="understanding-desc">Measure cycle times, identify bottlenecks, and understand where time is spent. Distinguish between working time and waiting time to target interventions.</div>
+                    <ul class="understanding-questions">
+                        <li>How long does our process take end-to-end?</li>
+                        <li>Where are the bottlenecks slowing us down?</li>
+                        <li>How much time is work vs waiting?</li>
+                        <li>Which resources are overloaded or underutilized?</li>
+                        <li>What causes cases to take longer than average?</li>
+                    </ul>
+                </div>
+                
+                <div class="understanding-card">
+                    <div class="understanding-icon">✅</div>
+                    <div class="understanding-title">Conformance Checking</div>
+                    <div class="understanding-desc">Compare actual execution against policies, regulations, and best practices. Detect deviations automatically and quantify compliance rates across all cases.</div>
+                    <ul class="understanding-questions">
+                        <li>Do our processes comply with regulations?</li>
+                        <li>Are required approvals being skipped?</li>
+                        <li>Which controls are being bypassed?</li>
+                        <li>What is our conformance rate to the standard process?</li>
+                        <li>Who is responsible for deviations?</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>The "As-Is" vs "To-Be" Gap</h3>
+                <p>Every organization has two versions of each process: the <strong>"to-be"</strong> process documented in policies and procedures, and the <strong>"as-is"</strong> process that actually executes in reality. Traditional process improvement requires expensive, time-consuming workshops to discover the as-is state. Process mining reveals it automatically from data, often uncovering that documented processes bear little resemblance to actual execution.</p>
+                <p>The gap between as-is and to-be isn't always bad—sometimes workarounds exist because the designed process is broken. Process mining reveals these patterns objectively, enabling teams to decide whether to enforce the standard process or update it to reflect what actually works. The goal is alignment: processes that are both effective and controlled.</p>
+            </div>
+        </section>
+
+        <!-- EVENT LOGS -->
+        <section class="module" id="event-logs">
+            <div class="module-header">
+                <div class="module-icon">📋</div>
+                <div class="module-info">
+                    <h2>Event Log Structure</h2>
+                    <p>The raw material for process mining</p>
+                </div>
+            </div>
+            
+            <div class="event-log-viz">
+                <div class="event-log-header">
+                    <div class="event-log-title">📄 Sample Event Log: Order-to-Cash Process</div>
+                    <div class="event-log-badge">1.2M Events</div>
+                </div>
+                <div class="event-log-body">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Case ID</th>
+                                <th>Activity</th>
+                                <th>Resource</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="log-timestamp">2024-01-15 09:23:41</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Order Created</td>
+                                <td class="log-resource">Sarah M.</td>
+                                <td>$12,450 • Customer: Acme Corp</td>
+                            </tr>
+                            <tr>
+                                <td class="log-timestamp">2024-01-15 09:24:02</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Credit Check</td>
+                                <td class="log-resource">System</td>
+                                <td>Auto-approved • Score: 780</td>
+                            </tr>
+                            <tr class="log-bottleneck">
+                                <td class="log-timestamp">2024-01-15 14:31:18</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Approval Requested</td>
+                                <td class="log-resource">Sarah M.</td>
+                                <td>⚠️ Manager approval • 5hr 7min wait</td>
+                            </tr>
+                            <tr class="log-bottleneck">
+                                <td class="log-timestamp">2024-01-16 10:45:33</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Approved</td>
+                                <td class="log-resource">Mike T.</td>
+                                <td>⚠️ 20hr 14min since request</td>
+                            </tr>
+                            <tr>
+                                <td class="log-timestamp">2024-01-16 10:47:12</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Invoice Generated</td>
+                                <td class="log-resource">System</td>
+                                <td>INV-2024-12847</td>
+                            </tr>
+                            <tr>
+                                <td class="log-timestamp">2024-01-18 15:22:08</td>
+                                <td class="log-case">ORD-2024-8847</td>
+                                <td class="log-activity">Payment Received</td>
+                                <td class="log-resource">System</td>
+                                <td>Full payment • 3.2 days to cash</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="reference-guide">
+                <div class="guide-header">
+                    <div class="guide-title">📋 Understanding Event Logs</div>
+                    <div class="guide-subtitle">How to read and interpret process mining data</div>
+                </div>
+                <div class="guide-body">
+                    <div class="guide-grid">
+                        <div class="guide-item">
+                            <div class="guide-item-name">Case ID</div>
+                            <div class="guide-item-desc">The unique identifier that ties all events in a single process instance together. In the example, ORD-2024-8847 is one order flowing through the process. All events for this order share the same Case ID, allowing us to reconstruct the full journey from creation to payment.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Activity</div>
+                            <div class="guide-item-desc">What happened at this step. Activities should be named consistently—"Order Created" and "Create Order" would be treated as different activities. Standardizing activity names before mining is critical for accurate analysis. Aim for 10-30 distinct activities per process.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Timestamp</div>
+                            <div class="guide-item-desc">When the activity occurred. Timestamps enable cycle time analysis—notice the highlighted rows show a 5+ hour wait before approval was even requested, then another 20 hours for actual approval. These delays are invisible without timestamp analysis and reveal the true bottleneck.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Resource</div>
+                            <div class="guide-item-desc">Who or what performed the activity. Can be a person (Sarah M.), system (automated), or role. Resource analysis reveals workload distribution, handoff patterns, and whether certain people are bottlenecks or super-performers. "System" resources indicate automation opportunities already captured.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROCESS MAP -->
+        <section class="module" id="process-map">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Process Maps & Variants</h2>
+                    <p>Visualizing how processes actually execute</p>
+                </div>
+            </div>
+            
+            <div class="process-map">
+                <div class="process-map-header">
+                    <div class="process-map-title">🗺️ Order-to-Cash Process Map</div>
+                    <div class="event-log-badge">47 Variants Discovered</div>
+                </div>
+                <div class="process-map-body">
+                    <div class="process-flow">
+                        <div class="process-node start">
+                            <div class="process-node-name">Order Created</div>
+                            <div class="process-node-stat">12,847 cases</div>
+                        </div>
+                        <span class="process-arrow">→</span>
+                        <div class="process-node">
+                            <div class="process-node-name">Credit Check</div>
+                            <div class="process-node-stat">Avg: 0.3 min</div>
+                        </div>
+                        <span class="process-arrow slow">→→</span>
+                        <div class="process-node bottleneck">
+                            <div class="process-node-name">Approval</div>
+                            <div class="process-node-stat">Avg: 18.4 hrs ⚠️</div>
+                        </div>
+                        <span class="process-arrow">→</span>
+                        <div class="process-node">
+                            <div class="process-node-name">Invoice</div>
+                            <div class="process-node-stat">Avg: 2.1 min</div>
+                        </div>
+                        <span class="process-arrow">→</span>
+                        <div class="process-node end">
+                            <div class="process-node-name">Payment</div>
+                            <div class="process-node-stat">Avg: 3.2 days</div>
+                        </div>
+                    </div>
+                    <div class="variant-legend">
+                        <div class="variant-item">
+                            <div class="variant-line main"></div>
+                            <span>Happy path (68%)</span>
+                        </div>
+                        <div class="variant-item">
+                            <div class="variant-line alt"></div>
+                            <span>Rework loops (24%)</span>
+                        </div>
+                        <div class="variant-item">
+                            <div class="variant-line rare"></div>
+                            <span>Exception paths (8%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reference-guide">
+                <div class="guide-header">
+                    <div class="guide-title">🗺️ Reading Process Maps</div>
+                    <div class="guide-subtitle">How to interpret process mining visualizations</div>
+                </div>
+                <div class="guide-body">
+                    <div class="guide-grid">
+                        <div class="guide-item">
+                            <div class="guide-item-name">Bottleneck Identification</div>
+                            <div class="guide-item-desc">The yellow "Approval" node shows an 18.4 hour average wait time—this is your bottleneck. While credit check takes seconds and invoicing takes minutes, manual approval adds nearly a full day to cycle time. This is a prime target for automation (auto-approval rules) or process redesign (higher thresholds).</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Process Variants</div>
+                            <div class="guide-item-desc">47 variants means cases take 47 different paths through the process. The "happy path" (68%) is the expected flow. Rework loops (24%) indicate cases that bounce back—orders returned for correction, re-approvals needed. Exception paths (8%) are unusual routes requiring investigation. High variant count = harder to automate.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Automation Implications</div>
+                            <div class="guide-item-desc">Focus automation on the happy path first (68% of cases), then decide whether to automate exceptions or route them to humans. The 24% rework rate suggests upstream data quality issues worth fixing before automation—automating a broken process just creates broken automation faster.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Cycle Time Analysis</div>
+                            <div class="guide-item-desc">Total cycle time (order to payment) is 3.2 days, but only ~20 minutes is actual work. The rest is waiting—for approval, for payment. Automation won't help waiting time; you need process changes (approval rules, payment terms) to improve end-to-end cycle time. Distinguish working time from waiting time.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONFORMANCE CHECKING -->
+        <section class="module" id="conformance">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Conformance Checking</h2>
+                    <p>Comparing actual execution against expected behavior</p>
+                </div>
+            </div>
+            
+            <div class="conformance-viz">
+                <div class="conformance-header">
+                    <div class="conformance-title">✅ Purchase-to-Pay Conformance Analysis</div>
+                    <div class="conformance-stats">
+                        <div class="conformance-stat">
+                            <div class="conformance-stat-value good">73%</div>
+                            <div class="conformance-stat-label">Conformant</div>
+                        </div>
+                        <div class="conformance-stat">
+                            <div class="conformance-stat-value warning">19%</div>
+                            <div class="conformance-stat-label">Minor Deviation</div>
+                        </div>
+                        <div class="conformance-stat">
+                            <div class="conformance-stat-value bad">8%</div>
+                            <div class="conformance-stat-label">Major Violation</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="conformance-body">
+                    <div class="conformance-flow">
+                        <div class="conf-node compliant">
+                            <div class="conf-node-name">Create PR</div>
+                            <div class="conf-node-status">✓ Compliant</div>
+                        </div>
+                        <span class="conf-arrow">→</span>
+                        <div class="conf-node compliant">
+                            <div class="conf-node-name">Approve PR</div>
+                            <div class="conf-node-status">✓ Compliant</div>
+                        </div>
+                        <span class="conf-arrow violation">⚠→</span>
+                        <div class="conf-node skipped">
+                            <div class="conf-node-name">3-Way Match</div>
+                            <div class="conf-node-status">⚠ Often Skipped</div>
+                        </div>
+                        <span class="conf-arrow">→</span>
+                        <div class="conf-node deviation">
+                            <div class="conf-node-name">Manager Approval</div>
+                            <div class="conf-node-status">✗ Bypassed 8%</div>
+                        </div>
+                        <span class="conf-arrow">→</span>
+                        <div class="conf-node compliant">
+                            <div class="conf-node-name">Create PO</div>
+                            <div class="conf-node-status">✓ Compliant</div>
+                        </div>
+                    </div>
+                    
+                    <div class="deviation-list">
+                        <div class="deviation-item">
+                            <div class="deviation-icon skip">⏭️</div>
+                            <div class="deviation-info">
+                                <h4>Skipped Activity</h4>
+                                <p>3-way match bypassed before payment</p>
+                            </div>
+                            <div class="deviation-count">19%</div>
+                        </div>
+                        <div class="deviation-item">
+                            <div class="deviation-icon extra">➕</div>
+                            <div class="deviation-info">
+                                <h4>Unplanned Activity</h4>
+                                <p>Emergency PO created without requisition</p>
+                            </div>
+                            <div class="deviation-count">5%</div>
+                        </div>
+                        <div class="deviation-item">
+                            <div class="deviation-icon wrong">🔀</div>
+                            <div class="deviation-info">
+                                <h4>Wrong Sequence</h4>
+                                <p>Invoice received before goods receipt</p>
+                            </div>
+                            <div class="deviation-count">12%</div>
+                        </div>
+                        <div class="deviation-item">
+                            <div class="deviation-icon loop">🔄</div>
+                            <div class="deviation-info">
+                                <h4>Rework Loop</h4>
+                                <p>Approval rejected and resubmitted</p>
+                            </div>
+                            <div class="deviation-count">8%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Why Conformance Matters</h3>
+                <p><strong>Conformance checking</strong> compares actual process execution against a reference model—whether that's a documented procedure, regulatory requirement, or industry best practice. The visualization above shows a Purchase-to-Pay process where only 73% of cases follow the expected path. The remaining 27% have deviations ranging from minor (activities in different order) to major (required controls bypassed entirely).</p>
+                <p>The business implications are significant. The "3-way match" step (matching PO, goods receipt, and invoice before payment) is a fundamental financial control—skipping it creates fraud and overpayment risk. The 8% of cases bypassing manager approval violate segregation of duties requirements. Process mining doesn't just find these violations; it quantifies their frequency, identifies patterns (which vendors, which requesters, which time periods), and enables targeted remediation.</p>
+            </div>
+        </section>
+
+        <!-- ROOT CAUSE ANALYSIS -->
+        <section class="module" id="rootcause">
+            <div class="module-header">
+                <div class="module-icon">🔬</div>
+                <div class="module-info">
+                    <h2>Root Cause Analysis</h2>
+                    <p>Identifying why problems occur</p>
+                </div>
+            </div>
+            
+            <div class="rootcause-viz">
+                <div class="rootcause-header">
+                    <div class="rootcause-title">🔬 Why Are Orders Taking >5 Days?</div>
+                </div>
+                <div class="rootcause-body">
+                    <div class="rootcause-tree">
+                        <div class="rootcause-branch">
+                            <div class="rootcause-problem">
+                                <div class="rootcause-problem-label">Problem</div>
+                                <div class="rootcause-problem-name">Cycle Time > 5 Days</div>
+                                <div class="rootcause-problem-impact">Affects 23% of orders • $2.1M revenue impact</div>
+                            </div>
+                            <div class="rootcause-connector">→</div>
+                            <div class="rootcause-causes">
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation high">87% Correlation</div>
+                                    <div class="rootcause-cause-name">Manager on PTO</div>
+                                    <div class="rootcause-cause-detail">Approval queue backs up when Mike T. is out</div>
+                                </div>
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation high">72% Correlation</div>
+                                    <div class="rootcause-cause-name">Order Value > $50K</div>
+                                    <div class="rootcause-cause-detail">High-value orders require VP approval</div>
+                                </div>
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation medium">54% Correlation</div>
+                                    <div class="rootcause-cause-name">Customer: ACME Corp</div>
+                                    <div class="rootcause-cause-detail">Special pricing requires manual review</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rootcause-branch">
+                            <div class="rootcause-problem">
+                                <div class="rootcause-problem-label">Problem</div>
+                                <div class="rootcause-problem-name">Rework Required</div>
+                                <div class="rootcause-problem-impact">Affects 24% of orders • Adds 2.3 days avg</div>
+                            </div>
+                            <div class="rootcause-connector">→</div>
+                            <div class="rootcause-causes">
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation high">91% Correlation</div>
+                                    <div class="rootcause-cause-name">Missing Product Code</div>
+                                    <div class="rootcause-cause-detail">Orders from web portal lack SKU</div>
+                                </div>
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation medium">63% Correlation</div>
+                                    <div class="rootcause-cause-name">Address Validation Failed</div>
+                                    <div class="rootcause-cause-detail">International addresses not standardized</div>
+                                </div>
+                                <div class="rootcause-cause">
+                                    <div class="rootcause-cause-correlation medium">48% Correlation</div>
+                                    <div class="rootcause-cause-name">Credit Check Failed</div>
+                                    <div class="rootcause-cause-detail">New customers require manual override</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>From Symptoms to Causes</h3>
+                <p><strong>Root cause analysis</strong> uses machine learning to identify which factors correlate most strongly with process problems. Instead of guessing why orders are slow, the system analyzes all cases, compares fast vs slow, and surfaces the variables that best explain the difference. In the example above, "Manager on PTO" has 87% correlation with long cycle times—a specific, actionable insight.</p>
+                <p>The power lies in discovering <strong>non-obvious causes</strong>. You might assume high-value orders are slow because they're complex, but the data shows the real cause is VP approval requirements. You might think rework is random, but 91% correlates with orders from the web portal missing product codes—a fixable upstream problem. Root cause analysis transforms process improvement from opinion-based to data-driven.</p>
+            </div>
+        </section>
+
+        <!-- OPPORTUNITY SCORING -->
+        <section class="module" id="scoring">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Automation Opportunity Scoring</h2>
+                    <p>Quantifying and prioritizing automation candidates</p>
+                </div>
+            </div>
+            
+            <div class="opportunity-grid">
+                <div class="opportunity-card high">
+                    <div class="opportunity-header">
+                        <div class="opportunity-name">Invoice Processing</div>
+                        <div class="opportunity-score">92</div>
+                    </div>
+                    <div class="opportunity-metrics">
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">45K</div>
+                            <div class="opp-metric-label">Annual Volume</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">$2.1M</div>
+                            <div class="opp-metric-label">Est. Savings</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">87%</div>
+                            <div class="opp-metric-label">Standardized</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">12%</div>
+                            <div class="opp-metric-label">Error Rate</div>
+                        </div>
+                    </div>
+                    <ul class="opportunity-factors">
+                        <li>High volume, rule-based process</li>
+                        <li>Structured input data (PDF invoices)</li>
+                        <li>Clear validation rules</li>
+                        <li>Low exception rate</li>
+                    </ul>
+                </div>
+                
+                <div class="opportunity-card medium">
+                    <div class="opportunity-header">
+                        <div class="opportunity-name">Order Entry</div>
+                        <div class="opportunity-score">78</div>
+                    </div>
+                    <div class="opportunity-metrics">
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">23K</div>
+                            <div class="opp-metric-label">Annual Volume</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">$890K</div>
+                            <div class="opp-metric-label">Est. Savings</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">71%</div>
+                            <div class="opp-metric-label">Standardized</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">8%</div>
+                            <div class="opp-metric-label">Error Rate</div>
+                        </div>
+                    </div>
+                    <ul class="opportunity-factors">
+                        <li>Good volume, moderate complexity</li>
+                        <li>Multiple input channels (email, portal)</li>
+                        <li>Some manual validation needed</li>
+                        <li>Integration with 3 systems</li>
+                    </ul>
+                </div>
+                
+                <div class="opportunity-card low">
+                    <div class="opportunity-header">
+                        <div class="opportunity-name">Contract Review</div>
+                        <div class="opportunity-score">45</div>
+                    </div>
+                    <div class="opportunity-metrics">
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">2.4K</div>
+                            <div class="opp-metric-label">Annual Volume</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">$320K</div>
+                            <div class="opp-metric-label">Est. Savings</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">34%</div>
+                            <div class="opp-metric-label">Standardized</div>
+                        </div>
+                        <div class="opp-metric">
+                            <div class="opp-metric-value">3%</div>
+                            <div class="opp-metric-label">Error Rate</div>
+                        </div>
+                    </div>
+                    <ul class="opportunity-factors">
+                        <li>Low volume, high complexity</li>
+                        <li>Unstructured documents</li>
+                        <li>Requires legal judgment</li>
+                        <li>High variance in contract types</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="reference-guide">
+                <div class="guide-header">
+                    <div class="guide-title">📊 Scoring Methodology</div>
+                    <div class="guide-subtitle">How automation potential scores are calculated</div>
+                </div>
+                <div class="guide-body">
+                    <div class="guide-grid">
+                        <div class="guide-item">
+                            <div class="guide-item-name">Volume Weight (30%)</div>
+                            <div class="guide-item-desc">Higher volume = better ROI. Invoice processing at 45K/year scores high; contract review at 2.4K/year scores low. Volume alone doesn't make a good automation candidate, but it's necessary for meaningful savings.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Standardization (25%)</div>
+                            <div class="guide-item-desc">Fewer process variants = easier automation. Invoice processing at 87% standardized means most cases follow the same path. Contract review at 34% has too many variations—standardize first or accept partial automation.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Error Rate (20%)</div>
+                            <div class="guide-item-desc">High manual error rates justify automation investment. Invoice processing's 12% error rate means significant rework cost. Contract review's 3% error rate suggests humans are doing fine—automation value is speed, not accuracy.</div>
+                        </div>
+                        <div class="guide-item">
+                            <div class="guide-item-name">Complexity (25%)</div>
+                            <div class="guide-item-desc">Rule-based processes automate well; judgment-based don't. Invoice validation is rules (match PO, check amounts). Contract review requires legal judgment—AI can assist but not replace. Also consider input type: structured data vs unstructured documents.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROI & BUSINESS CASE -->
+        <section class="module" id="roi">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>ROI & Business Case</h2>
+                    <p>Quantifying process mining value</p>
+                </div>
+            </div>
+            
+            <div class="roi-calculator">
+                <div class="roi-header">
+                    <div class="roi-title">💰 Process Mining ROI Calculator</div>
+                </div>
+                <div class="roi-body">
+                    <div class="roi-grid">
+                        <div class="roi-metric">
+                            <div class="roi-metric-value">383%</div>
+                            <div class="roi-metric-label">3-Year ROI (Forrester)</div>
+                        </div>
+                        <div class="roi-metric">
+                            <div class="roi-metric-value">6 mo</div>
+                            <div class="roi-metric-label">Avg Payback Period</div>
+                        </div>
+                        <div class="roi-metric">
+                            <div class="roi-metric-value">$44.1M</div>
+                            <div class="roi-metric-label">Avg Benefits (3yr)</div>
+                        </div>
+                        <div class="roi-metric">
+                            <div class="roi-metric-value">50%</div>
+                            <div class="roi-metric-label">Faster Automation Impl.</div>
+                        </div>
+                    </div>
+                    <div class="roi-formula">
+                        ROI = (Process Improvements + Avoided Costs + Automation Savings) / (Platform Cost + Implementation + Training)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Building the Business Case</h3>
+                <p>According to a Forrester Total Economic Impact study, process mining customers see <strong>payback in as little as 6 months</strong> and <strong>383% ROI over three years</strong>. The composite organization in the study experienced benefits of $44.1 million. These returns come from multiple sources: direct process improvements (cycle time reduction, error elimination), avoided costs (compliance violations, fraud prevention), and accelerated automation (50% faster implementation from better process understanding).</p>
+                <p>The business case has three components. <strong>Direct savings</strong> come from fixing problems discovered: Siemens saved €10M+ annually by reducing activities in order-to-cash. <strong>Working capital improvements</strong> come from faster cash cycles: HP found $1B in cashflow opportunity in AP alone. <strong>Risk reduction</strong> comes from compliance: conformance checking prevents audit findings, fraud, and regulatory penalties. When building your business case, quantify all three.</p>
+            </div>
+        </section>
+
+        <!-- PLATFORMS -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Process Mining Platforms</h2>
+                    <p>Leading tools for process discovery and analysis</p>
+                </div>
+            </div>
+            
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo celonis">⛏️</div>
+                        <div>
+                            <div class="platform-name">Celonis</div>
+                            <div class="platform-type">Market Leader</div>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">The dominant process mining platform with the most mature capabilities. Strong in SAP environments with pre-built connectors and process models for common scenarios.</div>
+                        <ul class="platform-features">
+                            <li>Execution Management System (EMS)</li>
+                            <li>Pre-built SAP connectors</li>
+                            <li>Action Engine for recommendations</li>
+                            <li>Real-time process monitoring</li>
+                            <li>ML-powered root cause analysis</li>
+                        </ul>
+                        <div class="platform-pricing">Enterprise pricing • $100K+ annually</div>
+                    </div>
+                </div>
+                
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo microsoft">🔷</div>
+                        <div>
+                            <div class="platform-name">Microsoft Process Advisor</div>
+                            <div class="platform-type">Integrated Solution</div>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Built into Power Platform, Process Advisor combines traditional process mining with task mining (recording user actions). Best for Microsoft-centric organizations.</div>
+                        <ul class="platform-features">
+                            <li>Power Platform integration</li>
+                            <li>Task mining via desktop recorder</li>
+                            <li>Dataverse data storage</li>
+                            <li>Direct to Power Automate flows</li>
+                            <li>Lower cost entry point</li>
+                        </ul>
+                        <div class="platform-pricing">Included with Power Platform Premium</div>
+                    </div>
+                </div>
+                
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo uipath">🟠</div>
+                        <div>
+                            <div class="platform-name">UiPath Process Mining</div>
+                            <div class="platform-type">RPA-Integrated</div>
+                        </div>
+                    </div>
+                    <div class="platform-body">
+                        <div class="platform-desc">Acquired from ProcessGold, UiPath's solution connects process discovery directly to automation development. Ideal for organizations already using UiPath RPA.</div>
+                        <ul class="platform-features">
+                            <li>Direct UiPath Studio integration</li>
+                            <li>Automation Hub connection</li>
+                            <li>Task capture for attended processes</li>
+                            <li>ROI calculation built-in</li>
+                            <li>Combined licensing available</li>
+                        </ul>
+                        <div class="platform-pricing">Add-on to UiPath Enterprise</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overview-content">
+                <h3>Choosing a Process Mining Platform</h3>
+                <p><strong>Celonis</strong> is the right choice for large enterprises with complex SAP environments and budget for best-in-class tooling. Its Execution Management System goes beyond mining to actively recommend and trigger improvements. Companies like Siemens, Uber, and BMW use Celonis at scale. However, the price point and implementation complexity make it overkill for smaller initiatives.</p>
+                <p><strong>Microsoft Process Advisor</strong> is ideal for organizations already invested in Power Platform. The task mining capability (recording user desktop actions) complements traditional event log mining and feeds directly into Power Automate flows. The cost is essentially free if you have Power Platform Premium licenses. <strong>UiPath Process Mining</strong> makes sense if you're standardized on UiPath for RPA—tight integration means discovered processes can be handed directly to developers in Studio.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for successful process mining initiatives</p>
+                </div>
+            </div>
+            
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with a specific question or hypothesis to test</li>
+                        <li>Invest in data quality—it's 60% of the project effort</li>
+                        <li>Involve process owners early to validate findings</li>
+                        <li>Look for quick wins to build momentum and credibility</li>
+                        <li>Combine event log mining with task mining for full picture</li>
+                        <li>Use findings to redesign processes before automating</li>
+                        <li>Establish baseline metrics to measure improvement</li>
+                        <li>Plan for ongoing monitoring, not just one-time analysis</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Assume documented processes match reality</li>
+                        <li>Skip the data preparation phase—garbage in, garbage out</li>
+                        <li>Present raw findings without business context</li>
+                        <li>Automate broken processes—fix first, then automate</li>
+                        <li>Ignore the "long tail" of process variants</li>
+                        <li>Expect process mining alone to drive change</li>
+                        <li>Underestimate political resistance to transparency</li>
+                        <li>Treat it as a one-time project vs ongoing capability</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered process discovery</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">⛏️</div>
+                    <div class="agent-name">ProcessMiner</div>
+                    <div class="agent-role">Process Discovery Analyst</div>
+                    <div class="agent-desc">Analyzes event logs to discover process flows, identify bottlenecks, score automation opportunities, perform root cause analysis, and generate actionable recommendations with quantified business cases.</div>
+                    <ul class="agent-capabilities">
+                        <li>Event log ingestion and cleaning</li>
+                        <li>Process flow reconstruction</li>
+                        <li>Variant analysis and clustering</li>
+                        <li>Bottleneck identification</li>
+                        <li>Conformance checking</li>
+                        <li>Root cause analysis</li>
+                        <li>Automation opportunity scoring</li>
+                        <li>Natural language insights</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Discovery</div>
+                        <div class="code-tab">Root Cause</div>
+                        <div class="code-filename">process_miner.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># process_miner.py - Process Mining Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">import</span> pm4py
+<span class="code-keyword">from</span> pm4py.algo.discovery.alpha <span class="code-keyword">import</span> algorithm <span class="code-keyword">as</span> alpha_miner
+
+<span class="code-keyword">class</span> <span class="code-function">ProcessMiner</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, event_log_path: str):
+        self.log = pm4py.read_xes(event_log_path)
+        self.process_model = <span class="code-keyword">None</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">discover_process</span>(self):
+        <span class="code-string">"""Mine process model from event log."""</span>
+        self.process_model = alpha_miner.apply(self.log)
+        variants = pm4py.get_variants(self.log)
+        
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"total_cases"</span>: len(self.log),
+            <span class="code-string">"variant_count"</span>: len(variants),
+            <span class="code-string">"activities"</span>: self._get_activities(),
+            <span class="code-string">"avg_cycle_time"</span>: self._calc_cycle_time()
+        }
+    
+    <span class="code-keyword">def</span> <span class="code-function">find_bottlenecks</span>(self):
+        <span class="code-string">"""Identify activities with longest wait times."""</span>
+        bottlenecks = []
+        <span class="code-keyword">for</span> activity <span class="code-keyword">in</span> self._get_activities():
+            wait_time = self._calc_wait_time(activity)
+            <span class="code-keyword">if</span> wait_time > self.threshold:
+                bottlenecks.append({
+                    <span class="code-string">"activity"</span>: activity,
+                    <span class="code-string">"avg_wait"</span>: wait_time,
+                    <span class="code-string">"impact"</span>: self._calc_impact(activity)
+                })
+        <span class="code-keyword">return</span> sorted(bottlenecks, key=<span class="code-keyword">lambda</span> x: x[<span class="code-string">"impact"</span>])
+    
+    <span class="code-keyword">def</span> <span class="code-function">analyze_conformance</span>(self, reference_model):
+        <span class="code-string">"""Check conformance against reference."""</span>
+        <span class="code-keyword">return</span> pm4py.conformance_diagnostics_tbr(
+            self.log, reference_model
+        )
+
+<span class="code-comment"># Agent definition</span>
+miner_agent = Agent(
+    role=<span class="code-string">"Process Discovery Analyst"</span>,
+    goal=<span class="code-string">"Find automation opportunities"</span>,
+    tools=[EventLogLoader(), ProcessDiscovery(), 
+           BottleneckFinder(), ConformanceChecker()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring automation topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat08-p1-automation-maturity.html" class="related-card">
+                    <div class="related-num">Page 8.1</div>
+                    <div class="related-title">Automation Maturity</div>
+                    <div class="related-desc">Five-level maturity model</div>
+                </a>
+                <a href="cat08-p2-bot-orchestration.html" class="related-card">
+                    <div class="related-num">Page 8.2</div>
+                    <div class="related-title">Bot Orchestration</div>
+                    <div class="related-desc">Managing automation fleets</div>
+                </a>
+                <a href="cat08-p5-rpa-platforms.html" class="related-card">
+                    <div class="related-num">Page 8.5</div>
+                    <div class="related-title">RPA Platforms</div>
+                    <div class="related-desc">UiPath, AA, Blue Prism</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat08-p2-bot-orchestration.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">8.2: Bot Orchestration</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 8.3 of 6</div>
+        <a href="cat08-p4-power-platform.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">8.4: Power Platform</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

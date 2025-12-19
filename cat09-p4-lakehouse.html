@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Lakehouse | Architecture Patterns | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #6366F1;
+            --cat-light: #818CF8;
+            --cat-dark: #4F46E5;
+            --cat-glow: rgba(99, 102, 241, 0.15);
+            --page-color: #FF3621;
+            --page-light: #FF6B4A;
+            --page-glow: rgba(255, 54, 33, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --databricks: #FF3621;
+            --delta: #00ADD8;
+            --iceberg: #4A90D9;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        /* Hero */
+        .hero { margin-bottom: 28px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #FF3621, #00ADD8, #4A90D9); border-radius: 14px 14px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-color); padding: 5px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 14px; }
+        .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+        .hero > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 800px; margin-bottom: 24px; }
+        .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .hero-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .hero-stat-value { font-size: 22px; font-weight: 700; color: var(--page-light); }
+        .hero-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Business Case */
+        .business-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .business-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .business-icon { font-size: 28px; margin-bottom: 8px; }
+        .business-stat { font-size: 28px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .business-label { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .business-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        .use-cases-block { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .use-cases-block h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--page-light); }
+        .use-cases-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .use-case { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+        .use-case-icon { font-size: 20px; }
+        .use-case-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .use-case-desc { font-size: 10px; color: var(--text-muted); }
+
+        /* Architecture Diagram */
+        .architecture-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .arch-svg { width: 100%; height: auto; }
+        
+        .flow-explanation { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .flow-step { display: flex; align-items: flex-start; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; }
+        .step-num { width: 24px; height: 24px; background: var(--page-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .step-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+        .step-text strong { color: var(--text-primary); }
+        .step-text code { background: var(--bg-dark); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--page-light); }
+
+        /* Tech Stack Patterns */
+        .stack-patterns { display: flex; flex-direction: column; gap: 20px; }
+        .stack-pattern { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .stack-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .stack-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stack-badge.databricks { background: rgba(255, 54, 33, 0.2); color: #FF3621; }
+        .stack-badge.snowflake { background: rgba(41, 182, 246, 0.2); color: #29B6F6; }
+        .stack-badge.fabric { background: rgba(0, 120, 212, 0.2); color: #0078D4; }
+        .stack-badge.oss { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .stack-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .stack-use { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+        .stack-diagram { background: var(--bg-dark); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .stack-svg { width: 100%; height: auto; }
+        .stack-benefits { display: flex; gap: 16px; flex-wrap: wrap; }
+        .benefit { font-size: 11px; color: var(--green); background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 4px; }
+
+        /* Comparison Scorecard */
+        .compare-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .compare-header { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; background: var(--bg-card-alt); padding: 16px; border-bottom: 1px solid var(--border-color); }
+        .compare-col { font-size: 12px; text-align: center; font-weight: 600; }
+        .compare-col.lake { color: #3B82F6; }
+        .compare-col.warehouse { color: #F59E0B; }
+        .compare-col.lakehouse { color: #FF3621; }
+        .compare-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; padding: 14px 16px; border-bottom: 1px solid var(--border-color); align-items: center; }
+        .compare-row:last-child { border-bottom: none; }
+        .compare-row .compare-col:first-child { text-align: left; font-weight: 600; font-size: 12px; color: var(--text-primary); }
+        .compare-cell { text-align: center; }
+        .cell-good { color: var(--green); }
+        .cell-bad { color: var(--red); }
+        .cell-mid { color: var(--yellow); }
+        .cell-value { font-size: 11px; font-weight: 600; }
+        .cell-icon { font-size: 14px; }
+
+        /* Medallion Architecture */
+        .medallion-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .medallion-svg { width: 100%; height: auto; }
+        .medallion-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .medallion-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .medallion-card.bronze { border-top: 4px solid #CD7F32; }
+        .medallion-card.silver { border-top: 4px solid #C0C0C0; }
+        .medallion-card.gold { border-top: 4px solid #FFD700; }
+        .medallion-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .medallion-icon { font-size: 24px; }
+        .medallion-name { font-size: 16px; font-weight: 600; }
+        .medallion-card.bronze .medallion-name { color: #CD7F32; }
+        .medallion-card.silver .medallion-name { color: #C0C0C0; }
+        .medallion-card.gold .medallion-name { color: #FFD700; }
+        .medallion-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
+        .medallion-list { list-style: none; padding: 0; margin: 0; }
+        .medallion-list li { font-size: 11px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+        .medallion-list li::before { content: '•'; color: var(--page-light); }
+
+        /* Open Table Formats */
+        .formats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .format-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; }
+        .format-card.delta { border-top: 4px solid #00ADD8; }
+        .format-card.iceberg { border-top: 4px solid #4A90D9; }
+        .format-card.hudi { border-top: 4px solid #FF6B00; }
+        .format-logo { font-size: 40px; margin-bottom: 12px; }
+        .format-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .format-card.delta .format-name { color: #00ADD8; }
+        .format-card.iceberg .format-name { color: #4A90D9; }
+        .format-card.hudi .format-name { color: #FF6B00; }
+        .format-company { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; }
+        .format-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .format-features { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .format-feature { font-size: 10px; padding: 4px 8px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-secondary); }
+
+        /* Industry Stats */
+        .industry-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .industry-stat { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); margin: 8px 0; }
+        .stat-source { font-size: 9px; color: var(--text-muted); }
+
+        /* Quotes */
+        .quotes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .quote-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .quote-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+        .quote-text::before { content: '"'; font-size: 24px; color: var(--page-light); line-height: 0; vertical-align: -8px; margin-right: 4px; }
+        .quote-author { display: flex; align-items: center; gap: 12px; }
+        .quote-avatar { width: 40px; height: 40px; background: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .quote-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .quote-role { font-size: 10px; color: var(--text-muted); }
+
+        /* Module */
+        .module { margin-bottom: 40px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .module-info h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+
+        /* Content Block */
+        .content-block { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .content-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: var(--page-light); }
+        .content-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .content-block p:last-child { margin-bottom: 0; }
+        .content-block p strong { color: var(--text-primary); }
+
+        /* Two Column */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .info-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .info-box h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .info-box h4::before { content: ''; width: 3px; height: 16px; background: var(--page-color); border-radius: 2px; }
+        .info-list { list-style: none; margin: 0; padding: 0; }
+        .info-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li strong { color: var(--text-primary); }
+
+        /* Best Practices */
+        .bp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+        .bp-card { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .bp-card.do { border: 1px solid var(--green); }
+        .bp-card.dont { border: 1px solid var(--red); }
+        .bp-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .bp-card.do .bp-title { color: var(--green); }
+        .bp-card.dont .bp-title { color: var(--red); }
+        .bp-list { list-style: none; margin: 0; padding: 0; }
+        .bp-list li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: flex-start; gap: 10px; }
+        .bp-list li .icon { flex-shrink: 0; }
+        .bp-card.do .bp-list li .icon { color: var(--green); }
+        .bp-card.dont .bp-list li .icon { color: var(--red); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 24px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, #FF3621, #00ADD8); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-caps { list-style: none; margin: 0; padding: 0; }
+        .agent-caps li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+        .agent-caps li .icon { color: var(--page-light); }
+
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-tab { font-size: 12px; font-weight: 600; color: var(--page-light); }
+        .code-filename { font-size: 11px; color: var(--text-muted); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; line-height: 1.7; overflow-x: auto; }
+        .code-content pre { color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+
+        /* Related Grid */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-decoration: none; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-color); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+
+        /* Footer */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-color); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        /* Deep Dive Architecture Cards */
+        .arch-deep-dive { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; margin-bottom: 24px; overflow: hidden; }
+        .deep-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; }
+        .deep-header.warehouse { background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), transparent); border-bottom: 3px solid #F59E0B; }
+        .deep-header.lake { background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), transparent); border-bottom: 3px solid #3B82F6; }
+        .deep-header.mart { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent); border-bottom: 3px solid #8B5CF6; }
+        .deep-header.lakehouse { background: linear-gradient(90deg, rgba(255, 54, 33, 0.15), transparent); border-bottom: 3px solid #FF3621; }
+        .deep-icon { font-size: 32px; }
+        .deep-title h3 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .deep-header.warehouse .deep-title h3 { color: #F59E0B; }
+        .deep-header.lake .deep-title h3 { color: #3B82F6; }
+        .deep-header.mart .deep-title h3 { color: #8B5CF6; }
+        .deep-header.lakehouse .deep-title h3 { color: #FF3621; }
+        .deep-era { font-size: 11px; color: var(--text-muted); background: var(--bg-dark); padding: 2px 8px; border-radius: 4px; }
+        .deep-content { padding: 24px; }
+        .deep-definition { background: var(--bg-dark); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .deep-definition p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin: 0; }
+        .deep-definition p strong { color: var(--text-primary); }
+        .deep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .deep-box { background: var(--bg-dark); border-radius: 8px; padding: 16px; }
+        .deep-box h4 { font-size: 13px; font-weight: 600; color: var(--page-light); margin-bottom: 12px; }
+        .deep-box ul { list-style: none; margin: 0; padding: 0; }
+        .deep-box li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .deep-box li:last-child { border-bottom: none; }
+        .deep-box li strong { color: var(--text-primary); }
+        .deep-examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .example-label { font-size: 11px; color: var(--text-muted); }
+        .example-tag { font-size: 10px; padding: 4px 10px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-secondary); }
+        .example-tag.databricks { border-color: #FF3621; color: #FF3621; }
+        .example-tag.snowflake { border-color: #29B6F6; color: #29B6F6; }
+        .example-tag.fabric { border-color: #0078D4; color: #0078D4; }
+        .deep-tradeoffs { display: flex; flex-direction: column; gap: 8px; }
+        .tradeoff { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; padding: 10px; border-radius: 6px; }
+        .tradeoff.pro { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+        .tradeoff.con { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+        .tradeoff-icon { font-weight: 700; flex-shrink: 0; }
+
+        /* Evolution Timeline */
+        .evolution-timeline { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .evolution-svg { width: 100%; height: auto; }
+        .evolution-details { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .evo-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; position: relative; }
+        .evo-num { position: absolute; top: -10px; left: 16px; width: 24px; height: 24px; background: var(--page-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .evo-card h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; margin-top: 8px; }
+        .evo-card p { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+        .evo-card p strong { color: var(--page-light); }
+
+        /* Decision Grid */
+        .decision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .decision-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .decision-card.warehouse { border-top: 4px solid #F59E0B; }
+        .decision-card.lake { border-top: 4px solid #3B82F6; }
+        .decision-card.mart { border-top: 4px solid #8B5CF6; }
+        .decision-card.lakehouse-dec { border-top: 4px solid #FF3621; }
+        .decision-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .decision-icon { font-size: 24px; }
+        .decision-header h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0; }
+        .decision-list { list-style: none; margin: 0 0 16px 0; padding: 0; }
+        .decision-list li { font-size: 12px; color: var(--text-secondary); padding: 6px 0; line-height: 1.5; }
+        .decision-example { background: var(--bg-dark); border-radius: 6px; padding: 12px; font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+        .decision-example strong { color: var(--text-secondary); }
+
+        /* Decision Flowchart */
+        .decision-flowchart { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .decision-flowchart h4 { font-size: 14px; font-weight: 600; color: var(--page-light); margin-bottom: 16px; text-align: center; }
+        .flowchart-content { text-align: center; }
+        .flow-question { font-size: 14px; color: var(--text-primary); font-weight: 600; margin-bottom: 20px; padding: 16px; background: var(--bg-dark); border-radius: 8px; }
+        .flow-branches { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .flow-branch { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .flow-answer { font-size: 11px; padding: 6px 12px; border-radius: 4px; }
+        .flow-answer.yes { background: rgba(16, 185, 129, 0.2); color: var(--green); }
+        .flow-answer.no { background: rgba(107, 114, 128, 0.2); color: var(--text-secondary); }
+        .flow-result { font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 6px; }
+        .flow-result.lakehouse { background: rgba(255, 54, 33, 0.2); color: #FF3621; }
+        .flow-result.warehouse { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .flow-result.lake { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-stats, .business-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col, .bp-grid, .agent-grid { grid-template-columns: 1fr; }
+            .related-grid, .formats-grid, .medallion-details { grid-template-columns: 1fr; }
+            .use-cases-grid { grid-template-columns: repeat(2, 1fr); }
+            .flow-explanation { grid-template-columns: 1fr; }
+            .stack-use { margin-left: 0; width: 100%; margin-top: 8px; }
+            .compare-header, .compare-row { grid-template-columns: 1fr; gap: 8px; }
+            .compare-col { text-align: left; padding: 4px 0; }
+            .quotes-grid { grid-template-columns: 1fr; }
+            .industry-stats { grid-template-columns: repeat(2, 1fr); }
+            .deep-grid { grid-template-columns: 1fr; }
+            .evolution-details { grid-template-columns: repeat(2, 1fr); }
+            .decision-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat09-architecture-overview.html">Architecture Patterns</a>
+        <span class="sep">/</span>
+        <span class="current">Data Lakehouse</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Category 09</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat09-architecture-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat09-p1-microservices.html"><span class="nav-icon">🔲</span> 9.1 Microservices</a></li>
+            <li><a href="cat09-p2-event-driven.html"><span class="nav-icon">⚡</span> 9.2 Event-Driven</a></li>
+            <li><a href="cat09-p3-data-mesh.html"><span class="nav-icon">🕸️</span> 9.3 Data Mesh</a></li>
+            <li><a href="cat09-p4-lakehouse.html" class="active"><span class="nav-icon">🏠</span> 9.4 Data Lakehouse</a></li>
+            <li><a href="cat09-p5-api-patterns.html"><span class="nav-icon">🔌</span> 9.5 API Patterns</a></li>
+            <li><a href="cat09-p6-cqrs-eventsourcing.html"><span class="nav-icon">📚</span> 9.6 CQRS & ES</a></li>
+            <li><a href="cat09-p7-domain-driven.html"><span class="nav-icon">🎯</span> 9.7 DDD</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#business-case"><span class="nav-icon">💼</span> Business Case</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#tech-stacks"><span class="nav-icon">🔧</span> Tech Stacks</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Lake vs Warehouse</a></li>
+            <li><a href="#medallion"><span class="nav-icon">🏅</span> Medallion</a></li>
+            <li><a href="#formats"><span class="nav-icon">📄</span> Table Formats</a></li>
+            <li><a href="#industry"><span class="nav-icon">🎤</span> Industry Says</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- HERO -->
+        <section class="hero" id="overview">
+            <div class="hero-tag">🏠 Page 9.4 • Modern Data Architecture</div>
+            <h1>Data Lakehouse</h1>
+            <p>A modern data architecture that combines the flexibility and low-cost storage of data lakes with the data management and ACID transaction capabilities of data warehouses. Powered by open table formats like Delta Lake, Apache Iceberg, and Apache Hudi.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="hero-stat-value">85%</div><div class="hero-stat-label">Cost Reduction</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">10x</div><div class="hero-stat-label">Faster Queries</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">100%</div><div class="hero-stat-label">ACID Compliance</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">Open</div><div class="hero-stat-label">Table Formats</div></div>
+            </div>
+        </section>
+
+        <!-- BUSINESS CASE -->
+        <section class="module" id="business-case">
+            <div class="module-header">
+                <div class="module-icon">💼</div>
+                <div class="module-info">
+                    <h2>The Business Case for Lakehouse</h2>
+                    <p>Why enterprises are consolidating on lakehouse architecture</p>
+                </div>
+            </div>
+
+            <div class="business-grid">
+                <div class="business-card">
+                    <div class="business-icon">💰</div>
+                    <div class="business-stat">85%</div>
+                    <div class="business-label">Cost Reduction</div>
+                    <div class="business-desc">Eliminate duplicate storage across lake and warehouse</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">🚀</div>
+                    <div class="business-stat">10x</div>
+                    <div class="business-label">Query Performance</div>
+                    <div class="business-desc">Z-ordering, data skipping, and caching acceleration</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">🔄</div>
+                    <div class="business-stat">Zero</div>
+                    <div class="business-label">ETL Copies</div>
+                    <div class="business-desc">Single source of truth—no data movement between systems</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">🤖</div>
+                    <div class="business-stat">Direct</div>
+                    <div class="business-label">ML Access</div>
+                    <div class="business-desc">Train models directly on production data, no exports</div>
+                </div>
+            </div>
+
+            <div class="use-cases-block">
+                <h4>Common Use Cases</h4>
+                <div class="use-cases-grid">
+                    <div class="use-case">
+                        <span class="use-case-icon">📊</span>
+                        <span class="use-case-name">BI & Analytics</span>
+                        <span class="use-case-desc">SQL analytics on petabyte-scale data</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">🤖</span>
+                        <span class="use-case-name">ML & AI</span>
+                        <span class="use-case-desc">Feature engineering, training, serving</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">⚡</span>
+                        <span class="use-case-name">Streaming</span>
+                        <span class="use-case-desc">Real-time ingestion with batch unified</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">📋</span>
+                        <span class="use-case-name">Compliance</span>
+                        <span class="use-case-desc">Time travel, audit logs, GDPR deletes</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE DIAGRAM -->
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Lakehouse Architecture</h2>
+                    <p>Unified platform for all data workloads</p>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <svg viewBox="0 0 900 420" class="arch-svg">
+                    <defs>
+                        <pattern id="lhGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                        </pattern>
+                        <marker id="lhArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#818CF8"/>
+                        </marker>
+                    </defs>
+                    
+                    <rect width="100%" height="100%" fill="url(#lhGrid)"/>
+                    
+                    <text x="450" y="25" text-anchor="middle" fill="#FF6B4A" font-size="14" font-weight="600">Lakehouse Architecture: Unified Data Platform</text>
+                    
+                    <!-- Data Sources -->
+                    <rect x="30" y="60" width="140" height="160" rx="12" fill="rgba(59, 130, 246, 0.1)" stroke="#3B82F6" stroke-width="2"/>
+                    <text x="100" y="85" text-anchor="middle" fill="#3B82F6" font-size="11" font-weight="600">📥 Data Sources</text>
+                    
+                    <rect x="45" y="100" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="100" y="118" text-anchor="middle" fill="#60A5FA" font-size="9">Databases</text>
+                    
+                    <rect x="45" y="135" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="100" y="153" text-anchor="middle" fill="#60A5FA" font-size="9">APIs / SaaS</text>
+                    
+                    <rect x="45" y="170" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#3B82F6" stroke-width="1"/>
+                    <text x="100" y="188" text-anchor="middle" fill="#60A5FA" font-size="9">Files / Streaming</text>
+                    
+                    <!-- Arrow to Ingestion -->
+                    <path d="M 175 140 L 210 140" stroke="#818CF8" stroke-width="2" marker-end="url(#lhArrow)" fill="none"/>
+                    
+                    <!-- Ingestion Layer -->
+                    <rect x="220" y="80" width="120" height="120" rx="10" fill="rgba(16, 185, 129, 0.1)" stroke="#10B981" stroke-width="2"/>
+                    <text x="280" y="105" text-anchor="middle" fill="#10B981" font-size="11" font-weight="600">🔄 Ingestion</text>
+                    <text x="280" y="130" text-anchor="middle" fill="#34D399" font-size="9">Auto Loader</text>
+                    <text x="280" y="150" text-anchor="middle" fill="#34D399" font-size="9">Kafka Connect</text>
+                    <text x="280" y="170" text-anchor="middle" fill="#34D399" font-size="9">CDC / Fivetran</text>
+                    
+                    <!-- Arrow to Storage -->
+                    <path d="M 345 140 L 380 140" stroke="#818CF8" stroke-width="2" marker-end="url(#lhArrow)" fill="none"/>
+                    
+                    <!-- Cloud Storage -->
+                    <rect x="390" y="50" width="220" height="180" rx="14" fill="rgba(255, 54, 33, 0.08)" stroke="#FF3621" stroke-width="2"/>
+                    <text x="500" y="75" text-anchor="middle" fill="#FF3621" font-size="12" font-weight="600">☁️ Cloud Object Storage</text>
+                    <text x="500" y="92" text-anchor="middle" fill="#6a6a7a" font-size="9">S3 / ADLS / GCS</text>
+                    
+                    <!-- Delta Lake Layer -->
+                    <rect x="410" y="105" width="180" height="110" rx="10" fill="rgba(0, 173, 216, 0.15)" stroke="#00ADD8" stroke-width="2"/>
+                    <text x="500" y="128" text-anchor="middle" fill="#00ADD8" font-size="11" font-weight="600">🔷 Delta Lake</text>
+                    
+                    <!-- Medallion layers inside -->
+                    <rect x="425" y="140" width="50" height="30" rx="4" fill="#1a1a2e" stroke="#CD7F32" stroke-width="2"/>
+                    <text x="450" y="159" text-anchor="middle" fill="#CD7F32" font-size="8">Bronze</text>
+                    
+                    <rect x="485" y="140" width="50" height="30" rx="4" fill="#1a1a2e" stroke="#C0C0C0" stroke-width="2"/>
+                    <text x="510" y="159" text-anchor="middle" fill="#C0C0C0" font-size="8">Silver</text>
+                    
+                    <rect x="545" y="140" width="50" height="30" rx="4" fill="#1a1a2e" stroke="#FFD700" stroke-width="2"/>
+                    <text x="570" y="159" text-anchor="middle" fill="#FFD700" font-size="8">Gold</text>
+                    
+                    <text x="500" y="195" text-anchor="middle" fill="#6a6a7a" font-size="8">ACID • Time Travel • Schema Evolution</text>
+                    
+                    <!-- Arrow to Compute -->
+                    <path d="M 615 140 L 650 140" stroke="#818CF8" stroke-width="2" marker-end="url(#lhArrow)" fill="none"/>
+                    
+                    <!-- Compute Layer -->
+                    <rect x="660" y="60" width="140" height="160" rx="12" fill="rgba(139, 92, 246, 0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                    <text x="730" y="85" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="600">⚡ Compute</text>
+                    
+                    <rect x="675" y="100" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="730" y="118" text-anchor="middle" fill="#A78BFA" font-size="9">SQL Warehouse</text>
+                    
+                    <rect x="675" y="135" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="730" y="153" text-anchor="middle" fill="#A78BFA" font-size="9">Spark Clusters</text>
+                    
+                    <rect x="675" y="170" width="110" height="28" rx="6" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1"/>
+                    <text x="730" y="188" text-anchor="middle" fill="#A78BFA" font-size="9">ML Runtime</text>
+                    
+                    <!-- Consumers Row -->
+                    <rect x="220" y="270" width="580" height="120" rx="14" fill="rgba(6, 182, 212, 0.08)" stroke="#06B6D4" stroke-width="2" stroke-dasharray="5,3"/>
+                    <text x="510" y="295" text-anchor="middle" fill="#06B6D4" font-size="11" font-weight="600">👥 Data Consumers</text>
+                    
+                    <rect x="250" y="310" width="100" height="55" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="300" y="335" text-anchor="middle" fill="#22D3EE" font-size="14">📊</text>
+                    <text x="300" y="352" text-anchor="middle" fill="#fff" font-size="9">BI Tools</text>
+                    
+                    <rect x="370" y="310" width="100" height="55" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="420" y="335" text-anchor="middle" fill="#22D3EE" font-size="14">🤖</text>
+                    <text x="420" y="352" text-anchor="middle" fill="#fff" font-size="9">ML Models</text>
+                    
+                    <rect x="490" y="310" width="100" height="55" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="540" y="335" text-anchor="middle" fill="#22D3EE" font-size="14">📱</text>
+                    <text x="540" y="352" text-anchor="middle" fill="#fff" font-size="9">Applications</text>
+                    
+                    <rect x="610" y="310" width="100" height="55" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="660" y="335" text-anchor="middle" fill="#22D3EE" font-size="14">📤</text>
+                    <text x="660" y="352" text-anchor="middle" fill="#fff" font-size="9">Data Sharing</text>
+                    
+                    <!-- Unity Catalog spanning top -->
+                    <rect x="220" y="240" width="580" height="25" rx="6" fill="rgba(255, 54, 33, 0.2)" stroke="#FF3621" stroke-width="1"/>
+                    <text x="510" y="257" text-anchor="middle" fill="#FF3621" font-size="10" font-weight="600">🔐 Unity Catalog — Governance • Access Control • Lineage • Discovery</text>
+                    
+                    <!-- Arrows down to consumers -->
+                    <path d="M 500 230 L 500 235" stroke="#818CF8" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+            
+            <div class="flow-explanation">
+                <div class="flow-step">
+                    <span class="step-num">1</span>
+                    <span class="step-text"><strong>Ingest from any source</strong> — Databases, APIs, files, streams all land in cloud storage</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">2</span>
+                    <span class="step-text"><strong>Delta Lake table format</strong> — Adds ACID, time travel, schema evolution to object storage</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">3</span>
+                    <span class="step-text"><strong>Medallion architecture</strong> — Bronze (raw) → Silver (cleaned) → Gold (business-ready)</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">4</span>
+                    <span class="step-text"><strong>Unified compute</strong> — SQL, Spark, and ML all query the same data</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">5</span>
+                    <span class="step-text"><strong>Unity Catalog</strong> — Centralized governance, access control, and lineage</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">6</span>
+                    <span class="step-text"><strong>Serve all consumers</strong> — BI, ML, apps, and external sharing from single source</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECH STACK PATTERNS -->
+        <section class="module" id="tech-stacks">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Lakehouse Implementation Stacks</h2>
+                    <p>Platform choices for building a lakehouse</p>
+                </div>
+            </div>
+
+            <div class="stack-patterns">
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge databricks">Databricks</span>
+                        <span class="stack-name">Delta Lake + Unity Catalog</span>
+                        <span class="stack-use">Enterprise • Multi-cloud • ML-first</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <defs>
+                                <marker id="stackArrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                    <polygon points="0 0, 8 3, 0 6" fill="#818CF8"/>
+                                </marker>
+                            </defs>
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#3B82F6" font-size="12">📥</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Sources</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#10B981" font-size="12">🔄</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Auto Loader</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(0, 173, 216, 0.15)" stroke="#00ADD8" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#00ADD8" font-size="11" font-weight="600">Delta Lake</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">S3 / ADLS / GCS</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Unity Catalog</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#8B5CF6" font-size="12">⚡</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">SQL + Spark</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#06B6D4" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">BI + ML</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ Delta Lake native</span>
+                        <span class="benefit">✓ Unity Catalog</span>
+                        <span class="benefit">✓ Photon engine</span>
+                        <span class="benefit">✓ MLflow built-in</span>
+                    </div>
+                </div>
+
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge snowflake">Snowflake</span>
+                        <span class="stack-name">Iceberg Tables + External</span>
+                        <span class="stack-use">SQL-centric • Existing Snowflake • Hybrid</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#3B82F6" font-size="12">📥</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Sources</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#29B6F6" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#29B6F6" font-size="12">❄️</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Snowpipe</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(74, 144, 217, 0.15)" stroke="#4A90D9" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#4A90D9" font-size="11" font-weight="600">Iceberg Tables</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">External Storage</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Open Catalog</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#29B6F6" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#29B6F6" font-size="12">⚡</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Warehouses</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#06B6D4" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">Cortex AI</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ Iceberg native</span>
+                        <span class="benefit">✓ Zero-copy sharing</span>
+                        <span class="benefit">✓ Snowpark</span>
+                        <span class="benefit">✓ Cortex LLMs</span>
+                    </div>
+                </div>
+
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge fabric">Microsoft Fabric</span>
+                        <span class="stack-name">OneLake + Delta</span>
+                        <span class="stack-use">Microsoft ecosystem • Power BI • Azure</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#3B82F6" font-size="12">📥</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Sources</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#0078D4" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#0078D4" font-size="12">🔄</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Pipelines</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(0, 120, 212, 0.15)" stroke="#0078D4" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#0078D4" font-size="11" font-weight="600">OneLake</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">Delta + Parquet</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Shortcuts</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#0078D4" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#0078D4" font-size="12">⚡</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Spark + SQL</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#F2C811" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#F2C811" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">Power BI</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ OneLake unified</span>
+                        <span class="benefit">✓ Power BI native</span>
+                        <span class="benefit">✓ Copilot</span>
+                        <span class="benefit">✓ Purview gov</span>
+                    </div>
+                </div>
+
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge oss">Open Source</span>
+                        <span class="stack-name">Iceberg + Trino/Spark</span>
+                        <span class="stack-use">Multi-engine • Vendor neutral • Cost control</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#3B82F6" font-size="12">📥</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Sources</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#10B981" font-size="12">🔄</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Airflow</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(74, 144, 217, 0.15)" stroke="#4A90D9" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#4A90D9" font-size="11" font-weight="600">Apache Iceberg</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">S3 / MinIO</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Nessie Catalog</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#EC4899" font-size="12">⚡</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Trino/Spark</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow)" fill="none"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#06B6D4" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">Superset</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ No vendor lock</span>
+                        <span class="benefit">✓ Multi-engine</span>
+                        <span class="benefit">✓ Cost control</span>
+                        <span class="benefit">✓ Full flexibility</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Data Lake vs Warehouse vs Lakehouse</h2>
+                    <p>Understanding the evolution of data architectures</p>
+                </div>
+            </div>
+
+            <div class="compare-table">
+                <div class="compare-header">
+                    <div class="compare-col">Capability</div>
+                    <div class="compare-col lake">🌊 Data Lake</div>
+                    <div class="compare-col warehouse">🏢 Warehouse</div>
+                    <div class="compare-col lakehouse">🏠 Lakehouse</div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">ACID Transactions</div>
+                    <div class="compare-cell cell-bad"><span class="cell-icon">✗</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Schema Enforcement</div>
+                    <div class="compare-cell cell-bad"><span class="cell-icon">✗</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">BI Query Performance</div>
+                    <div class="compare-cell cell-bad"><span class="cell-value">Slow</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-value">Fast</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-value">Fast</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Storage Cost</div>
+                    <div class="compare-cell cell-good"><span class="cell-value">$0.02/GB</span></div>
+                    <div class="compare-cell cell-bad"><span class="cell-value">$20+/GB</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-value">$0.02/GB</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">All Data Types</div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                    <div class="compare-cell cell-bad"><span class="cell-value">Structured</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">ML/AI Support</div>
+                    <div class="compare-cell cell-mid"><span class="cell-value">Direct</span></div>
+                    <div class="compare-cell cell-bad"><span class="cell-value">Export</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-value">Native</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Time Travel</div>
+                    <div class="compare-cell cell-bad"><span class="cell-icon">✗</span></div>
+                    <div class="compare-cell cell-mid"><span class="cell-value">Limited</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-value">Full</span></div>
+                </div>
+                <div class="compare-row">
+                    <div class="compare-col">Open Format</div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                    <div class="compare-cell cell-bad"><span class="cell-value">Proprietary</span></div>
+                    <div class="compare-cell cell-good"><span class="cell-icon">✓</span></div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>The Lakehouse Advantage</h3>
+                <p>Lakehouse combines the <strong>low-cost, flexible storage</strong> of data lakes with the <strong>reliability and performance</strong> of data warehouses. The key enabler is open table formats (Delta Lake, Iceberg, Hudi) that add ACID transactions, schema enforcement, and query optimization directly on cloud object storage.</p>
+                <p>This eliminates the traditional two-tier architecture where data is copied from lake to warehouse, reducing cost, complexity, and staleness while enabling ML and BI on the same data.</p>
+            </div>
+        </section>
+
+        <!-- DEEP DIVE: UNDERSTANDING ARCHITECTURES -->
+        <section class="module" id="deep-dive">
+            <div class="module-header">
+                <div class="module-icon">🔍</div>
+                <div class="module-info">
+                    <h2>Understanding Data Architectures</h2>
+                    <p>Deep dive into each approach</p>
+                </div>
+            </div>
+
+            <!-- Data Warehouse Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header warehouse">
+                    <span class="deep-icon">🏢</span>
+                    <div class="deep-title">
+                        <h3>Data Warehouse</h3>
+                        <span class="deep-era">1980s - Present</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> A centralized repository of integrated data from multiple sources, optimized for analytical queries and business intelligence. Data is extracted from operational systems, transformed into a consistent format, and loaded into the warehouse (ETL).</p>
+                    </div>
+                    <div class="deep-grid">
+                        <div class="deep-box">
+                            <h4>Key Characteristics</h4>
+                            <ul>
+                                <li><strong>Schema-on-Write:</strong> Data must conform to predefined schema before loading</li>
+                                <li><strong>ACID Transactions:</strong> Full transactional guarantees for data integrity</li>
+                                <li><strong>Columnar Storage:</strong> Optimized for analytical queries (aggregations, scans)</li>
+                                <li><strong>SQL Interface:</strong> Standard SQL for querying, familiar to analysts</li>
+                                <li><strong>Star/Snowflake Schema:</strong> Dimensional modeling with facts and dimensions</li>
+                            </ul>
+                        </div>
+                        <div class="deep-box">
+                            <h4>Typical Components</h4>
+                            <ul>
+                                <li><strong>Staging Area:</strong> Landing zone for raw data from sources</li>
+                                <li><strong>Integration Layer:</strong> ETL processing and data cleansing</li>
+                                <li><strong>Presentation Layer:</strong> Dimensional models for BI consumption</li>
+                                <li><strong>Semantic Layer:</strong> Business definitions and metrics</li>
+                                <li><strong>BI Tools:</strong> Reporting, dashboards, ad-hoc queries</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="deep-examples">
+                        <span class="example-label">Examples:</span>
+                        <span class="example-tag">Snowflake</span>
+                        <span class="example-tag">Amazon Redshift</span>
+                        <span class="example-tag">Google BigQuery</span>
+                        <span class="example-tag">Azure Synapse</span>
+                        <span class="example-tag">Teradata</span>
+                        <span class="example-tag">Oracle ADW</span>
+                    </div>
+                    <div class="deep-tradeoffs">
+                        <div class="tradeoff pro">
+                            <span class="tradeoff-icon">✓</span>
+                            <span>Fast query performance, strong governance, mature tooling, SQL familiarity</span>
+                        </div>
+                        <div class="tradeoff con">
+                            <span class="tradeoff-icon">✗</span>
+                            <span>Expensive storage, rigid schema, limited data types, vendor lock-in</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Lake Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header lake">
+                    <span class="deep-icon">🌊</span>
+                    <div class="deep-title">
+                        <h3>Data Lake</h3>
+                        <span class="deep-era">2010s - Present</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> A centralized repository that stores all structured, semi-structured, and unstructured data at any scale in its native format. Data is stored first and schema is applied at read time (schema-on-read). Built on cheap object storage like S3, ADLS, or GCS.</p>
+                    </div>
+                    <div class="deep-grid">
+                        <div class="deep-box">
+                            <h4>Key Characteristics</h4>
+                            <ul>
+                                <li><strong>Schema-on-Read:</strong> No predefined schema required; interpret at query time</li>
+                                <li><strong>Any Data Type:</strong> JSON, Parquet, Avro, images, video, logs, IoT streams</li>
+                                <li><strong>Massive Scale:</strong> Petabytes of data at low cost ($0.02/GB/month)</li>
+                                <li><strong>Raw Data Preservation:</strong> Keep everything, decide later what's useful</li>
+                                <li><strong>Multiple Engines:</strong> Spark, Presto, Hive can all query the same data</li>
+                            </ul>
+                        </div>
+                        <div class="deep-box">
+                            <h4>Common Problems ("Data Swamp")</h4>
+                            <ul>
+                                <li><strong>No ACID:</strong> Concurrent writes can corrupt data, no transactions</li>
+                                <li><strong>No Schema Enforcement:</strong> Data quality degrades over time</li>
+                                <li><strong>Poor Performance:</strong> Small files, no indexing, slow queries</li>
+                                <li><strong>No Governance:</strong> Who owns what? What's in this file?</li>
+                                <li><strong>Stale Metadata:</strong> Catalog out of sync with actual data</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="deep-examples">
+                        <span class="example-label">Examples:</span>
+                        <span class="example-tag">Amazon S3</span>
+                        <span class="example-tag">Azure Data Lake Storage</span>
+                        <span class="example-tag">Google Cloud Storage</span>
+                        <span class="example-tag">Hadoop HDFS</span>
+                        <span class="example-tag">MinIO</span>
+                    </div>
+                    <div class="deep-tradeoffs">
+                        <div class="tradeoff pro">
+                            <span class="tradeoff-icon">✓</span>
+                            <span>Extremely cheap storage, any data type, massive scale, ML-friendly</span>
+                        </div>
+                        <div class="tradeoff con">
+                            <span class="tradeoff-icon">✗</span>
+                            <span>No transactions, poor BI performance, governance nightmare, "data swamp" risk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Mart Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header mart">
+                    <span class="deep-icon">🏪</span>
+                    <div class="deep-title">
+                        <h3>Data Mart</h3>
+                        <span class="deep-era">1990s - Present</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> A subset of a data warehouse focused on a specific business line, department, or subject area. Data marts provide a simplified, business-specific view of data, optimized for the queries that department runs most often. Think of it as a "department store" vs the warehouse's "wholesale distribution center."</p>
+                    </div>
+                    <div class="deep-grid">
+                        <div class="deep-box">
+                            <h4>Key Characteristics</h4>
+                            <ul>
+                                <li><strong>Subject-Oriented:</strong> Focused on one business area (Sales, Finance, Marketing)</li>
+                                <li><strong>Subset of Warehouse:</strong> Usually fed from enterprise data warehouse</li>
+                                <li><strong>Optimized for Speed:</strong> Pre-aggregated, denormalized for fast queries</li>
+                                <li><strong>Business-Owned:</strong> Controlled by the department, not central IT</li>
+                                <li><strong>Smaller Scale:</strong> Gigabytes to low terabytes, not petabytes</li>
+                            </ul>
+                        </div>
+                        <div class="deep-box">
+                            <h4>Types of Data Marts</h4>
+                            <ul>
+                                <li><strong>Dependent:</strong> Sourced from enterprise data warehouse (recommended)</li>
+                                <li><strong>Independent:</strong> Sourced directly from operational systems (risky)</li>
+                                <li><strong>Hybrid:</strong> Combines warehouse data with departmental sources</li>
+                                <li><strong>Virtual:</strong> Logical views over warehouse, no physical copy</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="deep-examples">
+                        <span class="example-label">Common Examples:</span>
+                        <span class="example-tag">Sales Mart</span>
+                        <span class="example-tag">Finance Mart</span>
+                        <span class="example-tag">Marketing Mart</span>
+                        <span class="example-tag">HR Mart</span>
+                        <span class="example-tag">Supply Chain Mart</span>
+                    </div>
+                    <div class="deep-tradeoffs">
+                        <div class="tradeoff pro">
+                            <span class="tradeoff-icon">✓</span>
+                            <span>Fast for specific use cases, business-friendly, easier to manage, focused governance</span>
+                        </div>
+                        <div class="tradeoff con">
+                            <span class="tradeoff-icon">✗</span>
+                            <span>Data silos, inconsistent metrics across marts, duplication, synchronization overhead</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Lakehouse Deep Dive -->
+            <div class="arch-deep-dive">
+                <div class="deep-header lakehouse">
+                    <span class="deep-icon">🏠</span>
+                    <div class="deep-title">
+                        <h3>Data Lakehouse</h3>
+                        <span class="deep-era">2020s - Present</span>
+                    </div>
+                </div>
+                <div class="deep-content">
+                    <div class="deep-definition">
+                        <p><strong>What it is:</strong> A modern architecture that implements data warehouse capabilities (ACID transactions, schema enforcement, BI performance) directly on low-cost data lake storage. The innovation is <strong>open table formats</strong> (Delta Lake, Iceberg, Hudi) that add a metadata and transaction layer on top of Parquet files in object storage.</p>
+                    </div>
+                    <div class="deep-grid">
+                        <div class="deep-box">
+                            <h4>Key Characteristics</h4>
+                            <ul>
+                                <li><strong>ACID on Object Storage:</strong> Transactions via optimistic concurrency control</li>
+                                <li><strong>Schema Evolution:</strong> Add columns, change types without rewriting data</li>
+                                <li><strong>Time Travel:</strong> Query data as of any point in time, rollback mistakes</li>
+                                <li><strong>Unified Batch + Streaming:</strong> Same tables for both workloads</li>
+                                <li><strong>Open Formats:</strong> Parquet files, any engine can read them</li>
+                                <li><strong>Direct ML Access:</strong> Train models on production data, no export</li>
+                            </ul>
+                        </div>
+                        <div class="deep-box">
+                            <h4>How It Works</h4>
+                            <ul>
+                                <li><strong>Transaction Log:</strong> JSON/Parquet files tracking all changes</li>
+                                <li><strong>Data Files:</strong> Parquet files in cloud object storage</li>
+                                <li><strong>Metadata:</strong> Statistics for query optimization (min/max, null counts)</li>
+                                <li><strong>Catalog:</strong> Unity Catalog, Hive Metastore, or Iceberg catalog</li>
+                                <li><strong>Compute:</strong> Separate from storage, scale independently</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="deep-examples">
+                        <span class="example-label">Implementations:</span>
+                        <span class="example-tag databricks">Databricks + Delta Lake</span>
+                        <span class="example-tag snowflake">Snowflake + Iceberg</span>
+                        <span class="example-tag fabric">Microsoft Fabric</span>
+                        <span class="example-tag">Apache Iceberg</span>
+                        <span class="example-tag">Apache Hudi</span>
+                    </div>
+                    <div class="deep-tradeoffs">
+                        <div class="tradeoff pro">
+                            <span class="tradeoff-icon">✓</span>
+                            <span>Best of both worlds: cheap storage + warehouse features, open formats, unified ML/BI</span>
+                        </div>
+                        <div class="tradeoff con">
+                            <span class="tradeoff-icon">✗</span>
+                            <span>Newer ecosystem, requires expertise, eventual consistency for some patterns</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE EVOLUTION -->
+        <section class="module" id="evolution">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>The Evolution of Data Architecture</h2>
+                    <p>How we got from warehouses to lakehouses</p>
+                </div>
+            </div>
+
+            <div class="evolution-timeline">
+                <svg viewBox="0 0 900 200" class="evolution-svg">
+                    <defs>
+                        <linearGradient id="timelineBg" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.1"/>
+                            <stop offset="25%" stop-color="#3B82F6" stop-opacity="0.1"/>
+                            <stop offset="50%" stop-color="#8B5CF6" stop-opacity="0.1"/>
+                            <stop offset="75%" stop-color="#FF3621" stop-opacity="0.1"/>
+                            <stop offset="100%" stop-color="#10B981" stop-opacity="0.2"/>
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Background gradient -->
+                    <rect x="0" y="70" width="900" height="60" fill="url(#timelineBg)" rx="8"/>
+                    
+                    <!-- Timeline line -->
+                    <line x1="60" y1="100" x2="840" y2="100" stroke="#2a2a3e" stroke-width="3"/>
+                    
+                    <!-- Era 1: Warehouse -->
+                    <circle cx="120" cy="100" r="32" fill="#12121a" stroke="#F59E0B" stroke-width="3"/>
+                    <text x="120" y="108" text-anchor="middle" font-size="28">🏢</text>
+                    <text x="120" y="155" text-anchor="middle" fill="#F59E0B" font-size="12" font-weight="600">Warehouse</text>
+                    <text x="120" y="172" text-anchor="middle" fill="#6a6a7a" font-size="10">1980s-2000s</text>
+                    
+                    <!-- Connector + Problem 1 -->
+                    <line x1="155" y1="100" x2="225" y2="100" stroke="#F59E0B" stroke-width="2"/>
+                    <rect x="165" y="45" width="50" height="20" rx="4" fill="#12121a" stroke="#EF4444" stroke-width="1"/>
+                    <text x="190" y="59" text-anchor="middle" fill="#EF4444" font-size="9">Rigid $$$</text>
+                    
+                    <!-- Era 2: Data Lake -->
+                    <circle cx="300" cy="100" r="32" fill="#12121a" stroke="#3B82F6" stroke-width="3"/>
+                    <text x="300" y="108" text-anchor="middle" font-size="28">🌊</text>
+                    <text x="300" y="155" text-anchor="middle" fill="#3B82F6" font-size="12" font-weight="600">Data Lake</text>
+                    <text x="300" y="172" text-anchor="middle" fill="#6a6a7a" font-size="10">2010s</text>
+                    
+                    <!-- Connector + Problem 2 -->
+                    <line x1="335" y1="100" x2="405" y2="100" stroke="#3B82F6" stroke-width="2"/>
+                    <rect x="340" y="45" width="60" height="20" rx="4" fill="#12121a" stroke="#EF4444" stroke-width="1"/>
+                    <text x="370" y="59" text-anchor="middle" fill="#EF4444" font-size="9">No ACID</text>
+                    
+                    <!-- Era 3: Two-Tier -->
+                    <circle cx="480" cy="100" r="32" fill="#12121a" stroke="#8B5CF6" stroke-width="3"/>
+                    <text x="480" y="108" text-anchor="middle" font-size="28">🔀</text>
+                    <text x="480" y="155" text-anchor="middle" fill="#8B5CF6" font-size="12" font-weight="600">Two-Tier</text>
+                    <text x="480" y="172" text-anchor="middle" fill="#6a6a7a" font-size="10">2015-2020</text>
+                    
+                    <!-- Connector + Problem 3 -->
+                    <line x1="515" y1="100" x2="585" y2="100" stroke="#8B5CF6" stroke-width="2"/>
+                    <rect x="520" y="45" width="60" height="20" rx="4" fill="#12121a" stroke="#EF4444" stroke-width="1"/>
+                    <text x="550" y="59" text-anchor="middle" fill="#EF4444" font-size="9">2x Cost</text>
+                    
+                    <!-- Era 4: Lakehouse -->
+                    <circle cx="660" cy="100" r="36" fill="#12121a" stroke="#FF3621" stroke-width="4"/>
+                    <text x="660" y="108" text-anchor="middle" font-size="32">🏠</text>
+                    <text x="660" y="155" text-anchor="middle" fill="#FF3621" font-size="13" font-weight="700">Lakehouse</text>
+                    <text x="660" y="172" text-anchor="middle" fill="#6a6a7a" font-size="10">2020+</text>
+                    
+                    <!-- Connector to AI -->
+                    <line x1="700" y1="100" x2="760" y2="100" stroke="#FF3621" stroke-width="2"/>
+                    
+                    <!-- Era 5: AI-Native -->
+                    <circle cx="820" cy="100" r="32" fill="#12121a" stroke="#10B981" stroke-width="3"/>
+                    <text x="820" y="108" text-anchor="middle" font-size="28">🤖</text>
+                    <text x="820" y="155" text-anchor="middle" fill="#10B981" font-size="12" font-weight="600">AI-Native</text>
+                    <text x="820" y="172" text-anchor="middle" fill="#6a6a7a" font-size="10">Future</text>
+                    
+                    <!-- Success badge under Lakehouse -->
+                    <rect x="620" y="180" width="80" height="18" rx="9" fill="rgba(16, 185, 129, 0.2)" stroke="#10B981" stroke-width="1"/>
+                    <text x="660" y="193" text-anchor="middle" fill="#10B981" font-size="9">✓ Best of Both</text>
+                </svg>
+            </div>
+
+            <div class="evolution-details">
+                <div class="evo-card">
+                    <div class="evo-num">1</div>
+                    <h4>The Warehouse Era (1980s-2000s)</h4>
+                    <p>Enterprises built centralized data warehouses (Teradata, Oracle, IBM) using expensive proprietary hardware. ETL pipelines transformed data into star schemas. Great for BI, but <strong>expensive, rigid, and couldn't handle unstructured data</strong>.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">2</div>
+                    <h4>The Data Lake Revolution (2010s)</h4>
+                    <p>Hadoop and cloud object storage (S3) promised unlimited cheap storage for any data type. "Store everything, figure it out later." But without governance, lakes became <strong>"data swamps"—no ACID, no schema, no reliability</strong>.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">3</div>
+                    <h4>The Two-Tier Mess (2015-2020)</h4>
+                    <p>Companies ran both: lakes for raw data and ML, warehouses for BI. ETL pipelines copied data between them. Result: <strong>2x storage cost, stale data, inconsistent metrics, complex pipelines</strong>.</p>
+                </div>
+                <div class="evo-card">
+                    <div class="evo-num">4</div>
+                    <h4>The Lakehouse Unification (2020+)</h4>
+                    <p>Open table formats (Delta Lake 2019, Iceberg 2020) add warehouse features to lake storage. <strong>One copy of data, ACID transactions, BI and ML on the same platform</strong>. The best of both worlds.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHEN TO USE EACH -->
+        <section class="module" id="decision">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>When to Use Each Architecture</h2>
+                    <p>Decision framework for your use case</p>
+                </div>
+            </div>
+
+            <div class="decision-grid">
+                <div class="decision-card warehouse">
+                    <div class="decision-header">
+                        <span class="decision-icon">🏢</span>
+                        <h4>Use a Data Warehouse When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Primarily SQL-based BI and reporting</li>
+                        <li>✓ Structured data only (no images, logs, JSON)</li>
+                        <li>✓ Strong data governance requirements</li>
+                        <li>✓ Sub-second query response needed</li>
+                        <li>✓ Existing Snowflake/BigQuery investment</li>
+                        <li>✓ Team is SQL-heavy, limited Spark skills</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> Finance team needs daily revenue reports from ERP data with strict audit requirements.
+                    </div>
+                </div>
+
+                <div class="decision-card lake">
+                    <div class="decision-header">
+                        <span class="decision-icon">🌊</span>
+                        <h4>Use a Data Lake When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Primarily ML/AI workloads</li>
+                        <li>✓ Storing raw data for future unknown use</li>
+                        <li>✓ Massive scale, cost is primary concern</li>
+                        <li>✓ Unstructured data (images, video, logs)</li>
+                        <li>✓ Archive/compliance storage</li>
+                        <li>✗ Not recommended for BI workloads</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> IoT platform storing sensor data for ML model training, no immediate query needs.
+                    </div>
+                </div>
+
+                <div class="decision-card mart">
+                    <div class="decision-header">
+                        <span class="decision-icon">🏪</span>
+                        <h4>Use a Data Mart When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Department needs fast, focused analytics</li>
+                        <li>✓ Specific business domain (Sales, HR, Finance)</li>
+                        <li>✓ Pre-aggregated data for dashboards</li>
+                        <li>✓ Business users need self-service</li>
+                        <li>✓ Source from enterprise warehouse</li>
+                        <li>⚠️ Avoid independent marts (creates silos)</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> Marketing team needs campaign performance dashboard with pre-calculated attribution metrics.
+                    </div>
+                </div>
+
+                <div class="decision-card lakehouse-dec">
+                    <div class="decision-header">
+                        <span class="decision-icon">🏠</span>
+                        <h4>Use a Lakehouse When...</h4>
+                    </div>
+                    <ul class="decision-list">
+                        <li>✓ Both BI and ML on the same data</li>
+                        <li>✓ Streaming and batch unified</li>
+                        <li>✓ Cost optimization is critical</li>
+                        <li>✓ Need time travel and audit</li>
+                        <li>✓ Want to avoid vendor lock-in (open formats)</li>
+                        <li>✓ Greenfield project or major platform refresh</li>
+                    </ul>
+                    <div class="decision-example">
+                        <strong>Example:</strong> E-commerce platform needing real-time inventory, historical analytics, and ML recommendations from same data.
+                    </div>
+                </div>
+            </div>
+
+            <div class="decision-flowchart">
+                <h4>Quick Decision Tree</h4>
+                <div class="flowchart-content">
+                    <div class="flow-question">Do you need both ML/AI and BI/SQL analytics on the same data?</div>
+                    <div class="flow-branches">
+                        <div class="flow-branch">
+                            <span class="flow-answer yes">Yes</span>
+                            <span class="flow-result lakehouse">→ Lakehouse</span>
+                        </div>
+                        <div class="flow-branch">
+                            <span class="flow-answer no">No, primarily BI/SQL</span>
+                            <span class="flow-result warehouse">→ Data Warehouse</span>
+                        </div>
+                        <div class="flow-branch">
+                            <span class="flow-answer no">No, primarily ML/raw storage</span>
+                            <span class="flow-result lake">→ Data Lake</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INDUSTRY PERSPECTIVES -->
+        <section class="module" id="industry">
+            <div class="module-header">
+                <div class="module-icon">🎤</div>
+                <div class="module-info">
+                    <h2>What the Industry Says</h2>
+                    <p>Lakehouse adoption and perspectives</p>
+                </div>
+            </div>
+
+            <div class="industry-stats">
+                <div class="industry-stat">
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">cost reduction vs traditional warehouse</div>
+                    <div class="stat-source">Databricks ROI Study</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">67%</div>
+                    <div class="stat-label">of enterprises adopting lakehouse by 2025</div>
+                    <div class="stat-source">Gartner</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">3x</div>
+                    <div class="stat-label">faster time-to-insight vs two-tier</div>
+                    <div class="stat-source">Forrester</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">$50B</div>
+                    <div class="stat-label">lakehouse market by 2028</div>
+                    <div class="stat-source">IDC</div>
+                </div>
+            </div>
+
+            <div class="quotes-grid">
+                <div class="quote-card">
+                    <div class="quote-text">The lakehouse paradigm is the most significant shift in data architecture since the cloud. It's not just about cost—it's about eliminating the data engineering tax of moving data between systems.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👨‍💼</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Ali Ghodsi</div>
+                            <div class="quote-role">CEO, Databricks</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">We migrated from Redshift to Lakehouse and cut our data platform costs by 70% while improving query performance. The unified architecture simplified everything.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👩‍💻</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Data Platform Lead</div>
+                            <div class="quote-role">Fortune 500 Retailer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">Open table formats are the great equalizer. With Iceberg, we can use Spark for ETL, Trino for ad-hoc, and Flink for streaming—all on the same data.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">🔧</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Principal Engineer</div>
+                            <div class="quote-role">Tech Unicorn</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">By 2026, 75% of new data management deployments will implement lakehouse architecture. The two-tier data lake + warehouse model is becoming obsolete.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">📊</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Gartner Research</div>
+                            <div class="quote-role">Data & Analytics Predictions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MEDALLION ARCHITECTURE -->
+        <section class="module" id="medallion">
+            <div class="module-header">
+                <div class="module-icon">🏅</div>
+                <div class="module-info">
+                    <h2>Medallion Architecture</h2>
+                    <p>Bronze, Silver, Gold data quality layers</p>
+                </div>
+            </div>
+
+            <div class="medallion-diagram">
+                <svg viewBox="0 0 800 180" class="medallion-svg">
+                    <defs>
+                        <marker id="medArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#818CF8"/>
+                        </marker>
+                    </defs>
+                    
+                    <!-- Sources -->
+                    <rect x="20" y="60" width="100" height="70" rx="10" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                    <text x="70" y="90" text-anchor="middle" fill="#3B82F6" font-size="14">📥</text>
+                    <text x="70" y="110" text-anchor="middle" fill="#fff" font-size="10">Raw Sources</text>
+                    
+                    <path d="M 125 95 L 165 95" stroke="#818CF8" stroke-width="2" marker-end="url(#medArrow)" fill="none"/>
+                    
+                    <!-- Bronze -->
+                    <rect x="175" y="40" width="160" height="110" rx="12" fill="rgba(205, 127, 50, 0.15)" stroke="#CD7F32" stroke-width="3"/>
+                    <text x="255" y="70" text-anchor="middle" fill="#CD7F32" font-size="24">🥉</text>
+                    <text x="255" y="95" text-anchor="middle" fill="#CD7F32" font-size="14" font-weight="600">Bronze</text>
+                    <text x="255" y="115" text-anchor="middle" fill="#a0a0b0" font-size="9">Raw, Append-Only</text>
+                    <text x="255" y="130" text-anchor="middle" fill="#6a6a7a" font-size="8">Schema-on-Read</text>
+                    
+                    <path d="M 340 95 L 380 95" stroke="#818CF8" stroke-width="2" marker-end="url(#medArrow)" fill="none"/>
+                    
+                    <!-- Silver -->
+                    <rect x="390" y="40" width="160" height="110" rx="12" fill="rgba(192, 192, 192, 0.15)" stroke="#C0C0C0" stroke-width="3"/>
+                    <text x="470" y="70" text-anchor="middle" fill="#C0C0C0" font-size="24">🥈</text>
+                    <text x="470" y="95" text-anchor="middle" fill="#C0C0C0" font-size="14" font-weight="600">Silver</text>
+                    <text x="470" y="115" text-anchor="middle" fill="#a0a0b0" font-size="9">Cleaned, Validated</text>
+                    <text x="470" y="130" text-anchor="middle" fill="#6a6a7a" font-size="8">Conformed Schema</text>
+                    
+                    <path d="M 555 95 L 595 95" stroke="#818CF8" stroke-width="2" marker-end="url(#medArrow)" fill="none"/>
+                    
+                    <!-- Gold -->
+                    <rect x="605" y="40" width="160" height="110" rx="12" fill="rgba(255, 215, 0, 0.15)" stroke="#FFD700" stroke-width="3"/>
+                    <text x="685" y="70" text-anchor="middle" fill="#FFD700" font-size="24">🥇</text>
+                    <text x="685" y="95" text-anchor="middle" fill="#FFD700" font-size="14" font-weight="600">Gold</text>
+                    <text x="685" y="115" text-anchor="middle" fill="#a0a0b0" font-size="9">Business Aggregates</text>
+                    <text x="685" y="130" text-anchor="middle" fill="#6a6a7a" font-size="8">ML Features</text>
+                </svg>
+            </div>
+
+            <div class="medallion-details">
+                <div class="medallion-card bronze">
+                    <div class="medallion-header">
+                        <span class="medallion-icon">🥉</span>
+                        <span class="medallion-name">Bronze Layer</span>
+                    </div>
+                    <div class="medallion-desc">Raw data exactly as received from source systems. Append-only, preserving full history for audit and reprocessing.</div>
+                    <ul class="medallion-list">
+                        <li>Raw ingestion from sources</li>
+                        <li>No transformations applied</li>
+                        <li>Full history preserved</li>
+                        <li>Schema-on-read flexibility</li>
+                        <li>Source system metadata</li>
+                    </ul>
+                </div>
+                <div class="medallion-card silver">
+                    <div class="medallion-header">
+                        <span class="medallion-icon">🥈</span>
+                        <span class="medallion-name">Silver Layer</span>
+                    </div>
+                    <div class="medallion-desc">Cleaned, deduplicated, and validated data. Conformed to enterprise data models with quality rules applied.</div>
+                    <ul class="medallion-list">
+                        <li>Data quality validated</li>
+                        <li>Duplicates removed</li>
+                        <li>Nulls handled</li>
+                        <li>Schema enforced</li>
+                        <li>Joins and enrichment</li>
+                    </ul>
+                </div>
+                <div class="medallion-card gold">
+                    <div class="medallion-header">
+                        <span class="medallion-icon">🥇</span>
+                        <span class="medallion-name">Gold Layer</span>
+                    </div>
+                    <div class="medallion-desc">Business-level aggregates and feature tables. Optimized for specific use cases: BI dashboards, ML training, reporting.</div>
+                    <ul class="medallion-list">
+                        <li>Business aggregations</li>
+                        <li>KPIs and metrics</li>
+                        <li>ML feature tables</li>
+                        <li>Consumption-ready</li>
+                        <li>SLA-governed</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLE FORMATS -->
+        <section class="module" id="formats">
+            <div class="module-header">
+                <div class="module-icon">📄</div>
+                <div class="module-info">
+                    <h2>Open Table Formats</h2>
+                    <p>Delta Lake, Apache Iceberg, Apache Hudi</p>
+                </div>
+            </div>
+
+            <div class="formats-grid">
+                <div class="format-card delta">
+                    <div class="format-logo">🔷</div>
+                    <div class="format-name">Delta Lake</div>
+                    <div class="format-company">Databricks / Linux Foundation</div>
+                    <div class="format-desc">The original lakehouse table format. Deep integration with Spark, extensive ecosystem, and battle-tested at scale. Now open-sourced to Linux Foundation.</div>
+                    <div class="format-features">
+                        <span class="format-feature">ACID</span>
+                        <span class="format-feature">Time Travel</span>
+                        <span class="format-feature">Z-Order</span>
+                        <span class="format-feature">Liquid Clustering</span>
+                        <span class="format-feature">Change Data Feed</span>
+                    </div>
+                </div>
+                <div class="format-card iceberg">
+                    <div class="format-logo">🧊</div>
+                    <div class="format-name">Apache Iceberg</div>
+                    <div class="format-company">Netflix / Apache Foundation</div>
+                    <div class="format-desc">Engine-agnostic format designed for massive tables. Hidden partitioning, partition evolution, and strong multi-engine support (Spark, Trino, Flink).</div>
+                    <div class="format-features">
+                        <span class="format-feature">ACID</span>
+                        <span class="format-feature">Time Travel</span>
+                        <span class="format-feature">Hidden Partitions</span>
+                        <span class="format-feature">Partition Evolution</span>
+                        <span class="format-feature">Multi-Engine</span>
+                    </div>
+                </div>
+                <div class="format-card hudi">
+                    <div class="format-logo">🔥</div>
+                    <div class="format-name">Apache Hudi</div>
+                    <div class="format-company">Uber / Apache Foundation</div>
+                    <div class="format-desc">Optimized for incremental processing and CDC workloads. Copy-on-write and merge-on-read tables. Strong in streaming ingestion scenarios.</div>
+                    <div class="format-features">
+                        <span class="format-feature">ACID</span>
+                        <span class="format-feature">Incremental</span>
+                        <span class="format-feature">CDC Native</span>
+                        <span class="format-feature">Compaction</span>
+                        <span class="format-feature">Record-Level</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Choosing a Table Format</h3>
+                <p><strong>Delta Lake:</strong> Best for Databricks-centric environments, Spark workloads, and when you need deep Unity Catalog integration. Largest community and ecosystem.</p>
+                <p><strong>Apache Iceberg:</strong> Best for multi-engine environments (Spark + Trino + Flink), very large tables (petabyte+), and when vendor neutrality is critical. Growing fast.</p>
+                <p><strong>Apache Hudi:</strong> Best for CDC-heavy workloads, near-real-time ingestion, and when you need fine-grained record-level operations.</p>
+            </div>
+        </section>
+
+        <!-- INDUSTRY SAYS -->
+        <section class="module" id="industry">
+            <div class="module-header">
+                <div class="module-icon">🎤</div>
+                <div class="module-info">
+                    <h2>What the Industry Says</h2>
+                    <p>Lakehouse adoption and perspectives</p>
+                </div>
+            </div>
+
+            <div class="industry-stats">
+                <div class="industry-stat">
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">cost reduction vs traditional warehouse</div>
+                    <div class="stat-source">Databricks ROI Study</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">67%</div>
+                    <div class="stat-label">of enterprises adopting lakehouse by 2025</div>
+                    <div class="stat-source">Gartner</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">3x</div>
+                    <div class="stat-label">faster time-to-insight vs legacy</div>
+                    <div class="stat-source">Forrester</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">$50B</div>
+                    <div class="stat-label">lakehouse market by 2028</div>
+                    <div class="stat-source">IDC</div>
+                </div>
+            </div>
+
+            <div class="quotes-grid">
+                <div class="quote-card">
+                    <div class="quote-text">The lakehouse paradigm is the most significant shift in data architecture since the cloud. It's not just about cost—it's about eliminating the data engineering tax of moving data between systems.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👨‍💼</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Ali Ghodsi</div>
+                            <div class="quote-role">CEO, Databricks</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">We migrated from Redshift to Lakehouse and cut our data platform costs by 70% while improving query performance. The unified architecture simplified everything.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👩‍💻</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Data Platform Lead</div>
+                            <div class="quote-role">Fortune 500 Retailer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">Open table formats are the great equalizer. With Iceberg, we can use Spark for ETL, Trino for ad-hoc, and Flink for streaming—all on the same data.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">🔧</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Principal Engineer</div>
+                            <div class="quote-role">Tech Unicorn</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">By 2026, 75% of new data management deployments will implement lakehouse architecture. The two-tier data lake + warehouse model is becoming obsolete.</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">📊</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Gartner Research</div>
+                            <div class="quote-role">Data & Analytics Predictions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Building successful lakehouse implementations</p>
+                </div>
+            </div>
+
+            <div class="bp-grid">
+                <div class="bp-card do">
+                    <div class="bp-title">✓ Do</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✓</span> Use medallion architecture (Bronze → Silver → Gold)</li>
+                        <li><span class="icon">✓</span> Implement Z-ordering on high-cardinality filter columns</li>
+                        <li><span class="icon">✓</span> Enable time travel for audit and recovery</li>
+                        <li><span class="icon">✓</span> Use Unity Catalog for governance from day one</li>
+                        <li><span class="icon">✓</span> Automate VACUUM and OPTIMIZE operations</li>
+                        <li><span class="icon">✓</span> Design partitions based on query patterns</li>
+                        <li><span class="icon">✓</span> Use Delta Live Tables for declarative pipelines</li>
+                        <li><span class="icon">✓</span> Monitor data quality with expectations</li>
+                    </ul>
+                </div>
+                <div class="bp-card dont">
+                    <div class="bp-title">✗ Don't</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✗</span> Skip the Silver layer—it catches quality issues</li>
+                        <li><span class="icon">✗</span> Over-partition small tables (file fragmentation)</li>
+                        <li><span class="icon">✗</span> Forget to run OPTIMIZE regularly</li>
+                        <li><span class="icon">✗</span> Use SELECT * in production queries</li>
+                        <li><span class="icon">✗</span> Store secrets in notebooks or code</li>
+                        <li><span class="icon">✗</span> Ignore small file problem (1000s of tiny files)</li>
+                        <li><span class="icon">✗</span> Mix batch and streaming without clear patterns</li>
+                        <li><span class="icon">✗</span> Skip testing on representative data volumes</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT SECTION -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered lakehouse optimization</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🏠</div>
+                    <div class="agent-name">LakehouseOptimizer</div>
+                    <div class="agent-role">Performance & Cost Tuning Agent</div>
+                    <div class="agent-desc">Analyzes lakehouse tables, recommends optimizations, identifies performance bottlenecks, and automates maintenance operations.</div>
+                    <ul class="agent-caps">
+                        <li><span class="icon">✦</span> Z-order column recommendations</li>
+                        <li><span class="icon">✦</span> Partition strategy analysis</li>
+                        <li><span class="icon">✦</span> Small file detection and compaction</li>
+                        <li><span class="icon">✦</span> Query pattern analysis</li>
+                        <li><span class="icon">✦</span> Cost optimization insights</li>
+                        <li><span class="icon">✦</span> Liquid clustering migration</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab">Lakehouse Optimizer</div>
+                        <div class="code-filename">lakehouse_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># lakehouse_agent.py</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+lakehouse_optimizer = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Lakehouse Optimizer"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Maximize query performance, minimize cost"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in Delta Lake optimization,
+    Z-ordering strategies, partition design, and
+    Unity Catalog governance implementation."""</span>,
+    <span class="code-string">tools=</span>[table_analyzer, query_profiler,
+           optimization_recommender, cost_calculator]
+)
+
+optimize_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Analyze these tables:
+    {table_list}
+    
+    Recommend Z-order columns, partition changes,
+    and estimate performance improvements."""</span>,
+    <span class="code-string">agent=</span>lakehouse_optimizer
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat09-p3-data-mesh.html" class="related-card">
+                    <div class="related-num">Page 9.3</div>
+                    <div class="related-title">Data Mesh</div>
+                    <div class="related-desc">Domain-oriented data architecture</div>
+                </a>
+                <a href="cat09-p2-event-driven.html" class="related-card">
+                    <div class="related-num">Page 9.2</div>
+                    <div class="related-title">Event-Driven</div>
+                    <div class="related-desc">Streaming and event architectures</div>
+                </a>
+                <a href="cat09-p6-cqrs-eventsourcing.html" class="related-card">
+                    <div class="related-num">Page 9.6</div>
+                    <div class="related-title">CQRS & Event Sourcing</div>
+                    <div class="related-desc">Command query responsibility separation</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat09-p3-data-mesh.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">9.3: Data Mesh</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 9.4</div>
+        <a href="cat09-p5-api-patterns.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">9.5: API Patterns</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

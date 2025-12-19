@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPA Platforms | Automation & RPA | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #8B5CF6;
+            --cat-light: #A78BFA;
+            --cat-dark: #7C3AED;
+            --cat-glow: rgba(139, 92, 246, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --uipath: #FA4616;
+            --aa: #0076CE;
+            --blueprism: #0052CC;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 32px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 100;
+            padding: 24px 0;
+        }
+
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        /* Hero */
+        .hero {
+            margin-bottom: 28px;
+            padding: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--uipath), var(--aa), var(--blueprism));
+            border-radius: 14px 14px 0 0;
+        }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 11px; color: var(--cat-light); margin-bottom: 14px; }
+        .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+        .hero > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 800px; margin-bottom: 24px; }
+        .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .hero-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .hero-stat-value { font-size: 22px; font-weight: 700; color: var(--cat-light); }
+        .hero-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Module */
+        .module { margin-bottom: 40px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .module-info h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+
+        /* Content Block */
+        .content-block { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .content-block h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; color: var(--cat-light); }
+        .content-block p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
+        .content-block p:last-child { margin-bottom: 0; }
+        .content-block p strong { color: var(--text-primary); }
+
+        /* Platform Card */
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .platform-header { padding: 24px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 20px; }
+        .platform-logo { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; flex-shrink: 0; color: white; }
+        .platform-logo.uipath { background: linear-gradient(135deg, #FA4616, #FF6B3D); }
+        .platform-logo.aa { background: linear-gradient(135deg, #0076CE, #00A3E0); }
+        .platform-logo.blueprism { background: linear-gradient(135deg, #0052CC, #2684FF); }
+        .platform-logo.mspa { background: linear-gradient(135deg, #0066FF, #00BCF2); }
+        .platform-title h3 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+        .platform-tagline { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+        .platform-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+        .badge { font-size: 10px; padding: 4px 10px; border-radius: 4px; font-weight: 600; }
+        .badge.leader { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid var(--green); }
+        .badge.challenger { background: rgba(245, 158, 11, 0.15); color: var(--yellow); border: 1px solid var(--yellow); }
+        .badge.new { background: rgba(6, 182, 212, 0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+        .platform-body { padding: 24px; }
+
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-box { background: var(--bg-dark); border-radius: 8px; padding: 14px; text-align: center; }
+        .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Two Column */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .info-box { background: var(--bg-dark); border-radius: 12px; padding: 20px; }
+        .info-box h4 { font-size: 14px; font-weight: 600; margin-bottom: 14px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .info-box h4::before { content: ''; width: 3px; height: 16px; background: var(--cat-primary); border-radius: 2px; }
+        .info-box p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .info-list { list-style: none; margin: 0; padding: 0; }
+        .info-list li { font-size: 12px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li strong { color: var(--text-primary); }
+
+        /* Pros Cons */
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .pros-box { background: var(--bg-dark); border-radius: 12px; padding: 20px; border-left: 4px solid var(--green); }
+        .cons-box { background: var(--bg-dark); border-radius: 12px; padding: 20px; border-left: 4px solid var(--red); }
+        .pros-box h4 { color: var(--green); font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+        .cons-box h4 { color: var(--red); font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+        .check-list { list-style: none; margin: 0; padding: 0; }
+        .check-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px; }
+        .check-list li:last-child { border-bottom: none; }
+        .check-list li .icon { flex-shrink: 0; font-size: 11px; }
+        .pros-box .check-list li .icon { color: var(--green); }
+        .cons-box .check-list li .icon { color: var(--red); }
+
+        /* Best For */
+        .best-for { background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)); border: 1px solid var(--cat-dark); border-radius: 12px; padding: 20px; }
+        .best-for h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--cat-light); }
+        .best-for-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+        .best-for-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; text-align: center; }
+        .best-for-item .icon { font-size: 24px; margin-bottom: 8px; }
+        .best-for-item .text { font-size: 11px; color: var(--text-primary); font-weight: 500; line-height: 1.4; }
+
+        /* Comparison Table */
+        .table-wrapper { overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 24px; }
+        .comparison-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .comparison-table th { background: var(--bg-card-alt); padding: 12px; text-align: left; font-size: 11px; font-weight: 600; border-bottom: 2px solid var(--border-color); color: var(--text-primary); }
+        .comparison-table td { padding: 10px 12px; font-size: 11px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); }
+        .comparison-table td:first-child { font-weight: 600; color: var(--text-primary); }
+        .comparison-table tr:hover td { background: var(--bg-hover); }
+        .comparison-table .yes { color: var(--green); font-weight: 600; }
+        .comparison-table .partial { color: var(--yellow); }
+        .comparison-table .no { color: var(--text-muted); }
+
+        /* Use Cases */
+        .usecase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .usecase-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .usecase-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+        .usecase-title { display: flex; align-items: center; gap: 12px; }
+        .usecase-title .icon { font-size: 24px; }
+        .usecase-title .name { font-size: 15px; font-weight: 600; }
+        .usecase-title .dept { font-size: 11px; color: var(--text-muted); }
+        .usecase-platforms { display: flex; gap: 6px; }
+        .platform-badge { font-size: 10px; padding: 4px 10px; border-radius: 4px; font-weight: 600; }
+        .platform-badge.best { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+        .platform-badge.good { background: rgba(245, 158, 11, 0.15); color: var(--yellow); }
+        .usecase-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+        .usecase-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .metric-box { background: var(--bg-dark); border-radius: 6px; padding: 10px; text-align: center; }
+        .metric-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+        .metric-value { font-size: 11px; color: var(--text-primary); font-weight: 600; }
+
+        /* Selection Framework */
+        .selection-step { display: grid; grid-template-columns: 60px 1fr; gap: 20px; margin-bottom: 28px; position: relative; }
+        .selection-step:last-child { margin-bottom: 0; }
+        .selection-step::after { content: ''; position: absolute; left: 30px; top: 60px; bottom: -28px; width: 2px; background: var(--border-color); }
+        .selection-step:last-child::after { display: none; }
+        .step-number { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: var(--cat-light); position: relative; z-index: 1; }
+        .step-content { background: var(--bg-dark); border-radius: 10px; padding: 20px; }
+        .step-question { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .step-subtext { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+        .step-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .step-option { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .step-option:hover { border-color: var(--cat-primary); }
+        .step-answer { font-size: 12px; color: var(--text-secondary); }
+        .step-result { font-size: 11px; font-weight: 600; color: var(--green); white-space: nowrap; }
+
+        /* TCO Cards */
+        .tco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .tco-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .tco-header { padding: 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .tco-platform { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .tco-scenario { font-size: 10px; color: var(--text-muted); }
+        .tco-body { padding: 16px; }
+        .tco-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+        .tco-line:last-child { border-bottom: none; }
+        .tco-line.total { font-weight: 600; color: var(--cat-light); font-size: 14px; padding-top: 14px; margin-top: 6px; border-top: 2px solid var(--cat-primary); border-bottom: none; }
+        .tco-label { color: var(--text-secondary); }
+        .tco-value { color: var(--text-primary); font-weight: 500; }
+
+        /* Best Practices */
+        .bp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 24px; }
+        .bp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .bp-card.do { border-left: 4px solid var(--green); }
+        .bp-card.dont { border-left: 4px solid var(--red); }
+        .bp-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .bp-card.do .bp-title { color: var(--green); }
+        .bp-card.dont .bp-title { color: var(--red); }
+        .bp-list { list-style: none; margin: 0; padding: 0; }
+        .bp-list li { font-size: 12px; color: var(--text-secondary); padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 12px; line-height: 1.6; }
+        .bp-list li:last-child { border-bottom: none; }
+        .bp-list li .icon { flex-shrink: 0; font-size: 12px; }
+        .bp-card.do .bp-list li .icon { color: var(--green); }
+        .bp-card.dont .bp-list li .icon { color: var(--red); }
+
+        /* Agent Section */
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 24px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--uipath), var(--aa)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 12px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-caps { list-style: none; margin: 0; padding: 0; }
+        .agent-caps li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+        .agent-caps li .icon { color: var(--cat-light); }
+
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 11px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(139, 92, 246, 0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 10px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.7; background: var(--bg-dark); overflow-x: auto; max-height: 320px; overflow-y: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+
+        /* Related */
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+
+        /* Footer */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 28px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--text-secondary); padding: 14px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .two-col, .pros-cons, .usecase-grid, .bp-grid, .agent-grid, .tco-grid { grid-template-columns: 1fr; }
+            .stats-row, .best-for-grid { grid-template-columns: repeat(3, 1fr); }
+            .related-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat08-automation-overview.html">Automation & RPA</a>
+        <span class="sep">/</span>
+        <span class="current">RPA Platforms</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">⚡ Category 08</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat08-automation-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat08-p1-automation-maturity.html"><span class="nav-icon">📊</span> 8.1 Automation Maturity</a></li>
+            <li><a href="cat08-p2-bot-orchestration.html"><span class="nav-icon">🤖</span> 8.2 Bot Orchestration</a></li>
+            <li><a href="cat08-p3-process-mining.html"><span class="nav-icon">⛏️</span> 8.3 Process Mining</a></li>
+            <li><a href="cat08-p4-lowcode-platforms.html"><span class="nav-icon">⚡</span> 8.4 Low-Code Platforms</a></li>
+            <li><a href="cat08-p5-rpa-platforms.html" class="active"><span class="nav-icon">🔧</span> 8.5 RPA Platforms</a></li>
+            <li><a href="cat08-p6-document-processing.html"><span class="nav-icon">📄</span> 8.6 Document Processing</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#landscape"><span class="nav-icon">🗺️</span> Market Landscape</a></li>
+            <li><a href="#uipath"><span class="nav-icon">🟠</span> UiPath</a></li>
+            <li><a href="#aa"><span class="nav-icon">🔵</span> Automation Anywhere</a></li>
+            <li><a href="#blueprism"><span class="nav-icon">🔷</span> Blue Prism</a></li>
+            <li><a href="#mspa"><span class="nav-icon">⚡</span> Power Automate Desktop</a></li>
+            <li><a href="#comparison"><span class="nav-icon">⚖️</span> Comparison Matrix</a></li>
+            <li><a href="#usecases"><span class="nav-icon">💼</span> Use Cases</a></li>
+            <li><a href="#selection"><span class="nav-icon">🎯</span> Selection Framework</a></li>
+            <li><a href="#tco"><span class="nav-icon">💰</span> TCO Analysis</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <!-- HERO -->
+        <section class="hero" id="overview">
+            <div class="hero-tag">🔧 Page 8.5 • Desktop & UI Automation</div>
+            <h1>RPA Platforms</h1>
+            <p>A comprehensive guide to Robotic Process Automation platforms—UiPath, Automation Anywhere, Blue Prism, and Microsoft Power Automate Desktop. Understand when UI automation is the right choice, compare platform capabilities, and build a sustainable RPA practice.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="hero-stat-value">$2.9B</div><div class="hero-stat-label">RPA Market 2024</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">23%</div><div class="hero-stat-label">Annual Growth</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">300%</div><div class="hero-stat-label">Avg 3yr ROI</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">85%</div><div class="hero-stat-label">Fortune 500 Use</div></div>
+            </div>
+        </section>
+
+        <!-- UNDERSTANDING RPA -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding RPA</h2>
+                    <p>What RPA is, when to use it, and when to avoid it</p>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>What is Robotic Process Automation?</h3>
+                <p><strong>RPA automates tasks by mimicking human interactions with software.</strong> Rather than connecting through APIs (the approach used by iPaaS and low-code platforms), RPA bots interact with applications the same way humans do—clicking buttons, typing text, reading screens, moving files. This "surface-level" automation works with any application that has a user interface, regardless of whether it exposes APIs.</p>
+                <p>The technology uses screen scraping, image recognition, and UI element identification to "see" what's on screen and interact with it. Modern RPA platforms combine these techniques with AI (Computer Vision, NLP, Document Understanding) to handle unstructured content and make decisions that previously required human judgment.</p>
+                <p><strong>RPA fills the gap where APIs don't exist.</strong> Legacy mainframes, desktop applications from the 1990s, web applications that block programmatic access—RPA can automate these when nothing else can. But this strength is also its limitation: UI automation is inherently fragile, slower than API integration, and requires ongoing maintenance.</p>
+            </div>
+
+            <div class="content-block">
+                <h3>When to Use RPA vs. API Integration</h3>
+                <p><strong>Use RPA when:</strong> No API exists, the application is legacy/mainframe, you need to automate across multiple disconnected systems, the process involves desktop applications, or you need a quick win before a larger transformation project.</p>
+                <p><strong>Prefer API integration when:</strong> APIs are available, you need high-volume/high-speed processing, the integration is mission-critical, or you're building for long-term scalability. API integrations are faster, more reliable, and easier to maintain.</p>
+                <p><strong>The hybrid approach often wins:</strong> Many real-world processes combine API calls for modern systems with RPA for legacy touchpoints. A single automation might pull data via API from Salesforce, process it in Excel using RPA, and update a mainframe terminal session—all orchestrated together.</p>
+            </div>
+        </section>
+
+        <!-- MARKET LANDSCAPE -->
+        <section class="module" id="landscape">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Market Landscape</h2>
+                    <p>The competitive landscape of RPA platforms</p>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>The Big Three (Plus Microsoft)</h3>
+                <p><strong>UiPath</strong> leads in market share and mindshare, with the most extensive feature set and largest community. They've expanded beyond RPA into full "automation platform" territory with process mining, test automation, and AI capabilities.</p>
+                <p><strong>Automation Anywhere</strong> pioneered cloud-native RPA and has strong enterprise credentials. Their recent focus on generative AI integration positions them for the next wave of intelligent automation.</p>
+                <p><strong>Blue Prism</strong> (now part of SS&C) originated enterprise RPA and maintains a reputation for governance and security. Popular in heavily regulated industries like financial services.</p>
+                <p><strong>Microsoft Power Automate Desktop</strong> disrupted the market by including RPA capabilities free with Windows 11 and M365. Less feature-rich than the dedicated vendors but deeply integrated with the Microsoft ecosystem.</p>
+            </div>
+        </section>
+
+        <!-- UIPATH -->
+        <section class="module" id="uipath">
+            <div class="module-header">
+                <div class="module-icon">🟠</div>
+                <div class="module-info">
+                    <h2>UiPath</h2>
+                    <p>The market leader in enterprise RPA</p>
+                </div>
+            </div>
+
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-logo uipath">Ui</div>
+                    <div class="platform-title">
+                        <h3>UiPath</h3>
+                        <div class="platform-tagline">The leading enterprise automation platform</div>
+                        <div class="platform-badges">
+                            <span class="badge leader">Gartner Leader</span>
+                            <span class="badge leader">Forrester Leader</span>
+                            <span class="badge new">Autopilot AI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-body">
+                    <div class="stats-row">
+                        <div class="stat-box"><div class="stat-value">10,800+</div><div class="stat-label">Customers</div></div>
+                        <div class="stat-box"><div class="stat-value">$1.3B</div><div class="stat-label">ARR 2024</div></div>
+                        <div class="stat-box"><div class="stat-value">63%</div><div class="stat-label">Fortune 500</div></div>
+                        <div class="stat-box"><div class="stat-value">500+</div><div class="stat-label">Integrations</div></div>
+                        <div class="stat-box"><div class="stat-value">2M+</div><div class="stat-label">Community</div></div>
+                        <div class="stat-box"><div class="stat-value">NYSE</div><div class="stat-label">PATH</div></div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="info-box">
+                            <h4>Platform Components</h4>
+                            <ul class="info-list">
+                                <li><strong>Studio:</strong> Development environment for building automations. Studio X for citizen developers, Studio Pro for professionals.</li>
+                                <li><strong>Orchestrator:</strong> Centralized management, scheduling, monitoring, and analytics for all robots.</li>
+                                <li><strong>Robots:</strong> Attended (human-triggered), Unattended (scheduled/triggered), or Test robots.</li>
+                                <li><strong>Document Understanding:</strong> AI-powered extraction from invoices, receipts, forms.</li>
+                                <li><strong>Process Mining:</strong> Discover automation opportunities from system logs.</li>
+                                <li><strong>Test Suite:</strong> Automated testing for applications and RPA bots.</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>Key Differentiators</h4>
+                            <ul class="info-list">
+                                <li><strong>Largest ecosystem:</strong> Most integrations, biggest community, most training resources.</li>
+                                <li><strong>AI capabilities:</strong> Computer Vision, Document Understanding, Autopilot generative AI.</li>
+                                <li><strong>Full platform:</strong> Not just RPA—process mining, test automation, API integration.</li>
+                                <li><strong>Marketplace:</strong> 1,000+ pre-built components and templates.</li>
+                                <li><strong>Enterprise governance:</strong> Role-based access, audit logs, credential management.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="pros-cons">
+                        <div class="pros-box">
+                            <h4>Strengths</h4>
+                            <ul class="check-list">
+                                <li><span class="icon">✓</span> Most comprehensive feature set in the market</li>
+                                <li><span class="icon">✓</span> Largest community and ecosystem for support</li>
+                                <li><span class="icon">✓</span> Best-in-class document processing AI</li>
+                                <li><span class="icon">✓</span> Strong enterprise governance and security</li>
+                                <li><span class="icon">✓</span> Extensive training and certification program</li>
+                                <li><span class="icon">✓</span> Process mining for opportunity discovery</li>
+                            </ul>
+                        </div>
+                        <div class="cons-box">
+                            <h4>Limitations</h4>
+                            <ul class="check-list">
+                                <li><span class="icon">✗</span> Premium pricing—most expensive of the leaders</li>
+                                <li><span class="icon">✗</span> Complex licensing model confuses buyers</li>
+                                <li><span class="icon">✗</span> Platform complexity requires dedicated expertise</li>
+                                <li><span class="icon">✗</span> Orchestrator resource-intensive to self-host</li>
+                                <li><span class="icon">✗</span> Feature bloat—many orgs only use fraction</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="best-for">
+                        <h4>Best For</h4>
+                        <div class="best-for-grid">
+                            <div class="best-for-item"><div class="icon">🏢</div><div class="text">Large enterprises</div></div>
+                            <div class="best-for-item"><div class="icon">🏭</div><div class="text">Complex automation programs</div></div>
+                            <div class="best-for-item"><div class="icon">📄</div><div class="text">Document-heavy processes</div></div>
+                            <div class="best-for-item"><div class="icon">🔒</div><div class="text">Regulated industries</div></div>
+                            <div class="best-for-item"><div class="icon">🌐</div><div class="text">Global deployments</div></div>
+                            <div class="best-for-item"><div class="icon">🧪</div><div class="text">Test automation needs</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUTOMATION ANYWHERE -->
+        <section class="module" id="aa">
+            <div class="module-header">
+                <div class="module-icon">🔵</div>
+                <div class="module-info">
+                    <h2>Automation Anywhere</h2>
+                    <p>Cloud-native RPA with AI-first focus</p>
+                </div>
+            </div>
+
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-logo aa">AA</div>
+                    <div class="platform-title">
+                        <h3>Automation Anywhere</h3>
+                        <div class="platform-tagline">Cloud-native automation with generative AI</div>
+                        <div class="platform-badges">
+                            <span class="badge leader">Gartner Leader</span>
+                            <span class="badge leader">Cloud Native</span>
+                            <span class="badge new">Automation Co-Pilot</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-body">
+                    <div class="stats-row">
+                        <div class="stat-box"><div class="stat-value">5,000+</div><div class="stat-label">Customers</div></div>
+                        <div class="stat-box"><div class="stat-value">$700M+</div><div class="stat-label">ARR Est.</div></div>
+                        <div class="stat-box"><div class="stat-value">300+</div><div class="stat-label">Integrations</div></div>
+                        <div class="stat-box"><div class="stat-value">1M+</div><div class="stat-label">Community</div></div>
+                        <div class="stat-box"><div class="stat-value">100%</div><div class="stat-label">Cloud</div></div>
+                        <div class="stat-box"><div class="stat-value">50+</div><div class="stat-label">AI Skills</div></div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="info-box">
+                            <h4>Platform Components</h4>
+                            <ul class="info-list">
+                                <li><strong>Automation 360:</strong> Cloud-native control room for managing automations.</li>
+                                <li><strong>Bot Creator:</strong> Development environment with recorder and visual designer.</li>
+                                <li><strong>Bot Runners:</strong> Attended and unattended bot execution.</li>
+                                <li><strong>IQ Bot:</strong> AI-powered document processing and data extraction.</li>
+                                <li><strong>Process Discovery:</strong> Automated process mining and task capture.</li>
+                                <li><strong>Automation Co-Pilot:</strong> GenAI assistant for building automations.</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>Key Differentiators</h4>
+                            <ul class="info-list">
+                                <li><strong>Cloud-first architecture:</strong> True SaaS—no on-premise infrastructure required.</li>
+                                <li><strong>Generative AI focus:</strong> Automation Co-Pilot for natural language automation building.</li>
+                                <li><strong>Process Discovery:</strong> Strong task mining capabilities built-in.</li>
+                                <li><strong>AARI:</strong> Attended automation interface for human-in-the-loop.</li>
+                                <li><strong>Google partnership:</strong> Deep integration with Google Cloud and Workspace.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="best-for">
+                        <h4>Best For</h4>
+                        <div class="best-for-grid">
+                            <div class="best-for-item"><div class="icon">☁️</div><div class="text">Cloud-first orgs</div></div>
+                            <div class="best-for-item"><div class="icon">🤖</div><div class="text">AI-heavy use cases</div></div>
+                            <div class="best-for-item"><div class="icon">🔍</div><div class="text">Process discovery</div></div>
+                            <div class="best-for-item"><div class="icon">📊</div><div class="text">Google Cloud users</div></div>
+                            <div class="best-for-item"><div class="icon">👥</div><div class="text">Attended automation</div></div>
+                            <div class="best-for-item"><div class="icon">🚀</div><div class="text">Rapid deployment</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLUE PRISM -->
+        <section class="module" id="blueprism">
+            <div class="module-header">
+                <div class="module-icon">🔷</div>
+                <div class="module-info">
+                    <h2>Blue Prism (SS&C)</h2>
+                    <p>Enterprise-grade RPA with governance focus</p>
+                </div>
+            </div>
+
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-logo blueprism">BP</div>
+                    <div class="platform-title">
+                        <h3>Blue Prism</h3>
+                        <div class="platform-tagline">Secure, scalable intelligent automation (now part of SS&C)</div>
+                        <div class="platform-badges">
+                            <span class="badge leader">Gartner Leader</span>
+                            <span class="badge challenger">Enterprise Focus</span>
+                            <span class="badge new">SS&C Acquired</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-body">
+                    <div class="two-col">
+                        <div class="info-box">
+                            <h4>Key Strengths</h4>
+                            <ul class="info-list">
+                                <li><strong>Security & Governance:</strong> Built for regulated industries—banking, healthcare, government.</li>
+                                <li><strong>Centralized Control:</strong> All bot activity logged and auditable.</li>
+                                <li><strong>Object Reusability:</strong> Strong component library approach.</li>
+                                <li><strong>Blue Prism Cloud:</strong> SaaS offering for faster deployment.</li>
+                                <li><strong>Digital Exchange:</strong> Marketplace of pre-built assets.</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>Considerations</h4>
+                            <ul class="info-list">
+                                <li><strong>SS&C acquisition:</strong> Future roadmap uncertainty post-acquisition.</li>
+                                <li><strong>Market share decline:</strong> Lost ground to UiPath and AA in recent years.</li>
+                                <li><strong>Developer experience:</strong> Steeper learning curve than competitors.</li>
+                                <li><strong>Ecosystem:</strong> Smaller community and fewer integrations.</li>
+                                <li><strong>Innovation pace:</strong> Slower feature development than leaders.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="best-for">
+                        <h4>Best For</h4>
+                        <div class="best-for-grid">
+                            <div class="best-for-item"><div class="icon">🏦</div><div class="text">Financial services</div></div>
+                            <div class="best-for-item"><div class="icon">🔐</div><div class="text">High-security needs</div></div>
+                            <div class="best-for-item"><div class="icon">📋</div><div class="text">Audit requirements</div></div>
+                            <div class="best-for-item"><div class="icon">🏛️</div><div class="text">Government</div></div>
+                            <div class="best-for-item"><div class="icon">🔄</div><div class="text">Existing BP shops</div></div>
+                            <div class="best-for-item"><div class="icon">🛡️</div><div class="text">Risk-averse orgs</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- POWER AUTOMATE DESKTOP -->
+        <section class="module" id="mspa">
+            <div class="module-header">
+                <div class="module-icon">⚡</div>
+                <div class="module-info">
+                    <h2>Power Automate Desktop</h2>
+                    <p>Microsoft's free RPA bundled with Windows</p>
+                </div>
+            </div>
+
+            <div class="platform-card">
+                <div class="platform-header">
+                    <div class="platform-logo mspa">⚡</div>
+                    <div class="platform-title">
+                        <h3>Power Automate Desktop</h3>
+                        <div class="platform-tagline">Free desktop automation for Windows users</div>
+                        <div class="platform-badges">
+                            <span class="badge leader">Free with Windows</span>
+                            <span class="badge leader">M365 Integration</span>
+                            <span class="badge new">Copilot Actions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="platform-body">
+                    <div class="two-col">
+                        <div class="info-box">
+                            <h4>Why Consider PAD</h4>
+                            <ul class="info-list">
+                                <li><strong>Zero cost barrier:</strong> Free with Windows 11 and M365 E3/E5.</li>
+                                <li><strong>Microsoft integration:</strong> Native with Excel, Outlook, Teams, SharePoint.</li>
+                                <li><strong>Power Platform synergy:</strong> Combine with cloud flows and Power Apps.</li>
+                                <li><strong>Low learning curve:</strong> Accessible to citizen developers.</li>
+                                <li><strong>AI Builder:</strong> Document processing and AI capabilities.</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>Limitations to Know</h4>
+                            <ul class="info-list">
+                                <li><strong>Windows only:</strong> No Mac or Linux support.</li>
+                                <li><strong>Feature gaps:</strong> Less mature than UiPath/AA for complex scenarios.</li>
+                                <li><strong>Orchestration:</strong> Premium license required for unattended bots.</li>
+                                <li><strong>Enterprise governance:</strong> Requires CoE Starter Kit setup.</li>
+                                <li><strong>Community:</strong> Smaller ecosystem than dedicated RPA vendors.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="best-for">
+                        <h4>Best For</h4>
+                        <div class="best-for-grid">
+                            <div class="best-for-item"><div class="icon">🏢</div><div class="text">Microsoft shops</div></div>
+                            <div class="best-for-item"><div class="icon">💰</div><div class="text">Budget-conscious</div></div>
+                            <div class="best-for-item"><div class="icon">👥</div><div class="text">Citizen developers</div></div>
+                            <div class="best-for-item"><div class="icon">📧</div><div class="text">Office automation</div></div>
+                            <div class="best-for-item"><div class="icon">🔄</div><div class="text">Simple desktop tasks</div></div>
+                            <div class="best-for-item"><div class="icon">🚀</div><div class="text">Quick starts</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON MATRIX -->
+        <section class="module" id="comparison">
+            <div class="module-header">
+                <div class="module-icon">⚖️</div>
+                <div class="module-info">
+                    <h2>Platform Comparison</h2>
+                    <p>Side-by-side comparison of RPA platforms</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>UiPath</th>
+                            <th>Automation Anywhere</th>
+                            <th>Blue Prism</th>
+                            <th>Power Automate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Market Position</td><td class="yes">Leader</td><td class="yes">Leader</td><td class="partial">Challenger</td><td class="partial">Niche</td></tr>
+                        <tr><td>Deployment</td><td>Cloud + On-Prem</td><td class="yes">Cloud-Native</td><td>Cloud + On-Prem</td><td>Desktop + Cloud</td></tr>
+                        <tr><td>Attended RPA</td><td class="yes">★★★★★</td><td class="yes">★★★★★</td><td>★★★☆☆</td><td>★★★★☆</td></tr>
+                        <tr><td>Unattended RPA</td><td class="yes">★★★★★</td><td class="yes">★★★★★</td><td class="yes">★★★★★</td><td>★★★☆☆</td></tr>
+                        <tr><td>Document AI</td><td class="yes">★★★★★</td><td class="yes">★★★★☆</td><td>★★★☆☆</td><td>★★★☆☆</td></tr>
+                        <tr><td>Process Mining</td><td class="yes">✓ Built-in</td><td class="yes">✓ Built-in</td><td class="partial">○ Partner</td><td class="partial">○ Process Advisor</td></tr>
+                        <tr><td>Test Automation</td><td class="yes">✓ Native</td><td class="partial">○ Basic</td><td class="no">✗ No</td><td class="no">✗ No</td></tr>
+                        <tr><td>Generative AI</td><td class="yes">Autopilot</td><td class="yes">Co-Pilot</td><td class="partial">○ Limited</td><td class="yes">Copilot</td></tr>
+                        <tr><td>Governance</td><td class="yes">Excellent</td><td>Good</td><td class="yes">Excellent</td><td class="partial">Basic (CoE Kit)</td></tr>
+                        <tr><td>Community Size</td><td class="yes">Largest</td><td>Large</td><td>Medium</td><td>Growing</td></tr>
+                        <tr><td>Free Tier</td><td class="yes">✓ Community</td><td class="yes">✓ Community</td><td class="no">✗ No</td><td class="yes">✓ Windows</td></tr>
+                        <tr><td>Starting Price</td><td>$420/bot/mo</td><td>Custom</td><td>Custom</td><td>$15/user/mo</td></tr>
+                        <tr><td>Best For</td><td>Enterprise scale</td><td>Cloud-first</td><td>Regulated</td><td>Microsoft orgs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- USE CASES -->
+        <section class="module" id="usecases">
+            <div class="module-header">
+                <div class="module-icon">💼</div>
+                <div class="module-info">
+                    <h2>Use Cases</h2>
+                    <p>Common RPA scenarios and platform recommendations</p>
+                </div>
+            </div>
+
+            <div class="usecase-grid">
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-title">
+                            <span class="icon">💳</span>
+                            <div><div class="name">Invoice Processing</div><div class="dept">Finance / AP</div></div>
+                        </div>
+                        <div class="usecase-platforms">
+                            <span class="platform-badge best">UiPath</span>
+                            <span class="platform-badge good">AA</span>
+                        </div>
+                    </div>
+                    <div class="usecase-desc">Extract data from invoices (PDF, email, scanned), validate against PO, enter into ERP, route exceptions for approval. Combines Document AI with workflow automation.</div>
+                    <div class="usecase-metrics">
+                        <div class="metric-box"><div class="metric-label">Complexity</div><div class="metric-value">Medium-High</div></div>
+                        <div class="metric-box"><div class="metric-label">ROI Timeline</div><div class="metric-value">3-6 months</div></div>
+                        <div class="metric-box"><div class="metric-label">Typical Volume</div><div class="metric-value">1K-50K/mo</div></div>
+                        <div class="metric-box"><div class="metric-label">Key Tech</div><div class="metric-value">Document AI</div></div>
+                    </div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-title">
+                            <span class="icon">🖥️</span>
+                            <div><div class="name">Legacy System Data Entry</div><div class="dept">Operations</div></div>
+                        </div>
+                        <div class="usecase-platforms">
+                            <span class="platform-badge best">UiPath</span>
+                            <span class="platform-badge good">Blue Prism</span>
+                        </div>
+                    </div>
+                    <div class="usecase-desc">Automate data entry into mainframes, terminal emulators, or legacy Windows apps that lack APIs. Classic "swivel chair" automation replacing manual rekeying.</div>
+                    <div class="usecase-metrics">
+                        <div class="metric-box"><div class="metric-label">Complexity</div><div class="metric-value">Low-Medium</div></div>
+                        <div class="metric-box"><div class="metric-label">ROI Timeline</div><div class="metric-value">1-3 months</div></div>
+                        <div class="metric-box"><div class="metric-label">Typical Volume</div><div class="metric-value">500-5K/day</div></div>
+                        <div class="metric-box"><div class="metric-label">Key Tech</div><div class="metric-value">Screen scraping</div></div>
+                    </div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-title">
+                            <span class="icon">👤</span>
+                            <div><div class="name">Employee Onboarding</div><div class="dept">HR / IT</div></div>
+                        </div>
+                        <div class="usecase-platforms">
+                            <span class="platform-badge best">AA</span>
+                            <span class="platform-badge good">PAD</span>
+                        </div>
+                    </div>
+                    <div class="usecase-desc">Create accounts across multiple systems (AD, email, HRIS, apps), assign permissions, send welcome emails, schedule training. Multi-system orchestration.</div>
+                    <div class="usecase-metrics">
+                        <div class="metric-box"><div class="metric-label">Complexity</div><div class="metric-value">Medium</div></div>
+                        <div class="metric-box"><div class="metric-label">ROI Timeline</div><div class="metric-value">2-4 months</div></div>
+                        <div class="metric-box"><div class="metric-label">Typical Volume</div><div class="metric-value">10-100/week</div></div>
+                        <div class="metric-box"><div class="metric-label">Key Tech</div><div class="metric-value">Multi-app</div></div>
+                    </div>
+                </div>
+                <div class="usecase-card">
+                    <div class="usecase-header">
+                        <div class="usecase-title">
+                            <span class="icon">📊</span>
+                            <div><div class="name">Report Generation</div><div class="dept">Finance / Ops</div></div>
+                        </div>
+                        <div class="usecase-platforms">
+                            <span class="platform-badge best">PAD</span>
+                            <span class="platform-badge good">UiPath</span>
+                        </div>
+                    </div>
+                    <div class="usecase-desc">Pull data from multiple systems, consolidate in Excel, apply formatting and calculations, generate charts, distribute via email. Perfect for Excel-heavy workflows.</div>
+                    <div class="usecase-metrics">
+                        <div class="metric-box"><div class="metric-label">Complexity</div><div class="metric-value">Low-Medium</div></div>
+                        <div class="metric-box"><div class="metric-label">ROI Timeline</div><div class="metric-value">Immediate</div></div>
+                        <div class="metric-box"><div class="metric-label">Typical Volume</div><div class="metric-value">Daily/Weekly</div></div>
+                        <div class="metric-box"><div class="metric-label">Key Tech</div><div class="metric-value">Excel macros</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SELECTION FRAMEWORK -->
+        <section class="module" id="selection">
+            <div class="module-header">
+                <div class="module-icon">🎯</div>
+                <div class="module-info">
+                    <h2>Platform Selection</h2>
+                    <p>Decision framework for choosing an RPA platform</p>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <div class="selection-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-question">What's your primary technology ecosystem?</div>
+                        <div class="step-subtext">Ecosystem alignment reduces integration friction</div>
+                        <div class="step-options">
+                            <div class="step-option"><div class="step-answer">Microsoft 365 / Azure / Windows</div><div class="step-result">→ Power Automate</div></div>
+                            <div class="step-option"><div class="step-answer">Google Cloud / Workspace</div><div class="step-result">→ Automation Anywhere</div></div>
+                            <div class="step-option"><div class="step-answer">Mixed / Multi-cloud</div><div class="step-result">→ UiPath</div></div>
+                            <div class="step-option"><div class="step-answer">On-premise / Air-gapped</div><div class="step-result">→ Blue Prism</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="selection-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-question">What's your scale and budget?</div>
+                        <div class="step-subtext">Match platform capabilities to your needs</div>
+                        <div class="step-options">
+                            <div class="step-option"><div class="step-answer">Getting started / budget-limited</div><div class="step-result">→ Power Automate</div></div>
+                            <div class="step-option"><div class="step-answer">10-50 automations planned</div><div class="step-result">→ AA or UiPath</div></div>
+                            <div class="step-option"><div class="step-answer">Enterprise scale (100+)</div><div class="step-result">→ UiPath</div></div>
+                            <div class="step-option"><div class="step-answer">Regulated / audit-heavy</div><div class="step-result">→ Blue Prism</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="selection-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-question">What types of automation dominate?</div>
+                        <div class="step-subtext">Different platforms excel at different scenarios</div>
+                        <div class="step-options">
+                            <div class="step-option"><div class="step-answer">Document processing heavy</div><div class="step-result">→ UiPath</div></div>
+                            <div class="step-option"><div class="step-answer">Attended (human-triggered)</div><div class="step-result">→ AA or UiPath</div></div>
+                            <div class="step-option"><div class="step-answer">Simple desktop tasks</div><div class="step-result">→ Power Automate</div></div>
+                            <div class="step-option"><div class="step-answer">Unattended batch processing</div><div class="step-result">→ Any platform</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TCO ANALYSIS -->
+        <section class="module" id="tco">
+            <div class="module-header">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                    <h2>Total Cost of Ownership</h2>
+                    <p>Real costs beyond license fees</p>
+                </div>
+            </div>
+
+            <div class="tco-grid">
+                <div class="tco-card">
+                    <div class="tco-header"><div class="tco-platform">UiPath</div><div class="tco-scenario">20 bots, 50 automations, 3 years</div></div>
+                    <div class="tco-body">
+                        <div class="tco-line"><span class="tco-label">Licenses (3yr)</span><span class="tco-value">$302,400</span></div>
+                        <div class="tco-line"><span class="tco-label">Implementation</span><span class="tco-value">$150,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Training/Certs</span><span class="tco-value">$50,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Infrastructure</span><span class="tco-value">$30,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Ongoing Support</span><span class="tco-value">$90,000</span></div>
+                        <div class="tco-line total"><span class="tco-label">3-Year Total</span><span class="tco-value">$622,400</span></div>
+                    </div>
+                </div>
+                <div class="tco-card">
+                    <div class="tco-header"><div class="tco-platform">Automation Anywhere</div><div class="tco-scenario">20 bots, 50 automations, 3 years</div></div>
+                    <div class="tco-body">
+                        <div class="tco-line"><span class="tco-label">Licenses (3yr)</span><span class="tco-value">$270,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Implementation</span><span class="tco-value">$120,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Training/Certs</span><span class="tco-value">$40,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Infrastructure</span><span class="tco-value">$0 (Cloud)</span></div>
+                        <div class="tco-line"><span class="tco-label">Ongoing Support</span><span class="tco-value">$75,000</span></div>
+                        <div class="tco-line total"><span class="tco-label">3-Year Total</span><span class="tco-value">$505,000</span></div>
+                    </div>
+                </div>
+                <div class="tco-card">
+                    <div class="tco-header"><div class="tco-platform">Power Automate</div><div class="tco-scenario">20 users, 50 flows, 3 years</div></div>
+                    <div class="tco-body">
+                        <div class="tco-line"><span class="tco-label">Licenses (3yr)</span><span class="tco-value">$54,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Implementation</span><span class="tco-value">$40,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Training</span><span class="tco-value">$15,000</span></div>
+                        <div class="tco-line"><span class="tco-label">CoE Setup</span><span class="tco-value">$20,000</span></div>
+                        <div class="tco-line"><span class="tco-label">Ongoing Support</span><span class="tco-value">$30,000</span></div>
+                        <div class="tco-line total"><span class="tco-label">3-Year Total</span><span class="tco-value">$159,000</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Understanding RPA Costs</h3>
+                <p><strong>Licenses are just the beginning.</strong> Implementation, training, infrastructure, and ongoing maintenance often exceed software costs. Budget 2-3x license fees for total program cost.</p>
+                <p><strong>Bot maintenance is ongoing.</strong> Applications change, breaking automations. Plan for 20-30% of development effort annually for maintenance and fixes.</p>
+                <p><strong>Hidden costs include:</strong> VDI infrastructure for unattended bots, exception handling development, monitoring tools, and the CoE team to govern the program.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Lessons from successful RPA programs</p>
+                </div>
+            </div>
+
+            <div class="bp-grid">
+                <div class="bp-card do">
+                    <div class="bp-title">Do These Things</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✓</span> Start with process standardization before automation—fix the process first.</li>
+                        <li><span class="icon">✓</span> Build a Center of Excellence to govern, support, and scale the program.</li>
+                        <li><span class="icon">✓</span> Design for exception handling—every automation will encounter unexpected scenarios.</li>
+                        <li><span class="icon">✓</span> Create reusable components and libraries to accelerate future development.</li>
+                        <li><span class="icon">✓</span> Monitor bot performance and business outcomes, not just technical metrics.</li>
+                        <li><span class="icon">✓</span> Plan for maintenance—applications change, and bots break.</li>
+                    </ul>
+                </div>
+                <div class="bp-card dont">
+                    <div class="bp-title">Avoid These Mistakes</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✗</span> Automating broken or unstable processes—garbage in, garbage out faster.</li>
+                        <li><span class="icon">✗</span> Choosing RPA when an API integration would be more reliable and maintainable.</li>
+                        <li><span class="icon">✗</span> Underestimating maintenance effort—plan for 25% of dev time ongoing.</li>
+                        <li><span class="icon">✗</span> Deploying without proper error handling and logging.</li>
+                        <li><span class="icon">✗</span> Letting citizen developers build without governance or standards.</li>
+                        <li><span class="icon">✗</span> Expecting "set and forget"—RPA requires continuous attention.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered RPA platform selection and design</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🔧</div>
+                    <div class="agent-name">RPAArchitect</div>
+                    <div class="agent-role">RPA Platform Specialist</div>
+                    <div class="agent-desc">Analyzes your process requirements, technology ecosystem, and constraints to recommend the optimal RPA platform and architecture. Designs bot frameworks, estimates ROI, and creates implementation roadmaps.</div>
+                    <ul class="agent-caps">
+                        <li><span class="icon">✦</span> Platform selection recommendation</li>
+                        <li><span class="icon">✦</span> Process automation feasibility analysis</li>
+                        <li><span class="icon">✦</span> ROI calculation and business case</li>
+                        <li><span class="icon">✦</span> Bot architecture design</li>
+                        <li><span class="icon">✦</span> CoE framework recommendations</li>
+                        <li><span class="icon">✦</span> Migration path planning</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Process Analyzer</div>
+                        <div class="code-filename">rpa_architect.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># rpa_architect.py - Process Analysis</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> typing <span class="code-keyword">import</span> Dict, List
+
+<span class="code-keyword">class</span> <span class="code-function">RPAArchitect</span>:
+    <span class="code-string">"""AI agent for RPA platform selection."""</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">analyze_process</span>(self, process: Dict) -> Dict:
+        <span class="code-string">"""Score process for RPA suitability."""</span>
+        score = 0
+        
+        <span class="code-comment"># Rule-based = good for RPA</span>
+        <span class="code-keyword">if</span> process[<span class="code-string">"rule_based"</span>]:
+            score += 25
+        
+        <span class="code-comment"># High volume = better ROI</span>
+        <span class="code-keyword">if</span> process[<span class="code-string">"volume"</span>] > 100:
+            score += 25
+            
+        <span class="code-comment"># Stable process = lower maintenance</span>
+        <span class="code-keyword">if</span> process[<span class="code-string">"change_frequency"</span>] == <span class="code-string">"low"</span>:
+            score += 25
+            
+        <span class="code-comment"># No API = RPA required</span>
+        <span class="code-keyword">if</span> <span class="code-keyword">not</span> process[<span class="code-string">"api_available"</span>]:
+            score += 25
+            
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"score"</span>: score,
+            <span class="code-string">"recommendation"</span>: <span class="code-string">"RPA"</span> <span class="code-keyword">if</span> score >= 50 
+                              <span class="code-keyword">else</span> <span class="code-string">"API Integration"</span>
+        }</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring automation topics</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat08-p4-lowcode-platforms.html" class="related-card">
+                    <div class="related-num">Page 8.4</div>
+                    <div class="related-title">Low-Code Platforms</div>
+                    <div class="related-desc">API-based automation with Power Automate, Zapier, Workato</div>
+                </a>
+                <a href="cat08-p6-document-processing.html" class="related-card">
+                    <div class="related-num">Page 8.6</div>
+                    <div class="related-title">Document Processing</div>
+                    <div class="related-desc">IDP and AI-powered document extraction</div>
+                </a>
+                <a href="cat08-p2-bot-orchestration.html" class="related-card">
+                    <div class="related-num">Page 8.2</div>
+                    <div class="related-title">Bot Orchestration</div>
+                    <div class="related-desc">Managing and scaling your bot workforce</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat08-p4-lowcode-platforms.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">8.4: Low-Code Platforms</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 8.5 of 6</div>
+        <a href="cat08-p6-document-processing.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">8.6: Document Processing</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

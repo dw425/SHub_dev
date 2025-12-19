@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --pink: #EC4899;
+            --violet: #8B5CF6;
+            --teal: #14B8A6;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .current { color: var(--text-primary); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+        
+        .hero { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 40px; margin-bottom: 32px; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--cat-dark), var(--cat-primary), var(--cat-light)); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--cat-glow); border: 1px solid var(--cat-primary); padding: 6px 16px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 16px; }
+        .hero h1 { font-size: 36px; margin-bottom: 12px; }
+        .hero-subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 24px; max-width: 700px; line-height: 1.7; }
+        .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .hero-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-stat-value { font-size: 28px; font-weight: 700; color: var(--cat-light); }
+        .hero-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        
+        .section { margin-bottom: 32px; }
+        .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .section-icon { width: 40px; height: 40px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .section-title { font-size: 20px; font-weight: 600; }
+        
+        .concepts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .concept-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .concept-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .concept-card.graphs::before { background: var(--yellow); }
+        .concept-card.rag::before { background: var(--cyan); }
+        .concept-card.semantic::before { background: var(--teal); }
+        .concept-card.governance::before { background: var(--violet); }
+        .concept-icon { font-size: 32px; margin-bottom: 12px; }
+        .concept-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .concept-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+        
+        .pages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .page-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; transition: all 0.2s; text-decoration: none; color: inherit; position: relative; overflow: hidden; }
+        .page-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); transform: scaleX(0); transition: transform 0.2s; }
+        .page-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .page-card:hover::before { transform: scaleX(1); }
+        .page-num { font-size: 11px; color: var(--cat-light); font-weight: 600; margin-bottom: 8px; }
+        .page-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+        .page-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+        .page-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .page-tag { font-size: 9px; padding: 3px 8px; background: var(--bg-card-alt); border-radius: 4px; color: var(--text-muted); }
+        
+        .tools-preview { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .tools-intro { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; }
+        .tools-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+        .tool-item { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; transition: all 0.2s; }
+        .tool-item:hover { border-color: var(--cat-primary); }
+        .tool-icon { font-size: 24px; margin-bottom: 6px; }
+        .tool-name { font-size: 10px; color: var(--text-secondary); }
+        
+        .agent-preview { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; display: flex; align-items: center; gap: 20px; }
+        .agent-avatar { width: 64px; height: 64px; background: linear-gradient(135deg, var(--cat-primary), var(--cat-light)); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; flex-shrink: 0; }
+        .agent-info h3 { font-size: 18px; margin-bottom: 4px; }
+        .agent-info .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 8px; }
+        .agent-info p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-stats { grid-template-columns: repeat(2, 1fr); }
+            .pages-grid { grid-template-columns: repeat(2, 1fr); }
+            .tools-grid { grid-template-columns: repeat(3, 1fr); }
+            .concepts-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <span class="current">Knowledge Management</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html" class="active"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Deep Dives</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> 7.1 Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> 7.2 RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> 7.3 Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> 7.4 Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html"><span class="nav-icon">📖</span> 7.5 Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> 7.6 Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> 7.7 Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> 7.8 Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-badge">📚 Category 07 • Enterprise Knowledge</div>
+            <h1>Knowledge Management</h1>
+            <p class="hero-subtitle">Transform organizational knowledge into AI-ready assets with knowledge graphs, RAG pipelines, semantic models, and modern wiki platforms that make expertise discoverable and actionable.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">8</div>
+                    <div class="hero-stat-label">Deep Dive Pages</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">RAG</div>
+                    <div class="hero-stat-label">AI Integration</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">30+</div>
+                    <div class="hero-stat-label">Tools Covered</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">Graph</div>
+                    <div class="hero-stat-label">Semantic Models</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KEY CONCEPTS -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">💡</div>
+                <div class="section-title">Core Pillars</div>
+            </div>
+            <div class="concepts-grid">
+                <div class="concept-card graphs">
+                    <div class="concept-icon">🕸️</div>
+                    <div class="concept-title">Knowledge Graphs</div>
+                    <div class="concept-desc">Connect entities and relationships for powerful discovery and AI reasoning</div>
+                </div>
+                <div class="concept-card rag">
+                    <div class="concept-icon">🔍</div>
+                    <div class="concept-title">RAG Pipelines</div>
+                    <div class="concept-desc">Ground LLM responses in enterprise knowledge with semantic retrieval</div>
+                </div>
+                <div class="concept-card semantic">
+                    <div class="concept-icon">🧊</div>
+                    <div class="concept-title">Semantic Layers</div>
+                    <div class="concept-desc">Define business meaning with metrics stores and data mesh architectures</div>
+                </div>
+                <div class="concept-card governance">
+                    <div class="concept-icon">📖</div>
+                    <div class="concept-title">Content Platforms</div>
+                    <div class="concept-desc">Enterprise wikis and documentation systems for collaborative knowledge</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGES GRID -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">📄</div>
+                <div class="section-title">Category Pages</div>
+            </div>
+            <div class="pages-grid">
+                <a href="cat07-p1-knowledge-graphs.html" class="page-card">
+                    <div class="page-num">Page 7.1</div>
+                    <div class="page-title">Knowledge Graphs</div>
+                    <div class="page-desc">Transform information into connected networks of entities and relationships for powerful discovery.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Neo4j</span>
+                        <span class="page-tag">Cypher</span>
+                        <span class="page-tag">GraphRAG</span>
+                        <span class="page-tag">Ontology</span>
+                    </div>
+                </a>
+                <a href="cat07-p2-rag-search.html" class="page-card">
+                    <div class="page-num">Page 7.2</div>
+                    <div class="page-title">RAG & Semantic Search</div>
+                    <div class="page-desc">Retrieval-Augmented Generation pipelines that ground LLM responses in your enterprise knowledge.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Embeddings</span>
+                        <span class="page-tag">Chunking</span>
+                        <span class="page-tag">Hybrid Search</span>
+                        <span class="page-tag">Reranking</span>
+                    </div>
+                </a>
+                <a href="cat07-p3-taxonomy.html" class="page-card">
+                    <div class="page-num">Page 7.3</div>
+                    <div class="page-title">Taxonomy & Ontology</div>
+                    <div class="page-desc">Structure knowledge with hierarchical classification systems and formal semantic schemas.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">SKOS</span>
+                        <span class="page-tag">OWL</span>
+                        <span class="page-tag">Classification</span>
+                        <span class="page-tag">Auto-tagging</span>
+                    </div>
+                </a>
+                <a href="cat07-p4-content-lifecycle.html" class="page-card">
+                    <div class="page-num">Page 7.4</div>
+                    <div class="page-title">Content Lifecycle</div>
+                    <div class="page-desc">Manage knowledge from creation to retirement with governance workflows and freshness monitoring.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Governance</span>
+                        <span class="page-tag">Freshness</span>
+                        <span class="page-tag">Review Cycles</span>
+                        <span class="page-tag">Archival</span>
+                    </div>
+                </a>
+                <a href="cat07-p5-enterprise-wikis.html" class="page-card">
+                    <div class="page-num">Page 7.5</div>
+                    <div class="page-title">Enterprise Wikis</div>
+                    <div class="page-desc">Confluence, Notion, SharePoint and modern alternatives for collaborative knowledge documentation.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Confluence</span>
+                        <span class="page-tag">Notion</span>
+                        <span class="page-tag">SharePoint</span>
+                        <span class="page-tag">GitBook</span>
+                    </div>
+                </a>
+                <a href="cat07-p6-semantic-models.html" class="page-card">
+                    <div class="page-num">Page 7.6</div>
+                    <div class="page-title">Semantic Models</div>
+                    <div class="page-desc">Define business meaning with semantic layers, metrics stores, and data mesh architectures.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">dbt Semantic</span>
+                        <span class="page-tag">Cube</span>
+                        <span class="page-tag">Data Mesh</span>
+                        <span class="page-tag">Metrics</span>
+                    </div>
+                </a>
+                <a href="cat07-p7-vector-databases.html" class="page-card">
+                    <div class="page-num">Page 7.7</div>
+                    <div class="page-title">Vector Databases</div>
+                    <div class="page-desc">Purpose-built databases for storing and querying embeddings—the foundation of semantic search.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Pinecone</span>
+                        <span class="page-tag">Weaviate</span>
+                        <span class="page-tag">Qdrant</span>
+                        <span class="page-tag">HNSW</span>
+                    </div>
+                </a>
+                <a href="cat07-p8-platform-comparison.html" class="page-card">
+                    <div class="page-num">Page 7.8</div>
+                    <div class="page-title">Platform Comparison</div>
+                    <div class="page-desc">Comprehensive comparison of KM platforms with decision frameworks and stack recommendations.</div>
+                    <div class="page-tags">
+                        <span class="page-tag">Comparison</span>
+                        <span class="page-tag">Selection</span>
+                        <span class="page-tag">Stack</span>
+                        <span class="page-tag">TCO</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- TOOLS PREVIEW -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🛠️</div>
+                <div class="section-title">Tools & Platforms</div>
+            </div>
+            <div class="tools-preview">
+                <p class="tools-intro">Key technologies covered in this category:</p>
+                <div class="tools-grid">
+                    <div class="tool-item">
+                        <div class="tool-icon">🕸️</div>
+                        <div class="tool-name">Neo4j</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🌲</div>
+                        <div class="tool-name">Pinecone</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🔷</div>
+                        <div class="tool-name">Weaviate</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🔶</div>
+                        <div class="tool-name">Qdrant</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">📘</div>
+                        <div class="tool-name">Confluence</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">Notion</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🧊</div>
+                        <div class="tool-name">Cube</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🧱</div>
+                        <div class="tool-name">dbt Semantic</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🔗</div>
+                        <div class="tool-name">LangChain</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">🦜</div>
+                        <div class="tool-name">LlamaIndex</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">📚</div>
+                        <div class="tool-name">Unity Catalog</div>
+                    </div>
+                    <div class="tool-item">
+                        <div class="tool-icon">📁</div>
+                        <div class="tool-name">SharePoint</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AGENT PREVIEW -->
+        <section class="section">
+            <div class="section-header">
+                <div class="section-icon">🤖</div>
+                <div class="section-title">Featured Agent</div>
+            </div>
+            <div class="agent-preview">
+                <div class="agent-avatar">📚</div>
+                <div class="agent-info">
+                    <h3>KnowledgeEngineerAgent</h3>
+                    <div class="agent-role">Enterprise Knowledge Specialist</div>
+                    <p>Expert in designing knowledge management systems, building RAG pipelines, configuring vector databases, and implementing semantic search. Helps select the right combination of wikis, graphs, and AI tools to make organizational expertise discoverable and actionable.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="../category-06/cat06-chatbots-overview.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Category</div>
+                <div class="footer-link-title">06: Chatbots & Conversational AI</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Category 07 of 29</div>
+        <a href="cat07-p1-knowledge-graphs.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Start Learning</div>
+                <div class="footer-link-title">7.1: Knowledge Graphs</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

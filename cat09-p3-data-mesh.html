@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mesh | Architecture Patterns | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #6366F1;
+            --cat-light: #818CF8;
+            --cat-dark: #4F46E5;
+            --cat-glow: rgba(99, 102, 241, 0.15);
+            --page-color: #10B981;
+            --page-light: #34D399;
+            --page-glow: rgba(16, 185, 129, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --cyan: #06B6D4;
+            --sidebar-width: 280px;
+            --header-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 0 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1200px; padding: 32px; }
+
+        .hero { margin-bottom: 28px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--green), var(--cyan), var(--cat-primary)); border-radius: 14px 14px 0 0; }
+        .hero-tag { display: inline-flex; background: var(--page-glow); border: 1px solid var(--page-color); padding: 5px 14px; border-radius: 9999px; font-size: 11px; color: var(--page-light); margin-bottom: 14px; }
+        .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+        .hero > p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 800px; margin-bottom: 24px; }
+        .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .hero-stat { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+        .hero-stat-value { font-size: 22px; font-weight: 700; color: var(--page-light); }
+        .hero-stat-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        .business-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .business-card { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .business-icon { font-size: 28px; margin-bottom: 8px; }
+        .business-stat { font-size: 28px; font-weight: 700; color: var(--page-light); margin-bottom: 4px; }
+        .business-label { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+        .business-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+        
+        .use-cases-block { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .use-cases-block h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--page-light); }
+        .use-cases-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .use-case { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+        .use-case-icon { font-size: 20px; }
+        .use-case-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .use-case-desc { font-size: 10px; color: var(--text-muted); }
+
+        .architecture-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .arch-svg { width: 100%; height: auto; }
+        
+        .flow-explanation { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .flow-step { display: flex; align-items: flex-start; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; }
+        .step-num { width: 24px; height: 24px; background: var(--page-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .step-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+        .step-text strong { color: var(--text-primary); }
+        .step-text code { background: var(--bg-dark); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--page-light); }
+
+        .stack-patterns { display: flex; flex-direction: column; gap: 20px; }
+        .stack-pattern { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .stack-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .stack-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stack-badge.databricks { background: rgba(255, 63, 52, 0.2); color: #FF3F34; }
+        .stack-badge.snowflake { background: rgba(41, 182, 246, 0.2); color: #29B6F6; }
+        .stack-badge.fabric { background: rgba(0, 120, 212, 0.2); color: #0078D4; }
+        .stack-name { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+        .stack-use { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+        .stack-diagram { background: var(--bg-dark); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .stack-svg { width: 100%; height: auto; }
+        .stack-benefits { display: flex; gap: 16px; flex-wrap: wrap; }
+        .benefit { font-size: 11px; color: var(--green); background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 4px; }
+
+        /* Common Approaches */
+        .approaches-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .approach-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .approach-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .approach-badge { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+        .approach-badge.federated { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .approach-badge.hybrid { background: rgba(99, 102, 241, 0.2); color: #818CF8; }
+        .approach-badge.embedded { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .approach-badge.coe { background: rgba(236, 72, 153, 0.2); color: #EC4899; }
+        .approach-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+        .approach-diagram { background: var(--bg-dark); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+        .approach-svg { width: 100%; height: auto; }
+        .approach-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .approach-fit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .fit-label { font-size: 10px; color: var(--text-muted); }
+        .fit-tag { font-size: 10px; padding: 3px 8px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-secondary); }
+
+        /* Scorecard */
+        .scorecard-table { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+        .scorecard-header { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 0.8fr; background: var(--bg-card-alt); padding: 16px; border-bottom: 1px solid var(--border-color); }
+        .scorecard-criteria { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .scorecard-col { font-size: 11px; text-align: center; font-weight: 600; }
+        .scorecard-col.centralized { color: var(--yellow); }
+        .scorecard-col.mesh { color: var(--green); }
+        .scorecard-col.winner { color: var(--text-muted); }
+        .scorecard-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 0.8fr; padding: 16px; border-bottom: 1px solid var(--border-color); align-items: center; }
+        .scorecard-row:last-child { border-bottom: none; }
+        .scorecard-row .scorecard-criteria strong { display: block; color: var(--text-primary); font-size: 12px; }
+        .scorecard-row .scorecard-criteria span { font-size: 10px; color: var(--text-muted); }
+        .scorecard-row .scorecard-col { text-align: center; }
+        .score-value { display: block; font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .score-note { display: block; font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+        .mesh-win { color: var(--green) !important; font-weight: 600; }
+        .central-win { color: var(--yellow) !important; font-weight: 600; }
+        .tie { color: var(--cyan) !important; }
+        .scorecard-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .summary-card { display: flex; align-items: center; gap: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .summary-card.mesh { border-color: var(--green); }
+        .summary-card.central { border-color: var(--yellow); }
+        .summary-icon { font-size: 32px; }
+        .summary-content { flex: 1; }
+        .summary-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .summary-text { font-size: 11px; color: var(--text-muted); }
+        .summary-score { font-size: 36px; font-weight: 700; }
+        .summary-card.mesh .summary-score { color: var(--green); }
+        .summary-card.central .summary-score { color: var(--yellow); }
+
+        /* Industry Quotes */
+        .quotes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .quote-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .quote-text { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+        .quote-text::before { content: '"'; font-size: 24px; color: var(--page-light); line-height: 0; vertical-align: -8px; margin-right: 4px; }
+        .quote-author { display: flex; align-items: center; gap: 12px; }
+        .quote-avatar { width: 40px; height: 40px; background: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .quote-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+        .quote-role { font-size: 10px; color: var(--text-muted); }
+        .industry-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .industry-stat { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--page-light); }
+        .stat-label { font-size: 11px; color: var(--text-secondary); margin: 8px 0; }
+        .stat-source { font-size: 9px; color: var(--text-muted); }
+        .maturity-model { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .maturity-model h4 { font-size: 14px; font-weight: 600; color: var(--page-light); margin-bottom: 20px; text-align: center; }
+        .maturity-stages { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .maturity-stage { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; min-width: 140px; }
+        .stage-num { width: 28px; height: 28px; background: var(--page-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin: 0 auto 8px; }
+        .stage-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .stage-desc { font-size: 10px; color: var(--text-muted); }
+        .maturity-arrow { font-size: 20px; color: var(--page-light); }
+
+        /* AI/ML Section */
+        .ai-arch-diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+        .ai-svg { width: 100%; height: auto; }
+        .ai-patterns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .ai-pattern { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .ai-pattern-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .ai-badge { font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: rgba(167, 139, 250, 0.2); color: #A78BFA; }
+        .ai-pattern-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+        .ai-pattern-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .ai-pattern-example { background: var(--bg-dark); border-radius: 6px; padding: 10px; font-size: 11px; }
+        .ai-pattern-example code { color: #A78BFA; font-family: monospace; }
+        .ai-pattern-example span { color: var(--text-muted); display: block; margin-top: 4px; }
+
+        .module { margin-bottom: 40px; padding-top: 28px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+        .module-icon { width: 52px; height: 52px; background: var(--page-glow); border: 2px solid var(--page-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .module-info h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+        .module-info p { font-size: 13px; color: var(--text-muted); }
+
+        .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .principle-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-align: center; }
+        .principle-icon { font-size: 32px; margin-bottom: 12px; }
+        .principle-name { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--page-light); }
+        .principle-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .info-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; }
+        .info-box h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
+        .info-box h4::before { content: ''; width: 3px; height: 16px; background: var(--page-color); border-radius: 2px; }
+        .info-list { list-style: none; margin: 0; padding: 0; }
+        .info-list li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; border-bottom: 1px solid var(--border-color); line-height: 1.5; }
+        .info-list li:last-child { border-bottom: none; }
+        .info-list li strong { color: var(--text-primary); }
+
+        .platform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .platform-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .platform-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .platform-logo { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--bg-dark); }
+        .platform-name { font-size: 15px; font-weight: 600; }
+        .platform-type { font-size: 10px; color: var(--text-muted); }
+        .platform-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; }
+        .platform-features { display: flex; flex-wrap: wrap; gap: 6px; }
+        .platform-feature { font-size: 10px; padding: 4px 8px; background: var(--page-glow); border: 1px solid var(--page-color); border-radius: 4px; color: var(--page-light); }
+
+        .bp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+        .bp-card { background: var(--bg-dark); border-radius: 12px; padding: 24px; }
+        .bp-card.do { border: 1px solid var(--green); }
+        .bp-card.dont { border: 1px solid var(--red); }
+        .bp-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+        .bp-card.do .bp-title { color: var(--green); }
+        .bp-card.dont .bp-title { color: var(--red); }
+        .bp-list { list-style: none; margin: 0; padding: 0; }
+        .bp-list li { font-size: 13px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: flex-start; gap: 10px; }
+        .bp-list li .icon { flex-shrink: 0; }
+        .bp-card.do .bp-list li .icon { color: var(--green); }
+        .bp-card.dont .bp-list li .icon { color: var(--red); }
+
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; margin-bottom: 24px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--green), var(--cyan)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 12px; color: var(--page-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+        .agent-caps { list-style: none; margin: 0; padding: 0; }
+        .agent-caps li { font-size: 12px; color: var(--text-secondary); padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+        .agent-caps li .icon { color: var(--page-light); }
+
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { background: var(--bg-card-alt); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .code-tab { font-size: 12px; font-weight: 600; color: var(--page-light); }
+        .code-filename { font-size: 11px; color: var(--text-muted); }
+        .code-content { padding: 20px; font-family: 'Monaco', 'Menlo', monospace; font-size: 11px; line-height: 1.7; overflow-x: auto; }
+        .code-content pre { color: var(--text-secondary); }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-comment { color: #6A737D; }
+
+        .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-decoration: none; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--page-color); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--page-light); margin-bottom: 6px; }
+        .related-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .related-desc { font-size: 11px; color: var(--text-muted); }
+
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 24px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--page-color); color: var(--text-primary); }
+        .footer-link-label { font-size: 11px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 13px; color: var(--text-muted); }
+        .footer-brand span { color: var(--brand-orange); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-stats, .four-col, .business-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col, .bp-grid, .agent-grid, .platform-grid { grid-template-columns: 1fr; }
+            .related-grid { grid-template-columns: 1fr; }
+            .use-cases-grid { grid-template-columns: repeat(2, 1fr); }
+            .flow-explanation { grid-template-columns: 1fr; }
+            .stack-use { margin-left: 0; width: 100%; margin-top: 8px; }
+            .approaches-grid { grid-template-columns: 1fr; }
+            .scorecard-header, .scorecard-row { grid-template-columns: 1fr; gap: 8px; }
+            .scorecard-col { text-align: left; padding: 8px 0; }
+            .quotes-grid { grid-template-columns: 1fr; }
+            .industry-stats { grid-template-columns: repeat(2, 1fr); }
+            .ai-patterns { grid-template-columns: 1fr; }
+            .maturity-stages { flex-direction: column; }
+            .maturity-arrow { transform: rotate(90deg); }
+            .scorecard-summary { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat09-architecture-overview.html">Architecture Patterns</a>
+        <span class="sep">/</span>
+        <span class="current">Data Mesh</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">🏗️ Category 09</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat09-architecture-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+            <li><a href="cat09-p1-microservices.html"><span class="nav-icon">🔲</span> 9.1 Microservices</a></li>
+            <li><a href="cat09-p2-event-driven.html"><span class="nav-icon">⚡</span> 9.2 Event-Driven</a></li>
+            <li><a href="cat09-p3-data-mesh.html" class="active"><span class="nav-icon">🕸️</span> 9.3 Data Mesh</a></li>
+            <li><a href="cat09-p4-lakehouse.html"><span class="nav-icon">🏠</span> 9.4 Data Lakehouse</a></li>
+            <li><a href="cat09-p5-api-patterns.html"><span class="nav-icon">🔌</span> 9.5 API Patterns</a></li>
+            <li><a href="cat09-p6-cqrs-eventsourcing.html"><span class="nav-icon">📚</span> 9.6 CQRS & ES</a></li>
+            <li><a href="cat09-p7-domain-driven.html"><span class="nav-icon">🎯</span> 9.7 DDD</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📑 On This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#business-case"><span class="nav-icon">💼</span> Business Case</a></li>
+            <li><a href="#architecture"><span class="nav-icon">🏗️</span> Architecture</a></li>
+            <li><a href="#tech-stacks"><span class="nav-icon">🔧</span> Tech Stacks</a></li>
+            <li><a href="#approaches"><span class="nav-icon">🗺️</span> Approaches</a></li>
+            <li><a href="#scorecard"><span class="nav-icon">📊</span> Scorecard</a></li>
+            <li><a href="#industry"><span class="nav-icon">🎤</span> Industry Says</a></li>
+            <li><a href="#ai-mesh"><span class="nav-icon">🤖</span> AI & ML</a></li>
+            <li><a href="#principles"><span class="nav-icon">📦</span> Principles</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🛠️</span> Platforms</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+
+        <section class="hero" id="overview">
+            <div class="hero-tag">🕸️ Page 9.3 • Decentralized Data Architecture</div>
+            <h1>Data Mesh</h1>
+            <p>A paradigm shift from centralized data lakes and warehouses to a distributed, domain-oriented architecture where data is treated as a product owned by domain teams. Federated governance, self-serve infrastructure, and product thinking for data.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="hero-stat-value">4</div><div class="hero-stat-label">Core Principles</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">78%</div><div class="hero-stat-label">Faster Data Access</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">65%</div><div class="hero-stat-label">Enterprises Exploring</div></div>
+                <div class="hero-stat"><div class="hero-stat-value">10x</div><div class="hero-stat-label">Team Scalability</div></div>
+            </div>
+        </section>
+
+        <section class="module" id="business-case">
+            <div class="module-header">
+                <div class="module-icon">💼</div>
+                <div class="module-info">
+                    <h2>The Business Case for Data Mesh</h2>
+                    <p>Why enterprises are decentralizing data ownership</p>
+                </div>
+            </div>
+
+            <div class="business-grid">
+                <div class="business-card">
+                    <div class="business-icon">⏱️</div>
+                    <div class="business-stat">78%</div>
+                    <div class="business-label">Faster Time-to-Insight</div>
+                    <div class="business-desc">Domain teams access data without waiting for central data team</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">👥</div>
+                    <div class="business-stat">10x</div>
+                    <div class="business-label">Team Scalability</div>
+                    <div class="business-desc">Add domain teams without bottlenecking central platform</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">🎯</div>
+                    <div class="business-stat">90%</div>
+                    <div class="business-label">Data Quality</div>
+                    <div class="business-desc">Domain experts own data quality—they understand context</div>
+                </div>
+                <div class="business-card">
+                    <div class="business-icon">🔄</div>
+                    <div class="business-stat">60%</div>
+                    <div class="business-label">Reduced Duplication</div>
+                    <div class="business-desc">Clear ownership prevents redundant data pipelines</div>
+                </div>
+            </div>
+
+            <div class="use-cases-block">
+                <h4>When Data Mesh Makes Sense</h4>
+                <div class="use-cases-grid">
+                    <div class="use-case">
+                        <span class="use-case-icon">🏢</span>
+                        <span class="use-case-name">Large Enterprise</span>
+                        <span class="use-case-desc">50+ data domains, central team bottleneck</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">🏦</span>
+                        <span class="use-case-name">Financial Services</span>
+                        <span class="use-case-desc">Regulatory domains, strict data ownership</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">🛒</span>
+                        <span class="use-case-name">E-commerce</span>
+                        <span class="use-case-desc">Catalog, Orders, Customers, Fulfillment</span>
+                    </div>
+                    <div class="use-case">
+                        <span class="use-case-icon">🏥</span>
+                        <span class="use-case-name">Healthcare</span>
+                        <span class="use-case-desc">Clinical, Claims, Provider, Member domains</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="architecture">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Data Mesh Architecture</h2>
+                    <p>How domains publish and consume data products</p>
+                </div>
+            </div>
+
+            <div class="architecture-diagram">
+                <svg viewBox="0 0 900 450" class="arch-svg">
+                    <defs>
+                        <pattern id="meshGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                        </pattern>
+                        <marker id="meshArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#818CF8"/>
+                        </marker>
+                    </defs>
+                    
+                    <rect width="100%" height="100%" fill="url(#meshGrid)"/>
+                    
+                    <text x="450" y="25" text-anchor="middle" fill="#34D399" font-size="14" font-weight="600">Data Mesh: Domain-Oriented Data Products</text>
+                    
+                    <rect x="30" y="60" width="200" height="150" rx="12" fill="rgba(16, 185, 129, 0.1)" stroke="#10B981" stroke-width="2"/>
+                    <text x="130" y="85" text-anchor="middle" fill="#10B981" font-size="12" font-weight="600">📊 Sales Domain</text>
+                    <text x="130" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Owned by: Sales Analytics Team</text>
+                    <rect x="50" y="115" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="130" y="134" text-anchor="middle" fill="#34D399" font-size="10">📦 orders_daily</text>
+                    <rect x="50" y="150" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="130" y="169" text-anchor="middle" fill="#34D399" font-size="10">📦 revenue_metrics</text>
+                    
+                    <rect x="30" y="230" width="200" height="150" rx="12" fill="rgba(245, 158, 11, 0.1)" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="130" y="255" text-anchor="middle" fill="#F59E0B" font-size="12" font-weight="600">👥 Customer Domain</text>
+                    <text x="130" y="272" text-anchor="middle" fill="#6a6a7a" font-size="9">Owned by: Customer Success Team</text>
+                    <rect x="50" y="285" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                    <text x="130" y="304" text-anchor="middle" fill="#FBBF24" font-size="10">📦 customer_360</text>
+                    <rect x="50" y="320" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="1"/>
+                    <text x="130" y="339" text-anchor="middle" fill="#FBBF24" font-size="10">📦 churn_predictions</text>
+                    
+                    <rect x="300" y="100" width="300" height="280" rx="14" fill="rgba(99, 102, 241, 0.08)" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+                    <text x="450" y="125" text-anchor="middle" fill="#818CF8" font-size="11" font-weight="600">🛠️ Self-Serve Data Platform</text>
+                    
+                    <rect x="330" y="145" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                    <text x="390" y="170" text-anchor="middle" fill="#06B6D4" font-size="16">📚</text>
+                    <text x="390" y="190" text-anchor="middle" fill="#fff" font-size="10">Data Catalog</text>
+                    
+                    <rect x="470" y="145" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#FF3F34" stroke-width="2"/>
+                    <text x="530" y="170" text-anchor="middle" fill="#FF3F34" font-size="16">🔷</text>
+                    <text x="530" y="190" text-anchor="middle" fill="#fff" font-size="10">Unity Catalog</text>
+                    
+                    <rect x="330" y="220" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="2"/>
+                    <text x="390" y="245" text-anchor="middle" fill="#8B5CF6" font-size="16">⚖️</text>
+                    <text x="390" y="265" text-anchor="middle" fill="#fff" font-size="10">Governance</text>
+                    
+                    <rect x="470" y="220" width="120" height="60" rx="8" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                    <text x="530" y="245" text-anchor="middle" fill="#EC4899" font-size="16">✅</text>
+                    <text x="530" y="265" text-anchor="middle" fill="#fff" font-size="10">Quality Rules</text>
+                    
+                    <rect x="330" y="295" width="260" height="60" rx="8" fill="#1a1a2e" stroke="#14B8A6" stroke-width="2"/>
+                    <text x="460" y="320" text-anchor="middle" fill="#14B8A6" font-size="16">⚡</text>
+                    <text x="460" y="340" text-anchor="middle" fill="#fff" font-size="10">Shared Compute • Spark • SQL Warehouses</text>
+                    
+                    <rect x="670" y="60" width="200" height="150" rx="12" fill="rgba(6, 182, 212, 0.1)" stroke="#06B6D4" stroke-width="2"/>
+                    <text x="770" y="85" text-anchor="middle" fill="#06B6D4" font-size="12" font-weight="600">📦 Product Domain</text>
+                    <text x="770" y="102" text-anchor="middle" fill="#6a6a7a" font-size="9">Owned by: Product Team</text>
+                    <rect x="690" y="115" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="770" y="134" text-anchor="middle" fill="#22D3EE" font-size="10">📦 product_catalog</text>
+                    <rect x="690" y="150" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="770" y="169" text-anchor="middle" fill="#22D3EE" font-size="10">📦 inventory_levels</text>
+                    
+                    <rect x="670" y="230" width="200" height="150" rx="12" fill="rgba(236, 72, 153, 0.1)" stroke="#EC4899" stroke-width="2"/>
+                    <text x="770" y="255" text-anchor="middle" fill="#EC4899" font-size="12" font-weight="600">📢 Marketing Domain</text>
+                    <text x="770" y="272" text-anchor="middle" fill="#6a6a7a" font-size="9">Owned by: Marketing Analytics</text>
+                    <rect x="690" y="285" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="770" y="304" text-anchor="middle" fill="#F472B6" font-size="10">📦 campaign_perf</text>
+                    <rect x="690" y="320" width="160" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="770" y="339" text-anchor="middle" fill="#F472B6" font-size="10">📦 attribution</text>
+                    
+                    <path d="M 230 135 L 295 175" stroke="#818CF8" stroke-width="2" marker-end="url(#meshArrow)"/>
+                    <path d="M 230 305 L 295 250" stroke="#818CF8" stroke-width="2" marker-end="url(#meshArrow)"/>
+                    <path d="M 670 135 L 605 175" stroke="#818CF8" stroke-width="2" marker-end="url(#meshArrow)"/>
+                    <path d="M 670 305 L 605 250" stroke="#818CF8" stroke-width="2" marker-end="url(#meshArrow)"/>
+                    
+                    <rect x="30" y="400" width="300" height="40" rx="8" fill="#1a1a2e" stroke="#2a2a3e"/>
+                    <text x="45" y="420" fill="#6a6a7a" font-size="10">Legend:</text>
+                    <rect x="100" y="413" width="12" height="12" rx="2" fill="none" stroke="#10B981" stroke-width="2"/>
+                    <text x="117" y="423" fill="#a0a0b0" font-size="9">Domain</text>
+                    <rect x="170" y="413" width="12" height="12" rx="2" fill="none" stroke="#6366F1" stroke-width="2" stroke-dasharray="3,2"/>
+                    <text x="187" y="423" fill="#a0a0b0" font-size="9">Platform</text>
+                    <rect x="245" y="413" width="30" height="12" rx="2" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="280" y="423" fill="#a0a0b0" font-size="9">Data Product</text>
+                </svg>
+            </div>
+            
+            <div class="flow-explanation">
+                <div class="flow-step">
+                    <span class="step-num">1</span>
+                    <span class="step-text"><strong>Domain teams own data</strong> — Sales, Customer, Product, Marketing each manage their data products</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">2</span>
+                    <span class="step-text"><strong>Data as a Product</strong> — Each domain publishes discoverable, documented data products with SLAs</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">3</span>
+                    <span class="step-text"><strong>Self-serve platform</strong> — Central platform provides catalog, governance, compute—not pipelines</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">4</span>
+                    <span class="step-text"><strong>Cross-domain consumption</strong> — Marketing consumes <code>customer_360</code> from Customer domain</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">5</span>
+                    <span class="step-text"><strong>Federated governance</strong> — Global policies enforced, domain-specific rules owned locally</span>
+                </div>
+                <div class="flow-step">
+                    <span class="step-num">6</span>
+                    <span class="step-text"><strong>Unity Catalog</strong> — Single source of truth for data assets, lineage, and access control</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="tech-stacks">
+            <div class="module-header">
+                <div class="module-icon">🔧</div>
+                <div class="module-info">
+                    <h2>Data Mesh Implementation Stacks</h2>
+                    <p>Platform choices for self-serve data infrastructure</p>
+                </div>
+            </div>
+
+            <div class="stack-patterns">
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge databricks">Databricks</span>
+                        <span class="stack-name">Unity Catalog + Lakehouse</span>
+                        <span class="stack-use">Enterprise • ML-heavy • Multi-cloud</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <defs>
+                                <marker id="stackArrow2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                    <polygon points="0 0, 8 3, 0 6" fill="#818CF8"/>
+                                </marker>
+                            </defs>
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#10B981" font-size="12">🏢</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Domain Team</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#FF3F34" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#FF3F34" font-size="12">🔷</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Delta Tables</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(255, 63, 52, 0.15)" stroke="#FF3F34" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#FF3F34" font-size="11" font-weight="600">Unity Catalog</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">Governance • Lineage</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Access Control</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#F59E0B" font-size="12">⚡</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Workflows</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#3B82F6" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#3B82F6" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">SQL + BI</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ Unified governance</span>
+                        <span class="benefit">✓ Cross-cloud</span>
+                        <span class="benefit">✓ Built-in lineage</span>
+                        <span class="benefit">✓ Delta Sharing</span>
+                    </div>
+                </div>
+
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge snowflake">Snowflake</span>
+                        <span class="stack-name">Data Sharing + Marketplace</span>
+                        <span class="stack-use">SQL-centric • Data sharing • Multi-cloud</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#10B981" font-size="12">🏢</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Domain Team</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#29B6F6" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#29B6F6" font-size="12">❄️</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Database</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(41, 182, 246, 0.15)" stroke="#29B6F6" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#29B6F6" font-size="11" font-weight="600">Data Sharing</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">Secure Views</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Marketplace</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#F59E0B" font-size="12">🌊</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Streams</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#EC4899" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#EC4899" font-size="12">👥</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">Consumers</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ Zero-copy sharing</span>
+                        <span class="benefit">✓ SQL-native</span>
+                        <span class="benefit">✓ Marketplace</span>
+                        <span class="benefit">✓ Time travel</span>
+                    </div>
+                </div>
+
+                <div class="stack-pattern">
+                    <div class="stack-header">
+                        <span class="stack-badge fabric">Microsoft Fabric</span>
+                        <span class="stack-name">OneLake + Domains</span>
+                        <span class="stack-use">Microsoft ecosystem • Power BI • Azure-native</span>
+                    </div>
+                    <div class="stack-diagram">
+                        <svg viewBox="0 0 700 100" class="stack-svg">
+                            <rect x="10" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="55" y="50" text-anchor="middle" fill="#10B981" font-size="12">🏢</text>
+                            <text x="55" y="65" text-anchor="middle" fill="#fff" font-size="9">Domain Team</text>
+                            <path d="M 105 52 L 140 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="145" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#0078D4" stroke-width="2"/>
+                            <text x="190" y="50" text-anchor="middle" fill="#0078D4" font-size="12">🏠</text>
+                            <text x="190" y="65" text-anchor="middle" fill="#fff" font-size="9">Lakehouse</text>
+                            <path d="M 240 52 L 275 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="280" y="20" width="140" height="65" rx="10" fill="rgba(0, 120, 212, 0.15)" stroke="#0078D4" stroke-width="2"/>
+                            <text x="350" y="42" text-anchor="middle" fill="#0078D4" font-size="11" font-weight="600">OneLake</text>
+                            <text x="350" y="58" text-anchor="middle" fill="#a0a0b0" font-size="8">Domains • Shortcuts</text>
+                            <text x="350" y="72" text-anchor="middle" fill="#a0a0b0" font-size="8">Purview Integration</text>
+                            <path d="M 425 52 L 460 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="465" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="510" y="50" text-anchor="middle" fill="#F59E0B" font-size="12">🔄</text>
+                            <text x="510" y="65" text-anchor="middle" fill="#fff" font-size="9">Pipelines</text>
+                            <path d="M 560 52 L 595 52" stroke="#818CF8" stroke-width="2" marker-end="url(#stackArrow2)"/>
+                            <rect x="600" y="30" width="90" height="45" rx="8" fill="#1a1a2e" stroke="#F2C811" stroke-width="2"/>
+                            <text x="645" y="50" text-anchor="middle" fill="#F2C811" font-size="12">📊</text>
+                            <text x="645" y="65" text-anchor="middle" fill="#fff" font-size="9">Power BI</text>
+                        </svg>
+                    </div>
+                    <div class="stack-benefits">
+                        <span class="benefit">✓ Single lake</span>
+                        <span class="benefit">✓ Domain workspaces</span>
+                        <span class="benefit">✓ Purview governance</span>
+                        <span class="benefit">✓ Copilot ready</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMON MESH APPROACHES -->
+        <section class="module" id="approaches">
+            <div class="module-header">
+                <div class="module-icon">🗺️</div>
+                <div class="module-info">
+                    <h2>Common Data Mesh Approaches</h2>
+                    <p>Implementation patterns and organizational models</p>
+                </div>
+            </div>
+
+            <div class="approaches-grid">
+                <div class="approach-card">
+                    <div class="approach-header">
+                        <span class="approach-badge federated">Federated</span>
+                        <span class="approach-name">Full Decentralization</span>
+                    </div>
+                    <div class="approach-diagram">
+                        <svg viewBox="0 0 300 120" class="approach-svg">
+                            <rect x="20" y="20" width="60" height="40" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="45" text-anchor="middle" fill="#10B981" font-size="9">Domain A</text>
+                            <rect x="120" y="20" width="60" height="40" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="150" y="45" text-anchor="middle" fill="#F59E0B" font-size="9">Domain B</text>
+                            <rect x="220" y="20" width="60" height="40" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="250" y="45" text-anchor="middle" fill="#06B6D4" font-size="9">Domain C</text>
+                            <line x1="80" y1="40" x2="120" y2="40" stroke="#818CF8" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <line x1="180" y1="40" x2="220" y2="40" stroke="#818CF8" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <rect x="100" y="75" width="100" height="30" rx="6" fill="rgba(99, 102, 241, 0.1)" stroke="#6366F1" stroke-width="1" stroke-dasharray="3,2"/>
+                            <text x="150" y="94" text-anchor="middle" fill="#818CF8" font-size="8">Shared Standards Only</text>
+                        </svg>
+                    </div>
+                    <div class="approach-desc">Each domain fully owns infrastructure, pipelines, and data products. Central team only provides standards and governance policies.</div>
+                    <div class="approach-fit">
+                        <span class="fit-label">Best for:</span>
+                        <span class="fit-tag">Mature orgs</span>
+                        <span class="fit-tag">Strong engineering</span>
+                        <span class="fit-tag">100+ domains</span>
+                    </div>
+                </div>
+
+                <div class="approach-card">
+                    <div class="approach-header">
+                        <span class="approach-badge hybrid">Hybrid</span>
+                        <span class="approach-name">Platform + Domain Teams</span>
+                    </div>
+                    <div class="approach-diagram">
+                        <svg viewBox="0 0 300 120" class="approach-svg">
+                            <rect x="80" y="70" width="140" height="40" rx="6" fill="rgba(99, 102, 241, 0.15)" stroke="#6366F1" stroke-width="2"/>
+                            <text x="150" y="94" text-anchor="middle" fill="#818CF8" font-size="9">Central Platform</text>
+                            <rect x="20" y="15" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="37" text-anchor="middle" fill="#10B981" font-size="9">Domain A</text>
+                            <rect x="120" y="15" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="150" y="37" text-anchor="middle" fill="#F59E0B" font-size="9">Domain B</text>
+                            <rect x="220" y="15" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="250" y="37" text-anchor="middle" fill="#06B6D4" font-size="9">Domain C</text>
+                            <line x1="50" y1="50" x2="100" y2="70" stroke="#818CF8" stroke-width="1.5"/>
+                            <line x1="150" y1="50" x2="150" y2="70" stroke="#818CF8" stroke-width="1.5"/>
+                            <line x1="250" y1="50" x2="200" y2="70" stroke="#818CF8" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="approach-desc">Central platform provides compute, storage, catalog. Domain teams own data products and pipelines using shared infrastructure.</div>
+                    <div class="approach-fit">
+                        <span class="fit-label">Best for:</span>
+                        <span class="fit-tag">Mid-size orgs</span>
+                        <span class="fit-tag">Mixed skill levels</span>
+                        <span class="fit-tag">20-100 domains</span>
+                    </div>
+                </div>
+
+                <div class="approach-card">
+                    <div class="approach-header">
+                        <span class="approach-badge embedded">Embedded</span>
+                        <span class="approach-name">Platform Engineers in Domains</span>
+                    </div>
+                    <div class="approach-diagram">
+                        <svg viewBox="0 0 300 120" class="approach-svg">
+                            <rect x="20" y="20" width="80" height="80" rx="8" fill="rgba(16, 185, 129, 0.1)" stroke="#10B981" stroke-width="2"/>
+                            <text x="60" y="40" text-anchor="middle" fill="#10B981" font-size="9">Domain A</text>
+                            <circle cx="60" cy="70" r="15" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+                            <text x="60" y="74" text-anchor="middle" fill="#818CF8" font-size="8">PE</text>
+                            <rect x="110" y="20" width="80" height="80" rx="8" fill="rgba(245, 158, 11, 0.1)" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="150" y="40" text-anchor="middle" fill="#F59E0B" font-size="9">Domain B</text>
+                            <circle cx="150" cy="70" r="15" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+                            <text x="150" y="74" text-anchor="middle" fill="#818CF8" font-size="8">PE</text>
+                            <rect x="200" y="20" width="80" height="80" rx="8" fill="rgba(6, 182, 212, 0.1)" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="240" y="40" text-anchor="middle" fill="#06B6D4" font-size="9">Domain C</text>
+                            <circle cx="240" cy="70" r="15" fill="#1a1a2e" stroke="#6366F1" stroke-width="2"/>
+                            <text x="240" y="74" text-anchor="middle" fill="#818CF8" font-size="8">PE</text>
+                        </svg>
+                    </div>
+                    <div class="approach-desc">Platform engineers embedded in each domain team. They bring platform expertise while reporting to domain leadership.</div>
+                    <div class="approach-fit">
+                        <span class="fit-label">Best for:</span>
+                        <span class="fit-tag">Growing orgs</span>
+                        <span class="fit-tag">Culture shift</span>
+                        <span class="fit-tag">5-50 domains</span>
+                    </div>
+                </div>
+
+                <div class="approach-card">
+                    <div class="approach-header">
+                        <span class="approach-badge coe">CoE</span>
+                        <span class="approach-name">Center of Excellence</span>
+                    </div>
+                    <div class="approach-diagram">
+                        <svg viewBox="0 0 300 120" class="approach-svg">
+                            <rect x="100" y="10" width="100" height="45" rx="6" fill="rgba(236, 72, 153, 0.15)" stroke="#EC4899" stroke-width="2"/>
+                            <text x="150" y="30" text-anchor="middle" fill="#EC4899" font-size="9">Data Mesh CoE</text>
+                            <text x="150" y="45" text-anchor="middle" fill="#6a6a7a" font-size="7">Templates • Training • Support</text>
+                            <rect x="20" y="70" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="2"/>
+                            <text x="50" y="92" text-anchor="middle" fill="#10B981" font-size="9">Domain A</text>
+                            <rect x="120" y="70" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#F59E0B" stroke-width="2"/>
+                            <text x="150" y="92" text-anchor="middle" fill="#F59E0B" font-size="9">Domain B</text>
+                            <rect x="220" y="70" width="60" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="2"/>
+                            <text x="250" y="92" text-anchor="middle" fill="#06B6D4" font-size="9">Domain C</text>
+                            <path d="M 130 55 L 50 70" stroke="#EC4899" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+                            <path d="M 150 55 L 150 70" stroke="#EC4899" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+                            <path d="M 170 55 L 250 70" stroke="#EC4899" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="approach-desc">Central CoE provides templates, training, and consulting. Domains own execution but get expert guidance on demand.</div>
+                    <div class="approach-fit">
+                        <span class="fit-label">Best for:</span>
+                        <span class="fit-tag">Transformation</span>
+                        <span class="fit-tag">Skill building</span>
+                        <span class="fit-tag">Any size</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ECOSYSTEM SCORECARD -->
+        <section class="module" id="scorecard">
+            <div class="module-header">
+                <div class="module-icon">📊</div>
+                <div class="module-info">
+                    <h2>Ecosystem vs. Data Mesh Scorecard</h2>
+                    <p>Comparing traditional centralized vs mesh architectures</p>
+                </div>
+            </div>
+
+            <div class="scorecard-table">
+                <div class="scorecard-header">
+                    <div class="scorecard-criteria">Criteria</div>
+                    <div class="scorecard-col centralized">🏢 Centralized Data Team</div>
+                    <div class="scorecard-col mesh">🕸️ Data Mesh</div>
+                    <div class="scorecard-col winner">Winner</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Time to New Data Product</strong>
+                        <span>From request to production</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">4-8 weeks</span>
+                        <span class="score-note">Queue + prioritization</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">1-2 weeks</span>
+                        <span class="score-note">Domain owns delivery</span>
+                    </div>
+                    <div class="scorecard-col winner mesh-win">🕸️ Mesh</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Data Quality Ownership</strong>
+                        <span>Who fixes data issues</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">Unclear</span>
+                        <span class="score-note">Central team lacks context</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">Domain experts</span>
+                        <span class="score-note">Source team owns quality</span>
+                    </div>
+                    <div class="scorecard-col winner mesh-win">🕸️ Mesh</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Scalability</strong>
+                        <span>Adding new domains/products</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">Linear bottleneck</span>
+                        <span class="score-note">Central team capacity limit</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">Parallel growth</span>
+                        <span class="score-note">Each domain scales independently</span>
+                    </div>
+                    <div class="scorecard-col winner mesh-win">🕸️ Mesh</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Initial Setup Cost</strong>
+                        <span>Platform and org change</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">Lower</span>
+                        <span class="score-note">Single team, familiar model</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">Higher</span>
+                        <span class="score-note">Platform + org transformation</span>
+                    </div>
+                    <div class="scorecard-col winner central-win">🏢 Central</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Governance Consistency</strong>
+                        <span>Standards enforcement</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">Easier</span>
+                        <span class="score-note">Single point of control</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">Requires federation</span>
+                        <span class="score-note">Computational governance needed</span>
+                    </div>
+                    <div class="scorecard-col winner central-win">🏢 Central</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Domain Knowledge</strong>
+                        <span>Business context in data</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">Lost in translation</span>
+                        <span class="score-note">Requirements through tickets</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">Native</span>
+                        <span class="score-note">Producers are experts</span>
+                    </div>
+                    <div class="scorecard-col winner mesh-win">🕸️ Mesh</div>
+                </div>
+                <div class="scorecard-row">
+                    <div class="scorecard-criteria">
+                        <strong>Org Size Fit</strong>
+                        <span>When does it work best</span>
+                    </div>
+                    <div class="scorecard-col centralized">
+                        <span class="score-value">&lt; 10 domains</span>
+                        <span class="score-note">Small/medium orgs</span>
+                    </div>
+                    <div class="scorecard-col mesh">
+                        <span class="score-value">10+ domains</span>
+                        <span class="score-note">Large enterprises</span>
+                    </div>
+                    <div class="scorecard-col winner tie">🤝 Depends</div>
+                </div>
+            </div>
+
+            <div class="scorecard-summary">
+                <div class="summary-card mesh">
+                    <div class="summary-icon">🕸️</div>
+                    <div class="summary-content">
+                        <div class="summary-title">Data Mesh Wins</div>
+                        <div class="summary-text">Speed, quality, scalability, domain expertise</div>
+                    </div>
+                    <div class="summary-score">4</div>
+                </div>
+                <div class="summary-card central">
+                    <div class="summary-icon">🏢</div>
+                    <div class="summary-content">
+                        <div class="summary-title">Centralized Wins</div>
+                        <div class="summary-text">Initial cost, governance simplicity</div>
+                    </div>
+                    <div class="summary-score">2</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INDUSTRY PERSPECTIVES -->
+        <section class="module" id="industry">
+            <div class="module-header">
+                <div class="module-icon">🎤</div>
+                <div class="module-info">
+                    <h2>What the Industry Says About Data Mesh</h2>
+                    <p>Perspectives from practitioners and analysts</p>
+                </div>
+            </div>
+
+            <div class="quotes-grid">
+                <div class="quote-card">
+                    <div class="quote-text">"Data Mesh is not a technology—it's an organizational and cultural shift. The hardest part isn't the platform, it's getting domain teams to think like product owners."</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👩‍💼</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Zhamak Dehghani</div>
+                            <div class="quote-role">Creator of Data Mesh, Thoughtworks</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">"We've seen 78% faster time-to-insight after implementing mesh principles with Unity Catalog. The key was starting with 3 pilot domains, not boiling the ocean."</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">👨‍💻</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Enterprise CDO</div>
+                            <div class="quote-role">Fortune 500 Financial Services</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">"Data Mesh adoption grew 340% in 2023-2024. However, 60% of implementations fail in Year 1 due to underinvestment in the self-serve platform."</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">📊</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Gartner Research</div>
+                            <div class="quote-role">Data & Analytics Survey 2024</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="quote-card">
+                    <div class="quote-text">"Don't call it Data Mesh if you're just renaming your data warehouse team to 'domains'. Real mesh requires federated governance and true ownership transfer."</div>
+                    <div class="quote-author">
+                        <div class="quote-avatar">🎯</div>
+                        <div class="quote-info">
+                            <div class="quote-name">Data Engineering Weekly</div>
+                            <div class="quote-role">Industry Commentary</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="industry-stats">
+                <div class="industry-stat">
+                    <div class="stat-value">65%</div>
+                    <div class="stat-label">of enterprises exploring or implementing mesh</div>
+                    <div class="stat-source">Forrester 2024</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">340%</div>
+                    <div class="stat-label">growth in mesh adoption 2023-2024</div>
+                    <div class="stat-source">Gartner</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">60%</div>
+                    <div class="stat-label">fail in Year 1 due to platform underinvestment</div>
+                    <div class="stat-source">Gartner</div>
+                </div>
+                <div class="industry-stat">
+                    <div class="stat-value">2-3 yrs</div>
+                    <div class="stat-label">typical time to full mesh maturity</div>
+                    <div class="stat-source">McKinsey</div>
+                </div>
+            </div>
+
+            <div class="maturity-model">
+                <h4>Data Mesh Maturity Model</h4>
+                <div class="maturity-stages">
+                    <div class="maturity-stage">
+                        <div class="stage-num">1</div>
+                        <div class="stage-name">Exploring</div>
+                        <div class="stage-desc">Evaluating fit, pilot planning</div>
+                    </div>
+                    <div class="maturity-arrow">→</div>
+                    <div class="maturity-stage">
+                        <div class="stage-num">2</div>
+                        <div class="stage-name">Piloting</div>
+                        <div class="stage-desc">2-3 domains, platform MVP</div>
+                    </div>
+                    <div class="maturity-arrow">→</div>
+                    <div class="maturity-stage">
+                        <div class="stage-num">3</div>
+                        <div class="stage-name">Scaling</div>
+                        <div class="stage-desc">10+ domains, federated governance</div>
+                    </div>
+                    <div class="maturity-arrow">→</div>
+                    <div class="maturity-stage">
+                        <div class="stage-num">4</div>
+                        <div class="stage-name">Optimizing</div>
+                        <div class="stage-desc">Full adoption, continuous improvement</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI & DATA SCIENCE WITH MESH -->
+        <section class="module" id="ai-mesh">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Data Science & AI with Data Mesh</h2>
+                    <p>Leveraging mesh architecture for ML and AI workloads</p>
+                </div>
+            </div>
+
+            <div class="ai-arch-diagram">
+                <svg viewBox="0 0 900 320" class="ai-svg">
+                    <defs>
+                        <pattern id="aiGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a1a2e" stroke-width="0.5"/>
+                        </pattern>
+                        <marker id="aiArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#818CF8"/>
+                        </marker>
+                    </defs>
+                    
+                    <rect width="100%" height="100%" fill="url(#aiGrid)"/>
+                    
+                    <text x="450" y="25" text-anchor="middle" fill="#A78BFA" font-size="14" font-weight="600">ML/AI in a Data Mesh Architecture</text>
+                    
+                    <!-- Data Products (Left) -->
+                    <rect x="30" y="50" width="180" height="250" rx="12" fill="rgba(16, 185, 129, 0.08)" stroke="#10B981" stroke-width="2"/>
+                    <text x="120" y="75" text-anchor="middle" fill="#10B981" font-size="11" font-weight="600">📦 Data Products</text>
+                    
+                    <rect x="50" y="95" width="140" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="120" y="117" text-anchor="middle" fill="#34D399" font-size="9">customer_360</text>
+                    
+                    <rect x="50" y="140" width="140" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="120" y="162" text-anchor="middle" fill="#34D399" font-size="9">transaction_history</text>
+                    
+                    <rect x="50" y="185" width="140" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="120" y="207" text-anchor="middle" fill="#34D399" font-size="9">product_catalog</text>
+                    
+                    <rect x="50" y="230" width="140" height="35" rx="6" fill="#1a1a2e" stroke="#10B981" stroke-width="1"/>
+                    <text x="120" y="252" text-anchor="middle" fill="#34D399" font-size="9">clickstream_events</text>
+                    
+                    <!-- Feature Store (Center-Left) -->
+                    <rect x="250" y="80" width="140" height="100" rx="10" fill="rgba(245, 158, 11, 0.1)" stroke="#F59E0B" stroke-width="2"/>
+                    <text x="320" y="105" text-anchor="middle" fill="#F59E0B" font-size="11" font-weight="600">🗃️ Feature Store</text>
+                    <text x="320" y="125" text-anchor="middle" fill="#a0a0b0" font-size="8">Unity Catalog</text>
+                    <text x="320" y="145" text-anchor="middle" fill="#6a6a7a" font-size="8">• Feature versioning</text>
+                    <text x="320" y="160" text-anchor="middle" fill="#6a6a7a" font-size="8">• Online/Offline serving</text>
+                    
+                    <!-- Model Registry (Center) -->
+                    <rect x="250" y="200" width="140" height="100" rx="10" fill="rgba(139, 92, 246, 0.1)" stroke="#8B5CF6" stroke-width="2"/>
+                    <text x="320" y="225" text-anchor="middle" fill="#8B5CF6" font-size="11" font-weight="600">📚 Model Registry</text>
+                    <text x="320" y="245" text-anchor="middle" fill="#a0a0b0" font-size="8">MLflow</text>
+                    <text x="320" y="265" text-anchor="middle" fill="#6a6a7a" font-size="8">• Model versioning</text>
+                    <text x="320" y="280" text-anchor="middle" fill="#6a6a7a" font-size="8">• Stage transitions</text>
+                    
+                    <!-- ML Domain (Center-Right) -->
+                    <rect x="430" y="80" width="180" height="220" rx="12" fill="rgba(236, 72, 153, 0.08)" stroke="#EC4899" stroke-width="2"/>
+                    <text x="520" y="105" text-anchor="middle" fill="#EC4899" font-size="11" font-weight="600">🧠 ML Domain</text>
+                    <text x="520" y="122" text-anchor="middle" fill="#6a6a7a" font-size="8">Owned by: ML Platform Team</text>
+                    
+                    <rect x="450" y="135" width="140" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="520" y="154" text-anchor="middle" fill="#F472B6" font-size="9">📦 churn_model_v2</text>
+                    
+                    <rect x="450" y="175" width="140" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="520" y="194" text-anchor="middle" fill="#F472B6" font-size="9">📦 recommendation_engine</text>
+                    
+                    <rect x="450" y="215" width="140" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="520" y="234" text-anchor="middle" fill="#F472B6" font-size="9">📦 fraud_detection</text>
+                    
+                    <rect x="450" y="255" width="140" height="30" rx="6" fill="#1a1a2e" stroke="#EC4899" stroke-width="1"/>
+                    <text x="520" y="274" text-anchor="middle" fill="#F472B6" font-size="9">📦 demand_forecast</text>
+                    
+                    <!-- Serving (Right) -->
+                    <rect x="650" y="100" width="130" height="180" rx="12" fill="rgba(6, 182, 212, 0.08)" stroke="#06B6D4" stroke-width="2"/>
+                    <text x="715" y="125" text-anchor="middle" fill="#06B6D4" font-size="11" font-weight="600">⚡ Model Serving</text>
+                    
+                    <rect x="665" y="145" width="100" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="715" y="160" text-anchor="middle" fill="#22D3EE" font-size="8">REST API</text>
+                    <text x="715" y="172" text-anchor="middle" fill="#6a6a7a" font-size="7">Real-time</text>
+                    
+                    <rect x="665" y="190" width="100" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="715" y="205" text-anchor="middle" fill="#22D3EE" font-size="8">Batch Scoring</text>
+                    <text x="715" y="217" text-anchor="middle" fill="#6a6a7a" font-size="7">Scheduled</text>
+                    
+                    <rect x="665" y="235" width="100" height="35" rx="6" fill="#1a1a2e" stroke="#06B6D4" stroke-width="1"/>
+                    <text x="715" y="250" text-anchor="middle" fill="#22D3EE" font-size="8">Streaming</text>
+                    <text x="715" y="262" text-anchor="middle" fill="#6a6a7a" font-size="7">Kafka/Kinesis</text>
+                    
+                    <!-- Arrows -->
+                    <path d="M 210 150 L 245 130" stroke="#818CF8" stroke-width="2" marker-end="url(#aiArrow)" fill="none"/>
+                    <path d="M 210 200 L 245 230" stroke="#818CF8" stroke-width="2" marker-end="url(#aiArrow)" fill="none"/>
+                    <path d="M 390 130 L 425 150" stroke="#818CF8" stroke-width="2" marker-end="url(#aiArrow)" fill="none"/>
+                    <path d="M 390 250 L 425 230" stroke="#818CF8" stroke-width="2" marker-end="url(#aiArrow)" fill="none"/>
+                    <path d="M 610 190 L 645 190" stroke="#818CF8" stroke-width="2" marker-end="url(#aiArrow)" fill="none"/>
+                </svg>
+            </div>
+
+            <div class="ai-patterns">
+                <div class="ai-pattern">
+                    <div class="ai-pattern-header">
+                        <span class="ai-badge">Pattern 1</span>
+                        <span class="ai-pattern-name">ML as a Data Product</span>
+                    </div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-desc">Treat trained models as data products with the same rigor: versioning, documentation, SLAs, and ownership. Models published through Unity Catalog with lineage tracking.</div>
+                        <div class="ai-pattern-example">
+                            <code>catalog.ml_domain.churn_model_v2</code>
+                            <span>→ Returns predictions as a table consumers can query</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-pattern">
+                    <div class="ai-pattern-header">
+                        <span class="ai-badge">Pattern 2</span>
+                        <span class="ai-pattern-name">Feature Store as Shared Infrastructure</span>
+                    </div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-desc">Centralized feature store enables feature reuse across domains. Data products feed features, ML domain consumes them. Prevents feature duplication and drift.</div>
+                        <div class="ai-pattern-example">
+                            <code>feature_store.customer.purchase_frequency_30d</code>
+                            <span>→ Reused by churn, recommendation, and fraud models</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-pattern">
+                    <div class="ai-pattern-header">
+                        <span class="ai-badge">Pattern 3</span>
+                        <span class="ai-pattern-name">Domain-Embedded ML Engineers</span>
+                    </div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-desc">ML engineers sit within business domains, building models specific to domain needs. Central ML platform provides tools, domain provides context and data.</div>
+                        <div class="ai-pattern-example">
+                            <code>Sales Domain + ML Engineer</code>
+                            <span>→ Builds lead scoring model with deep sales context</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-pattern">
+                    <div class="ai-pattern-header">
+                        <span class="ai-badge">Pattern 4</span>
+                        <span class="ai-pattern-name">GenAI & RAG with Mesh</span>
+                    </div>
+                    <div class="ai-pattern-content">
+                        <div class="ai-pattern-desc">Vector stores as data products enable RAG patterns. Each domain publishes embeddings of their documents/data, consumed by GenAI applications.</div>
+                        <div class="ai-pattern-example">
+                            <code>catalog.legal_domain.contract_embeddings</code>
+                            <span>→ Powers contract Q&A chatbot</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="info-box">
+                    <h4>AI/ML Benefits in Data Mesh</h4>
+                    <ul class="info-list">
+                        <li><strong>Feature reuse:</strong> Features built once, consumed by many models</li>
+                        <li><strong>Data quality:</strong> Domain owners ensure training data accuracy</li>
+                        <li><strong>Faster iteration:</strong> ML teams don't wait for data team</li>
+                        <li><strong>Governance:</strong> Model lineage tracks back to source data products</li>
+                        <li><strong>Compliance:</strong> Know exactly what data trained each model</li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <h4>Key Technologies</h4>
+                    <ul class="info-list">
+                        <li><strong>Unity Catalog:</strong> Model registry + data governance unified</li>
+                        <li><strong>MLflow:</strong> Experiment tracking, model versioning, deployment</li>
+                        <li><strong>Feature Store:</strong> Online/offline serving, point-in-time correctness</li>
+                        <li><strong>Vector Search:</strong> Mosaic AI Vector Search for RAG</li>
+                        <li><strong>Model Serving:</strong> Real-time endpoints, batch scoring</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="principles">
+            <div class="module-header">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                    <h2>The Four Principles of Data Mesh</h2>
+                    <p>Foundational concepts from Zhamak Dehghani</p>
+                </div>
+            </div>
+
+            <div class="four-col">
+                <div class="principle-card">
+                    <div class="principle-icon">🏢</div>
+                    <div class="principle-name">Domain Ownership</div>
+                    <div class="principle-desc">Data owned by domain teams who understand the business context, not centralized data teams.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">📦</div>
+                    <div class="principle-name">Data as a Product</div>
+                    <div class="principle-desc">Treat data like a product with consumers, SLAs, discoverability, and quality guarantees.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">🛠️</div>
+                    <div class="principle-name">Self-Serve Platform</div>
+                    <div class="principle-desc">Infrastructure that enables domain teams to publish and consume data without central team dependency.</div>
+                </div>
+                <div class="principle-card">
+                    <div class="principle-icon">⚖️</div>
+                    <div class="principle-name">Federated Governance</div>
+                    <div class="principle-desc">Global standards with local autonomy—compliance enforced centrally, decisions made in domains.</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="info-box">
+                    <h4>Data Product Characteristics</h4>
+                    <ul class="info-list">
+                        <li><strong>Discoverable:</strong> Listed in catalog with clear description</li>
+                        <li><strong>Addressable:</strong> Unique identifier and access path</li>
+                        <li><strong>Trustworthy:</strong> Quality metrics and SLAs defined</li>
+                        <li><strong>Self-describing:</strong> Schema, lineage, ownership documented</li>
+                        <li><strong>Interoperable:</strong> Standard formats and protocols</li>
+                        <li><strong>Secure:</strong> Access controls and compliance built-in</li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <h4>Platform Capabilities</h4>
+                    <ul class="info-list">
+                        <li><strong>Data catalog:</strong> Discovery and metadata management</li>
+                        <li><strong>Compute provisioning:</strong> Self-serve Spark, SQL, ML</li>
+                        <li><strong>Storage management:</strong> Lakehouse with governance</li>
+                        <li><strong>Policy enforcement:</strong> Access, retention, quality</li>
+                        <li><strong>Observability:</strong> Lineage, quality monitoring</li>
+                        <li><strong>Data sharing:</strong> Cross-domain access controls</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Data Mesh Platforms</h2>
+                    <p>Tools enabling data mesh implementation</p>
+                </div>
+            </div>
+
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: rgba(255, 63, 52, 0.2); color: #FF3F34;">🔷</div>
+                        <div>
+                            <div class="platform-name">Databricks Unity Catalog</div>
+                            <div class="platform-type">Unified Governance for Lakehouse</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">Centralized governance layer for all data assets across clouds. Built-in lineage, access controls, and data sharing with Delta Sharing protocol.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Unity Catalog</span>
+                        <span class="platform-feature">Delta Sharing</span>
+                        <span class="platform-feature">Lineage</span>
+                        <span class="platform-feature">Multi-cloud</span>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: rgba(41, 182, 246, 0.2); color: #29B6F6;">❄️</div>
+                        <div>
+                            <div class="platform-name">Snowflake Data Cloud</div>
+                            <div class="platform-type">Cloud Data Platform</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">Zero-copy data sharing across accounts and clouds. Marketplace for data products. Strong SQL analytics with separation of storage and compute.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Data Sharing</span>
+                        <span class="platform-feature">Marketplace</span>
+                        <span class="platform-feature">Streams</span>
+                        <span class="platform-feature">Tasks</span>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: rgba(0, 120, 212, 0.2); color: #0078D4;">🔷</div>
+                        <div>
+                            <div class="platform-name">Microsoft Fabric</div>
+                            <div class="platform-type">Unified Analytics Platform</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">OneLake as single data lake with domain workspaces. Integrated with Purview for governance. Native Power BI and Copilot integration.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">OneLake</span>
+                        <span class="platform-feature">Domains</span>
+                        <span class="platform-feature">Purview</span>
+                        <span class="platform-feature">Copilot</span>
+                    </div>
+                </div>
+                <div class="platform-card">
+                    <div class="platform-header">
+                        <div class="platform-logo" style="background: rgba(16, 185, 129, 0.2); color: #10B981;">📚</div>
+                        <div>
+                            <div class="platform-name">Data Catalogs</div>
+                            <div class="platform-type">Alation, Collibra, Atlan</div>
+                        </div>
+                    </div>
+                    <div class="platform-desc">Specialized catalogs for data discovery, business glossary, and governance. Essential for large enterprises with diverse data assets.</div>
+                    <div class="platform-features">
+                        <span class="platform-feature">Discovery</span>
+                        <span class="platform-feature">Glossary</span>
+                        <span class="platform-feature">Lineage</span>
+                        <span class="platform-feature">Quality</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for successful data mesh adoption</p>
+                </div>
+            </div>
+
+            <div class="bp-grid">
+                <div class="bp-card do">
+                    <div class="bp-title">✓ Do</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✓</span> Start with high-value, well-understood domains first</li>
+                        <li><span class="icon">✓</span> Define clear data product contracts with SLAs</li>
+                        <li><span class="icon">✓</span> Invest heavily in self-serve platform capabilities</li>
+                        <li><span class="icon">✓</span> Establish federated governance model early</li>
+                        <li><span class="icon">✓</span> Embed data engineers in domain teams</li>
+                        <li><span class="icon">✓</span> Use standard formats and protocols across domains</li>
+                        <li><span class="icon">✓</span> Build data product thinking into culture</li>
+                        <li><span class="icon">✓</span> Measure and publish data quality metrics</li>
+                    </ul>
+                </div>
+                <div class="bp-card dont">
+                    <div class="bp-title">✗ Don't</div>
+                    <ul class="bp-list">
+                        <li><span class="icon">✗</span> Try to mesh everything at once—start small</li>
+                        <li><span class="icon">✗</span> Underinvest in the platform—it enables everything</li>
+                        <li><span class="icon">✗</span> Expect domain teams to build from scratch</li>
+                        <li><span class="icon">✗</span> Create data products without clear consumers</li>
+                        <li><span class="icon">✗</span> Ignore organizational change management</li>
+                        <li><span class="icon">✗</span> Skip governance—chaos ensues without standards</li>
+                        <li><span class="icon">✗</span> Forget about cross-domain data products</li>
+                        <li><span class="icon">✗</span> Treat data mesh as purely technical transformation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered data mesh design</p>
+                </div>
+            </div>
+
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">🕸️</div>
+                    <div class="agent-name">DataMeshArchitect</div>
+                    <div class="agent-role">Domain & Data Product Designer</div>
+                    <div class="agent-desc">Designs data mesh architectures, identifies domain boundaries, defines data products, and plans federated governance models.</div>
+                    <ul class="agent-caps">
+                        <li><span class="icon">✦</span> Domain identification and boundaries</li>
+                        <li><span class="icon">✦</span> Data product definition and contracts</li>
+                        <li><span class="icon">✦</span> Platform requirements analysis</li>
+                        <li><span class="icon">✦</span> Governance policy design</li>
+                        <li><span class="icon">✦</span> Migration planning from monolithic</li>
+                        <li><span class="icon">✦</span> Organizational change strategy</li>
+                    </ul>
+                </div>
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab">Data Mesh Designer</div>
+                        <div class="code-filename">data_mesh_architect.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># data_mesh_architect.py</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task, Crew
+
+data_mesh_architect = Agent(
+    <span class="code-string">role=</span><span class="code-string">"Data Mesh Architect"</span>,
+    <span class="code-string">goal=</span><span class="code-string">"Design domain-oriented data architecture"</span>,
+    <span class="code-string">backstory=</span><span class="code-string">"""Expert in data mesh principles,
+    domain-driven design for data, and building
+    self-serve data platforms with Unity Catalog."""</span>,
+    <span class="code-string">tools=</span>[domain_analyzer, product_definer,
+           governance_designer, platform_planner]
+)
+
+design_task = Task(
+    <span class="code-string">description=</span><span class="code-string">"""Analyze this organization:
+    {org_context}
+    
+    Identify data domains, define data products,
+    and design governance model."""</span>,
+    <span class="code-string">agent=</span>data_mesh_architect
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue exploring</p>
+                </div>
+            </div>
+
+            <div class="related-grid">
+                <a href="cat09-p4-lakehouse.html" class="related-card">
+                    <div class="related-num">Page 9.4</div>
+                    <div class="related-title">Data Lakehouse</div>
+                    <div class="related-desc">Modern unified data architecture</div>
+                </a>
+                <a href="cat09-p7-domain-driven.html" class="related-card">
+                    <div class="related-num">Page 9.7</div>
+                    <div class="related-title">Domain-Driven Design</div>
+                    <div class="related-desc">Bounded contexts and domains</div>
+                </a>
+                <a href="cat09-p1-microservices.html" class="related-card">
+                    <div class="related-num">Page 9.1</div>
+                    <div class="related-title">Microservices</div>
+                    <div class="related-desc">Distributed service architecture</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat09-p2-event-driven.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">9.2: Event-Driven</div>
+            </div>
+        </a>
+        <div class="footer-brand"><span>STRATEGY</span>HUB • Page 9.3</div>
+        <a href="cat09-p4-lakehouse.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">9.4: Data Lakehouse</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>

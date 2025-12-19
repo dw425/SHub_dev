@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Wikis | Knowledge Management | Strategy Hub</title>
+    <style>
+        :root {
+            --brand-orange: #FF9900;
+            --cat-primary: #F59E0B;
+            --cat-light: #FBBF24;
+            --cat-dark: #D97706;
+            --cat-glow: rgba(245, 158, 11, 0.15);
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-alt: #1a1a2e;
+            --bg-hover: #252538;
+            --border-color: #2a2a3e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6a6a7a;
+            --green: #10B981;
+            --yellow: #F59E0B;
+            --red: #EF4444;
+            --blue: #3B82F6;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --cyan: #06B6D4;
+            --teal: #14B8A6;
+            --indigo: #6366F1;
+            --sidebar-width: 260px;
+            --header-height: 60px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 16px 32px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: var(--header-height); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; }
+        .logo span { color: var(--brand-orange); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--brand-orange); }
+        .breadcrumb .sep { color: var(--text-muted); }
+        .breadcrumb .current { color: var(--text-primary); }
+        
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: var(--bg-card); border-right: 1px solid var(--border-color); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sidebar-section { margin-bottom: 24px; }
+        .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cat-light); padding: 0 24px; margin-bottom: 8px; }
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--text-secondary); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-nav a:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .sidebar-nav a.active { background: var(--cat-glow); color: var(--cat-light); border-left-color: var(--cat-light); }
+        .nav-icon { font-size: 14px; width: 24px; text-align: center; }
+        
+        .main-wrapper { margin-left: var(--sidebar-width); margin-top: var(--header-height); }
+        .main-content { max-width: 1100px; padding: 32px; }
+        
+        .hero-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; position: relative; }
+        .hero-compact::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--purple), var(--cat-primary)); }
+        .hero-tag { display: inline-flex; background: var(--cat-glow); border: 1px solid var(--cat-dark); padding: 5px 14px; border-radius: 9999px; font-size: 12px; color: var(--cat-light); margin-bottom: 12px; width: fit-content; }
+        .hero-left h1 { font-size: 28px; margin-bottom: 8px; }
+        .hero-left p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .hero-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-metric { background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; position: relative; }
+        .hero-metric::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--cat-primary); border-radius: 0 0 12px 12px; }
+        .hero-metric-value { font-size: 24px; font-weight: 700; color: var(--cat-light); }
+        .hero-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+        
+        .module { margin-bottom: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
+        .module:first-of-type { border-top: none; padding-top: 0; }
+        .module-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .module-icon { width: 52px; height: 52px; background: var(--cat-glow); border: 2px solid var(--cat-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+        .module-info h2 { font-size: 20px; margin-bottom: 4px; }
+        .module-info p { font-size: 12px; color: var(--text-muted); }
+        
+        .overview-content { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .overview-content h3 { font-size: 16px; margin-bottom: 12px; color: var(--cat-light); }
+        .overview-content p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .overview-content p:last-child { margin-bottom: 0; }
+        .overview-content code { background: var(--bg-card-alt); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        
+        .wiki-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .wiki-type { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .wiki-type::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+        .wiki-type:nth-child(1)::before { background: var(--blue); }
+        .wiki-type:nth-child(2)::before { background: var(--green); }
+        .wiki-type:nth-child(3)::before { background: var(--purple); }
+        .wiki-type:nth-child(4)::before { background: var(--pink); }
+        .wiki-type-icon { font-size: 32px; margin-bottom: 12px; }
+        .wiki-type-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .wiki-type-desc { font-size: 10px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+        .wiki-type-examples { font-size: 9px; color: var(--text-muted); font-style: italic; }
+        
+        .platform-compare { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; font-size: 11px; }
+        .platform-compare th { background: var(--bg-card-alt); padding: 12px 8px; text-align: center; font-size: 10px; border-bottom: 1px solid var(--border-color); }
+        .platform-compare th:first-child { text-align: left; padding-left: 16px; width: 160px; }
+        .platform-compare td { padding: 10px 8px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .platform-compare td:first-child { text-align: left; padding-left: 16px; font-weight: 500; }
+        .platform-compare tr:last-child td { border-bottom: none; }
+        .platform-compare tr:hover td { background: var(--bg-hover); }
+        .platform-head { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .platform-head-icon { font-size: 18px; }
+        .platform-head-name { font-weight: 600; font-size: 9px; }
+        .check { color: var(--green); font-weight: bold; }
+        .partial { color: var(--yellow); }
+        .none { color: var(--text-muted); }
+        .feature-name { color: var(--text-secondary); }
+        .feature-category { font-size: 9px; color: var(--cat-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .ia-viz { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .ia-header { padding: 12px 20px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .ia-title { font-size: 13px; font-weight: 600; }
+        .ia-badge { font-size: 11px; padding: 4px 12px; border-radius: 9999px; background: var(--cat-glow); color: var(--cat-light); }
+        .ia-body { padding: 24px; background: var(--bg-dark); }
+        .ia-tree { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .ia-branch { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .ia-branch-header { padding: 12px 16px; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
+        .ia-branch-icon { font-size: 16px; }
+        .ia-branch-name { font-size: 12px; font-weight: 600; }
+        .ia-branch-items { padding: 12px 16px; }
+        .ia-item { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-left: 2px solid var(--border-color); padding-left: 12px; margin-left: 8px; }
+        .ia-item:hover { border-left-color: var(--cat-primary); color: var(--text-primary); }
+        
+        .content-patterns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .pattern-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .pattern-icon { font-size: 28px; margin-bottom: 12px; }
+        .pattern-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .pattern-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .pattern-example { font-size: 10px; color: var(--text-muted); background: var(--bg-dark); padding: 10px; border-radius: 6px; font-family: monospace; }
+        
+        .adoption-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .adoption-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
+        .adoption-icon { font-size: 24px; margin-bottom: 10px; }
+        .adoption-value { font-size: 28px; font-weight: 700; color: var(--cat-light); margin-bottom: 4px; }
+        .adoption-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .adoption-trend { font-size: 10px; padding: 3px 8px; border-radius: 4px; }
+        .adoption-trend.up { background: rgba(16,185,129,0.2); color: var(--green); }
+        .adoption-trend.down { background: rgba(239,68,68,0.2); color: var(--red); }
+        .adoption-trend.flat { background: rgba(245,158,11,0.2); color: var(--yellow); }
+        
+        .governance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+        .gov-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .gov-icon { font-size: 28px; margin-bottom: 12px; }
+        .gov-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .gov-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .gov-list { list-style: none; }
+        .gov-list li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .gov-list li::before { content: '•'; color: var(--cat-light); }
+        
+        .migration-phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+        .migration-phase { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; position: relative; }
+        .migration-phase::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: var(--cat-light); font-size: 14px; z-index: 1; }
+        .migration-phase:last-child::after { display: none; }
+        .phase-num { font-size: 10px; color: var(--cat-light); margin-bottom: 6px; }
+        .phase-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .phase-tasks { list-style: none; }
+        .phase-tasks li { font-size: 10px; color: var(--text-muted); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+        .phase-tasks li::before { content: '☐'; color: var(--text-muted); font-size: 10px; }
+        
+        .best-practices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .practice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .practice-card.do { border-left: 3px solid var(--green); }
+        .practice-card.dont { border-left: 3px solid var(--red); }
+        .practice-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .practice-title.do { color: var(--green); }
+        .practice-title.dont { color: var(--red); }
+        .practice-list { list-style: none; }
+        .practice-list li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: flex-start; gap: 8px; }
+        .practice-list li:last-child { border-bottom: none; }
+        .practice-list li::before { content: '✓'; color: var(--green); flex-shrink: 0; }
+        .practice-card.dont .practice-list li::before { content: '✗'; color: var(--red); }
+        
+        .agent-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        .agent-info { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .agent-avatar { width: 56px; height: 56px; background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; }
+        .agent-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .agent-role { font-size: 11px; color: var(--cat-light); margin-bottom: 16px; }
+        .agent-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+        .agent-capabilities { list-style: none; }
+        .agent-capabilities li { font-size: 11px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: center; gap: 8px; }
+        .agent-capabilities li::before { content: '✦'; color: var(--cat-light); }
+        
+        .code-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .code-header { display: flex; align-items: center; background: var(--bg-card-alt); border-bottom: 1px solid var(--border-color); }
+        .code-tab { padding: 12px 20px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+        .code-tab.active { color: var(--cat-light); border-bottom-color: var(--cat-light); background: rgba(245,158,11,0.1); }
+        .code-filename { margin-left: auto; padding: 12px 20px; font-size: 11px; color: var(--text-muted); font-family: monospace; }
+        .code-content { padding: 16px; font-family: 'Monaco', 'Consolas', monospace; font-size: 11px; line-height: 1.8; background: var(--bg-dark); overflow-x: auto; }
+        .code-comment { color: #6A737D; }
+        .code-keyword { color: #FF7B72; }
+        .code-string { color: #A5D6FF; }
+        .code-function { color: #D2A8FF; }
+        
+        .related-pages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .related-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-decoration: none; color: inherit; transition: all 0.2s; }
+        .related-card:hover { border-color: var(--cat-primary); transform: translateY(-2px); }
+        .related-num { font-size: 10px; color: var(--cat-light); margin-bottom: 4px; }
+        .related-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .related-desc { font-size: 10px; color: var(--text-muted); }
+        
+        footer { background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 20px 32px; margin-left: var(--sidebar-width); }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; }
+        .footer-link { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-secondary); padding: 12px 20px; background: var(--bg-card-alt); border: 1px solid var(--border-color); border-radius: 10px; transition: all 0.2s; }
+        .footer-link:hover { border-color: var(--cat-primary); color: var(--text-primary); }
+        .footer-link-label { font-size: 10px; color: var(--text-muted); }
+        .footer-link-title { font-size: 13px; font-weight: 600; }
+        .footer-brand { font-size: 12px; color: var(--text-muted); }
+        .footer-brand strong { color: var(--brand-orange); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            footer { margin-left: 0; }
+            .hero-compact, .best-practices, .agent-grid { grid-template-columns: 1fr; }
+            .wiki-types, .adoption-metrics, .migration-phases, .ia-tree { grid-template-columns: repeat(2, 1fr); }
+            .governance-grid, .content-patterns, .related-pages { grid-template-columns: 1fr; }
+            .platform-compare { font-size: 9px; }
+            .platform-compare th, .platform-compare td { padding: 6px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span>STRATEGY</span>HUB</div>
+    <div class="breadcrumb">
+        <a href="#">Strategy Hub</a>
+        <span class="sep">/</span>
+        <a href="cat07-knowledge-overview.html">Knowledge Management</a>
+        <span class="sep">/</span>
+        <span class="current">Enterprise Wikis</span>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-title">📚 Category 07</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-knowledge-overview.html"><span class="nav-icon">🏠</span> Overview</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 This Page</div>
+        <ul class="sidebar-nav">
+            <li><a href="#overview" class="active"><span class="nav-icon">📖</span> Overview</a></li>
+            <li><a href="#types"><span class="nav-icon">📂</span> Wiki Types</a></li>
+            <li><a href="#platforms"><span class="nav-icon">🛠️</span> Platform Comparison</a></li>
+            <li><a href="#ia"><span class="nav-icon">🏗️</span> Information Architecture</a></li>
+            <li><a href="#patterns"><span class="nav-icon">📝</span> Content Patterns</a></li>
+            <li><a href="#adoption"><span class="nav-icon">📈</span> Adoption Metrics</a></li>
+            <li><a href="#governance"><span class="nav-icon">👥</span> Governance</a></li>
+            <li><a href="#migration"><span class="nav-icon">🚚</span> Migration</a></li>
+            <li><a href="#practices"><span class="nav-icon">✅</span> Best Practices</a></li>
+            <li><a href="#agent"><span class="nav-icon">🤖</span> Agent This</a></li>
+        </ul>
+    </div>
+    <div class="sidebar-section">
+        <div class="sidebar-title">📄 Other Pages</div>
+        <ul class="sidebar-nav">
+            <li><a href="cat07-p1-knowledge-graphs.html"><span class="nav-icon">🕸️</span> Knowledge Graphs</a></li>
+            <li><a href="cat07-p2-rag-search.html"><span class="nav-icon">🔍</span> RAG & Semantic Search</a></li>
+            <li><a href="cat07-p3-taxonomy.html"><span class="nav-icon">🏷️</span> Taxonomy & Ontology</a></li>
+            <li><a href="cat07-p4-content-lifecycle.html"><span class="nav-icon">📄</span> Content Lifecycle</a></li>
+            <li><a href="cat07-p5-enterprise-wikis.html" class="active"><span class="nav-icon">📖</span> Enterprise Wikis</a></li>
+            <li><a href="cat07-p6-semantic-models.html"><span class="nav-icon">🧊</span> Semantic Models</a></li>
+            <li><a href="cat07-p7-vector-databases.html"><span class="nav-icon">🗄️</span> Vector Databases</a></li>
+            <li><a href="cat07-p8-platform-comparison.html"><span class="nav-icon">⚖️</span> Platform Comparison</a></li>
+        </ul>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    <div class="main-content">
+        
+        <!-- HERO -->
+        <section class="hero-compact" id="overview">
+            <div class="hero-left">
+                <div class="hero-tag">📖 Page 7.5 • Collaborative Knowledge</div>
+                <h1>Enterprise Wikis</h1>
+                <p>Build and scale collaborative knowledge bases that capture institutional expertise, enable self-service discovery, and reduce knowledge silos across your organization.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <div class="hero-metric-value">70%</div>
+                    <div class="hero-metric-label">Reduced Repeat Questions</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">4.5x</div>
+                    <div class="hero-metric-label">Onboarding Speed</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">85%</div>
+                    <div class="hero-metric-label">Self-Service Rate</div>
+                </div>
+                <div class="hero-metric">
+                    <div class="hero-metric-value">$2.5M</div>
+                    <div class="hero-metric-label">Annual Savings (1000 emp)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OVERVIEW -->
+        <section class="module">
+            <div class="module-header">
+                <div class="module-icon">📖</div>
+                <div class="module-info">
+                    <h2>Understanding Enterprise Wikis</h2>
+                    <p>Why collaborative knowledge bases drive organizational efficiency</p>
+                </div>
+            </div>
+            <div class="overview-content">
+                <h3>The Knowledge Bottleneck Problem</h3>
+                <p>In most organizations, critical knowledge lives in people's heads, scattered documents, and tribal communication channels. New hires take months to become productive because they can't find answers. Experts spend <strong>20% of their time answering the same questions</strong> repeatedly. When key employees leave, institutional knowledge walks out the door.</p>
+                <p><strong>Enterprise wikis</strong> solve this by creating a single source of truth where knowledge is documented, discoverable, and collaboratively maintained. Unlike static documentation, wikis are living systems—content evolves through collective contribution and continuous refinement. The best wikis become the first place people look for answers.</p>
+                <p>The ROI is substantial: organizations with mature wiki implementations report <strong>70% reduction in repeat questions</strong>, <strong>4.5x faster onboarding</strong>, and <strong>$2,500/employee/year in productivity savings</strong> from reduced knowledge searching time. But success requires more than deploying software—it demands thoughtful information architecture, governance, and cultural change.</p>
+            </div>
+        </section>
+
+        <!-- WIKI TYPES -->
+        <section class="module" id="types">
+            <div class="module-header">
+                <div class="module-icon">📂</div>
+                <div class="module-info">
+                    <h2>Types of Enterprise Wikis</h2>
+                    <p>Different wiki models for different needs</p>
+                </div>
+            </div>
+            <div class="wiki-types">
+                <div class="wiki-type">
+                    <div class="wiki-type-icon">🏢</div>
+                    <div class="wiki-type-name">Company Wiki</div>
+                    <div class="wiki-type-desc">Organization-wide knowledge base for policies, processes, and company information.</div>
+                    <div class="wiki-type-examples">HR policies, benefits, org charts, company history</div>
+                </div>
+                <div class="wiki-type">
+                    <div class="wiki-type-icon">⚙️</div>
+                    <div class="wiki-type-name">Technical Wiki</div>
+                    <div class="wiki-type-desc">Engineering documentation, architecture decisions, and technical how-tos.</div>
+                    <div class="wiki-type-examples">API docs, runbooks, ADRs, system architecture</div>
+                </div>
+                <div class="wiki-type">
+                    <div class="wiki-type-icon">🎯</div>
+                    <div class="wiki-type-name">Team Wiki</div>
+                    <div class="wiki-type-desc">Team-specific knowledge, processes, and working agreements.</div>
+                    <div class="wiki-type-examples">Sprint rituals, team norms, project docs, OKRs</div>
+                </div>
+                <div class="wiki-type">
+                    <div class="wiki-type-icon">📚</div>
+                    <div class="wiki-type-name">Product Wiki</div>
+                    <div class="wiki-type-desc">Product documentation for internal and external stakeholders.</div>
+                    <div class="wiki-type-examples">Feature specs, user guides, release notes, FAQs</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Most organizations need <strong>multiple wiki types</strong> organized hierarchically or federated. A common pattern is a central company wiki with team-specific spaces nested underneath. The key is clear <strong>scope boundaries</strong>: what belongs in the company wiki vs. the engineering wiki vs. a team space? Without clear guidelines, content sprawls across multiple locations and becomes unfindable.</p>
+                <p>Consider your <strong>audience</strong> when structuring wikis: company-wide content should be accessible and jargon-free, while technical wikis can assume engineering expertise. Different wikis may have different governance models—the company wiki might require HR approval for policy changes, while team wikis allow direct editing by team members.</p>
+            </div>
+        </section>
+
+        <!-- PLATFORM COMPARISON -->
+        <section class="module" id="platforms">
+            <div class="module-header">
+                <div class="module-icon">🛠️</div>
+                <div class="module-info">
+                    <h2>Platform Comparison</h2>
+                    <p>Evaluating wiki platforms across 12 essential capabilities</p>
+                </div>
+            </div>
+            <table class="platform-compare">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📘</span><span class="platform-head-name">Confluence</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📚</span><span class="platform-head-name">Notion</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📁</span><span class="platform-head-name">SharePoint</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📝</span><span class="platform-head-name">GitBook</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">🔷</span><span class="platform-head-name">Slite</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📓</span><span class="platform-head-name">Coda</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">🏠</span><span class="platform-head-name">Tettra</span></div></th>
+                        <th><div class="platform-head"><span class="platform-head-icon">📋</span><span class="platform-head-name">Guru</span></div></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="feature-category">Editor</span><br><span class="feature-name">Rich Text Editor</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Editor</span><br><span class="feature-name">Real-time Collaboration</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Structure</span><br><span class="feature-name">Nested Pages/Hierarchy</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Structure</span><br><span class="feature-name">Templates</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Search</span><br><span class="feature-name">Full-Text Search</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Search</span><br><span class="feature-name">AI Search/Answers</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Permission Controls</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Governance</span><br><span class="feature-name">Version History</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Integration</span><br><span class="feature-name">Slack Integration</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Integration</span><br><span class="feature-name">API Access</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Analytics</span><br><span class="feature-name">Usage Analytics</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="feature-category">Analytics</span><br><span class="feature-name">Stale Content Detection</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="partial">◐</span></td>
+                        <td><span class="none">—</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Best For</strong></td>
+                        <td style="font-size: 9px;">Enterprise</td>
+                        <td style="font-size: 9px;">Startups</td>
+                        <td style="font-size: 9px;">Microsoft</td>
+                        <td style="font-size: 9px;">Developers</td>
+                        <td style="font-size: 9px;">Teams</td>
+                        <td style="font-size: 9px;">Databases</td>
+                        <td style="font-size: 9px;">SMB KB</td>
+                        <td style="font-size: 9px;">Verified KB</td>
+                    </tr>
+                    <tr style="background: var(--bg-card-alt);">
+                        <td><strong>Pricing</strong></td>
+                        <td style="font-size: 9px;">$$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$</td>
+                        <td style="font-size: 9px;">$$$</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="overview-content">
+                <p><strong>Confluence</strong> remains the enterprise standard with deep Jira integration, extensive templates, and robust permissions—but its complexity and cost are overkill for smaller teams. <strong>Notion</strong> offers the best editing experience and flexibility, making it ideal for startups and modern teams, though enterprise governance features lag. <strong>SharePoint</strong> dominates Microsoft shops with tight Office 365 integration but has a steeper learning curve.</p>
+                <p>For developer documentation, <strong>GitBook</strong> excels with Git-backed versioning and clean public docs. <strong>Guru</strong> and <strong>Tettra</strong> specialize in verified knowledge bases with built-in freshness tracking—ideal for customer support and sales enablement. <strong>Slite</strong> and <strong>Coda</strong> blend wiki capabilities with database-like features for teams wanting more structure. Choose based on your ecosystem (Atlassian vs. Microsoft vs. Google), team size, and governance requirements.</p>
+            </div>
+        </section>
+
+        <!-- INFORMATION ARCHITECTURE -->
+        <section class="module" id="ia">
+            <div class="module-header">
+                <div class="module-icon">🏗️</div>
+                <div class="module-info">
+                    <h2>Information Architecture</h2>
+                    <p>Structuring your wiki for discoverability</p>
+                </div>
+            </div>
+            <div class="ia-viz">
+                <div class="ia-header">
+                    <div class="ia-title">📊 Example Wiki Structure</div>
+                    <div class="ia-badge">4-Pillar Model</div>
+                </div>
+                <div class="ia-body">
+                    <div class="ia-tree">
+                        <div class="ia-branch">
+                            <div class="ia-branch-header">
+                                <span class="ia-branch-icon">🏢</span>
+                                <span class="ia-branch-name">Company</span>
+                            </div>
+                            <div class="ia-branch-items">
+                                <div class="ia-item">About Us</div>
+                                <div class="ia-item">Mission & Values</div>
+                                <div class="ia-item">Org Structure</div>
+                                <div class="ia-item">Policies</div>
+                                <div class="ia-item">Benefits & HR</div>
+                            </div>
+                        </div>
+                        <div class="ia-branch">
+                            <div class="ia-branch-header">
+                                <span class="ia-branch-icon">🎯</span>
+                                <span class="ia-branch-name">Teams</span>
+                            </div>
+                            <div class="ia-branch-items">
+                                <div class="ia-item">Engineering</div>
+                                <div class="ia-item">Product</div>
+                                <div class="ia-item">Design</div>
+                                <div class="ia-item">Sales</div>
+                                <div class="ia-item">Marketing</div>
+                            </div>
+                        </div>
+                        <div class="ia-branch">
+                            <div class="ia-branch-header">
+                                <span class="ia-branch-icon">📚</span>
+                                <span class="ia-branch-name">How-To</span>
+                            </div>
+                            <div class="ia-branch-items">
+                                <div class="ia-item">Onboarding</div>
+                                <div class="ia-item">Tools & Access</div>
+                                <div class="ia-item">Processes</div>
+                                <div class="ia-item">Troubleshooting</div>
+                                <div class="ia-item">Templates</div>
+                            </div>
+                        </div>
+                        <div class="ia-branch">
+                            <div class="ia-branch-header">
+                                <span class="ia-branch-icon">📦</span>
+                                <span class="ia-branch-name">Projects</span>
+                            </div>
+                            <div class="ia-branch-items">
+                                <div class="ia-item">Active Projects</div>
+                                <div class="ia-item">Completed</div>
+                                <div class="ia-item">Initiatives</div>
+                                <div class="ia-item">RFCs & ADRs</div>
+                                <div class="ia-item">Retrospectives</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Information architecture determines whether people find what they need. The <strong>4-pillar model</strong> above organizes content by purpose: Company (what everyone needs to know), Teams (department-specific), How-To (task-oriented guides), and Projects (time-bounded work). This structure answers the question "where does this belong?" clearly.</p>
+                <p>Design your IA around <strong>user mental models</strong>—how do people actually think about finding information? Common patterns include: <strong>audience-based</strong> (new hire, engineer, manager), <strong>task-based</strong> (how to request PTO, how to deploy), or <strong>topic-based</strong> (benefits, security, architecture). Use card sorting exercises with real users to validate your structure. The homepage should provide <strong>multiple entry points</strong>: search, navigation, recently updated, and most popular.</p>
+            </div>
+        </section>
+
+        <!-- CONTENT PATTERNS -->
+        <section class="module" id="patterns">
+            <div class="module-header">
+                <div class="module-icon">📝</div>
+                <div class="module-info">
+                    <h2>Content Patterns</h2>
+                    <p>Standardized templates for consistent documentation</p>
+                </div>
+            </div>
+            <div class="content-patterns">
+                <div class="pattern-card">
+                    <div class="pattern-icon">📋</div>
+                    <div class="pattern-name">How-To Guide</div>
+                    <div class="pattern-desc">Step-by-step instructions for completing a specific task. Goal-oriented and action-focused.</div>
+                    <div class="pattern-example">## Goal<br>## Prerequisites<br>## Steps<br>## Troubleshooting<br>## Related</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📖</div>
+                    <div class="pattern-name">Reference Doc</div>
+                    <div class="pattern-desc">Comprehensive information about a topic for lookup, not learning. Organized for scanning.</div>
+                    <div class="pattern-example">## Overview<br>## Specifications<br>## Parameters<br>## Examples<br>## See Also</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">💡</div>
+                    <div class="pattern-name">Explanation</div>
+                    <div class="pattern-desc">Background and context for understanding concepts. Answers "why" not just "how."</div>
+                    <div class="pattern-example">## Background<br>## Key Concepts<br>## How It Works<br>## Trade-offs<br>## Further Reading</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📝</div>
+                    <div class="pattern-name">Decision Record</div>
+                    <div class="pattern-desc">Documents architectural or process decisions with context and rationale.</div>
+                    <div class="pattern-example">## Context<br>## Decision<br>## Alternatives<br>## Consequences<br>## Status</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">🚨</div>
+                    <div class="pattern-name">Runbook</div>
+                    <div class="pattern-desc">Operational procedures for responding to incidents or executing critical tasks.</div>
+                    <div class="pattern-example">## Trigger<br>## Impact<br>## Diagnosis<br>## Resolution Steps<br>## Escalation</div>
+                </div>
+                <div class="pattern-card">
+                    <div class="pattern-icon">📊</div>
+                    <div class="pattern-name">Team Page</div>
+                    <div class="pattern-desc">Team overview with mission, members, processes, and key links.</div>
+                    <div class="pattern-example">## Mission<br>## Team Members<br>## How We Work<br>## Key Links<br>## Contact</div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Standardized templates ensure <strong>consistency</strong> across contributors and make content easier to scan. The <strong>Diátaxis framework</strong> (tutorials, how-tos, reference, explanation) provides a proven structure for technical documentation. Each pattern serves a different user need—don't mix them. A how-to should be actionable; an explanation should build understanding.</p>
+                <p>Embed templates in your wiki platform so contributors start with the right structure. Include <strong>metadata fields</strong> in templates: owner, last reviewed, related pages. This builds governance into the authoring process rather than adding it as an afterthought. Track which templates are used most to identify gaps and opportunities.</p>
+            </div>
+        </section>
+
+        <!-- ADOPTION METRICS -->
+        <section class="module" id="adoption">
+            <div class="module-header">
+                <div class="module-icon">📈</div>
+                <div class="module-info">
+                    <h2>Adoption Metrics</h2>
+                    <p>Measuring wiki health and engagement</p>
+                </div>
+            </div>
+            <div class="adoption-metrics">
+                <div class="adoption-card">
+                    <div class="adoption-icon">👀</div>
+                    <div class="adoption-value">12.4K</div>
+                    <div class="adoption-label">Monthly Page Views</div>
+                    <span class="adoption-trend up">↑ 23% vs last month</span>
+                </div>
+                <div class="adoption-card">
+                    <div class="adoption-icon">✏️</div>
+                    <div class="adoption-value">340</div>
+                    <div class="adoption-label">Monthly Edits</div>
+                    <span class="adoption-trend up">↑ 12% vs last month</span>
+                </div>
+                <div class="adoption-card">
+                    <div class="adoption-icon">👥</div>
+                    <div class="adoption-value">68%</div>
+                    <div class="adoption-label">Active Contributors</div>
+                    <span class="adoption-trend flat">— same as last month</span>
+                </div>
+                <div class="adoption-card">
+                    <div class="adoption-icon">🔍</div>
+                    <div class="adoption-value">89%</div>
+                    <div class="adoption-label">Search Success Rate</div>
+                    <span class="adoption-trend up">↑ 5% vs last month</span>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p><strong>Page views</strong> indicate consumption but not value—high views on a confusing page might mean people can't find what they need. <strong>Edit frequency</strong> shows content is being maintained. <strong>Contributor percentage</strong> reveals whether the wiki is truly collaborative or dependent on a few authors. <strong>Search success rate</strong> (clicks on results / total searches) measures findability.</p>
+                <p>Track <strong>time to first contribution</strong> for new hires—a healthy wiki culture onboards people as contributors, not just consumers. Monitor <strong>stale content ratio</strong> (pages not updated in 6+ months) to identify maintenance needs. Correlate wiki usage with <strong>support ticket volume</strong>—successful wikis deflect questions that would otherwise go to help desks or Slack channels.</p>
+            </div>
+        </section>
+
+        <!-- GOVERNANCE -->
+        <section class="module" id="governance">
+            <div class="module-header">
+                <div class="module-icon">👥</div>
+                <div class="module-info">
+                    <h2>Wiki Governance</h2>
+                    <p>Maintaining quality at scale</p>
+                </div>
+            </div>
+            <div class="governance-grid">
+                <div class="gov-card">
+                    <div class="gov-icon">👤</div>
+                    <div class="gov-title">Content Ownership</div>
+                    <div class="gov-desc">Every page needs an owner responsible for accuracy and freshness.</div>
+                    <ul class="gov-list">
+                        <li>Assign owner on creation</li>
+                        <li>Transfer on role change</li>
+                        <li>Flag orphaned pages</li>
+                        <li>Quarterly ownership audit</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">✅</div>
+                    <div class="gov-title">Review Process</div>
+                    <div class="gov-desc">Balance openness with quality through tiered review requirements.</div>
+                    <ul class="gov-list">
+                        <li>Open editing for team pages</li>
+                        <li>Peer review for how-tos</li>
+                        <li>Approval for policies</li>
+                        <li>SME sign-off for technical</li>
+                    </ul>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon">📅</div>
+                    <div class="gov-title">Freshness Cadence</div>
+                    <div class="gov-desc">Scheduled reviews prevent content decay and outdated information.</div>
+                    <ul class="gov-list">
+                        <li>Policies: quarterly</li>
+                        <li>Technical docs: 6 months</li>
+                        <li>Team pages: annually</li>
+                        <li>Auto-archive if stale</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Wiki governance balances two tensions: <strong>openness</strong> (anyone can contribute) vs. <strong>quality</strong> (content must be accurate). Overly restrictive governance kills participation; too loose leads to sprawl and inaccuracy. The sweet spot is <strong>tiered governance</strong>: low-stakes content (team notes) is open, high-stakes content (policies, runbooks) requires review.</p>
+                <p>Assign a <strong>wiki gardener</strong> role—someone who monitors health metrics, archives stale content, fixes broken links, and champions wiki culture. This doesn't need to be a full-time role but does need explicit ownership. Celebrate top contributors publicly to reinforce the value of knowledge sharing. Make contribution part of performance conversations.</p>
+            </div>
+        </section>
+
+        <!-- MIGRATION -->
+        <section class="module" id="migration">
+            <div class="module-header">
+                <div class="module-icon">🚚</div>
+                <div class="module-info">
+                    <h2>Wiki Migration</h2>
+                    <p>Moving from legacy systems or consolidating wikis</p>
+                </div>
+            </div>
+            <div class="migration-phases">
+                <div class="migration-phase">
+                    <div class="phase-num">Phase 1</div>
+                    <div class="phase-name">Audit</div>
+                    <ul class="phase-tasks">
+                        <li>Inventory existing content</li>
+                        <li>Identify active vs. stale</li>
+                        <li>Map content owners</li>
+                        <li>Document current IA</li>
+                    </ul>
+                </div>
+                <div class="migration-phase">
+                    <div class="phase-num">Phase 2</div>
+                    <div class="phase-name">Plan</div>
+                    <ul class="phase-tasks">
+                        <li>Design new IA</li>
+                        <li>Define migration scope</li>
+                        <li>Create content templates</li>
+                        <li>Set up redirects</li>
+                    </ul>
+                </div>
+                <div class="migration-phase">
+                    <div class="phase-num">Phase 3</div>
+                    <div class="phase-name">Migrate</div>
+                    <ul class="phase-tasks">
+                        <li>Move high-value content</li>
+                        <li>Update during migration</li>
+                        <li>Validate links/formatting</li>
+                        <li>Archive legacy content</li>
+                    </ul>
+                </div>
+                <div class="migration-phase">
+                    <div class="phase-num">Phase 4</div>
+                    <div class="phase-name">Adopt</div>
+                    <ul class="phase-tasks">
+                        <li>Train users on new wiki</li>
+                        <li>Redirect old URLs</li>
+                        <li>Monitor adoption</li>
+                        <li>Sunset old system</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>Migration is an opportunity for <strong>content curation</strong>, not just content copying. Don't migrate stale content—use the transition to clean house. Categorize existing pages as <strong>migrate, update-then-migrate, archive, or delete</strong>. A 40-60% reduction in page count during migration is typical and healthy.</p>
+                <p>Plan for a <strong>transition period</strong> where both systems are active. Implement redirects from old URLs to new locations—nothing kills trust faster than broken bookmarks. Communicate the migration timeline clearly and provide training on the new platform. Track adoption metrics post-migration and address gaps quickly.</p>
+            </div>
+        </section>
+
+        <!-- BEST PRACTICES -->
+        <section class="module" id="practices">
+            <div class="module-header">
+                <div class="module-icon">✅</div>
+                <div class="module-info">
+                    <h2>Best Practices</h2>
+                    <p>Guidelines for successful enterprise wikis</p>
+                </div>
+            </div>
+            <div class="best-practices">
+                <div class="practice-card do">
+                    <div class="practice-title do">✓ Do</div>
+                    <ul class="practice-list">
+                        <li>Start with search: ensure content is findable before adding more</li>
+                        <li>Use templates for consistency across all content types</li>
+                        <li>Assign owners to every page at creation time</li>
+                        <li>Link liberally: connect related content for discovery</li>
+                        <li>Write for scanning: headers, bullets, TL;DR summaries</li>
+                        <li>Review and update content on a regular cadence</li>
+                        <li>Make contributing easy: low friction, clear guidelines</li>
+                        <li>Celebrate contributors to build knowledge-sharing culture</li>
+                    </ul>
+                </div>
+                <div class="practice-card dont">
+                    <div class="practice-title dont">✗ Don't</div>
+                    <ul class="practice-list">
+                        <li>Create pages without clear ownership and review dates</li>
+                        <li>Duplicate content across multiple locations</li>
+                        <li>Let the wiki become a document graveyard</li>
+                        <li>Require approval for every edit (kills contribution)</li>
+                        <li>Ignore search analytics and failed search queries</li>
+                        <li>Assume "if you build it, they will come"</li>
+                        <li>Mix different content types on the same page</li>
+                        <li>Neglect mobile experience for field teams</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="overview-content">
+                <p>The #1 wiki failure mode is <strong>becoming a write-only medium</strong>: content goes in but nobody reads it. Combat this by investing in search quality, information architecture, and active curation. Monitor what people search for but don't find—these gaps represent the most valuable content to create.</p>
+                <p>Wiki success is <strong>cultural, not technical</strong>. The platform matters less than the habits you build. Make documentation part of the "definition of done" for projects. Ask "is this in the wiki?" before answering questions in Slack. Lead by example—when leaders use and contribute to the wiki, others follow.</p>
+            </div>
+        </section>
+
+        <!-- AGENT THIS -->
+        <section class="module" id="agent">
+            <div class="module-header">
+                <div class="module-icon">🤖</div>
+                <div class="module-info">
+                    <h2>Agent This</h2>
+                    <p>AI-powered wiki management</p>
+                </div>
+            </div>
+            
+            <div class="agent-grid">
+                <div class="agent-info">
+                    <div class="agent-avatar">📖</div>
+                    <div class="agent-name">WikiAgent</div>
+                    <div class="agent-role">Knowledge Base Curator</div>
+                    <div class="agent-desc">Automates wiki maintenance, identifies content gaps, suggests improvements, and answers questions from wiki content using RAG.</div>
+                    <ul class="agent-capabilities">
+                        <li>Answer questions from wiki content (RAG)</li>
+                        <li>Identify stale pages needing review</li>
+                        <li>Detect duplicate or conflicting content</li>
+                        <li>Suggest missing documentation from Slack questions</li>
+                        <li>Auto-generate page summaries and TL;DRs</li>
+                        <li>Fix broken links and update references</li>
+                        <li>Generate content from templates</li>
+                        <li>Surface trending and underutilized content</li>
+                    </ul>
+                </div>
+                
+                <div class="code-panel">
+                    <div class="code-header">
+                        <div class="code-tab active">Wiki Q&A</div>
+                        <div class="code-tab">Stale Detector</div>
+                        <div class="code-filename">wiki_agent.py</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><span class="code-comment"># wiki_agent.py - Wiki Management Agent</span>
+<span class="code-keyword">from</span> crewai <span class="code-keyword">import</span> Agent, Task
+<span class="code-keyword">from</span> langchain.vectorstores <span class="code-keyword">import</span> Pinecone
+<span class="code-keyword">from</span> confluence_api <span class="code-keyword">import</span> ConfluenceClient
+
+<span class="code-keyword">class</span> <span class="code-function">WikiQAAgent</span>:
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, wiki_client, vector_store):
+        self.wiki = wiki_client
+        self.vectors = vector_store
+    
+    <span class="code-keyword">def</span> <span class="code-function">answer_question</span>(self, question: str) -> dict:
+        <span class="code-string">"""Answer question using wiki content."""</span>
+        <span class="code-comment"># Retrieve relevant wiki pages</span>
+        docs = self.vectors.similarity_search(
+            question, k=5, filter={<span class="code-string">"status"</span>: <span class="code-string">"published"</span>}
+        )
+        
+        <span class="code-comment"># Generate answer with citations</span>
+        context = <span class="code-string">"\n"</span>.join([d.page_content <span class="code-keyword">for</span> d <span class="code-keyword">in</span> docs])
+        
+        answer = llm.invoke(<span class="code-string">f"""Answer based on wiki:
+Context: {context}
+Question: {question}
+
+Provide answer with [Page Title](url) citations."""</span>)
+        
+        <span class="code-keyword">return</span> {
+            <span class="code-string">"answer"</span>: answer,
+            <span class="code-string">"sources"</span>: [d.metadata[<span class="code-string">"url"</span>] <span class="code-keyword">for</span> d <span class="code-keyword">in</span> docs],
+            <span class="code-string">"confidence"</span>: self._calc_confidence(docs)
+        }
+    
+    <span class="code-keyword">def</span> <span class="code-function">find_content_gaps</span>(self, slack_questions: list):
+        <span class="code-string">"""Identify wiki gaps from unanswered Slack Qs."""</span>
+        gaps = []
+        <span class="code-keyword">for</span> q <span class="code-keyword">in</span> slack_questions:
+            result = self.answer_question(q)
+            <span class="code-keyword">if</span> result[<span class="code-string">"confidence"</span>] < 0.5:
+                gaps.append({<span class="code-string">"question"</span>: q, <span class="code-string">"suggested_page"</span>: ...})
+        <span class="code-keyword">return</span> gaps
+
+<span class="code-comment"># Agent definition</span>
+wiki_agent = Agent(
+    role=<span class="code-string">"Wiki Curator"</span>,
+    goal=<span class="code-string">"Keep wiki healthy and useful"</span>,
+    tools=[WikiQATool(), StaleDetectorTool(), 
+           GapFinderTool(), DuplicateCheckerTool()]
+)</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RELATED PAGES -->
+        <section class="module" id="related">
+            <div class="module-header">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                    <h2>Related Pages</h2>
+                    <p>Continue learning with these related topics</p>
+                </div>
+            </div>
+            
+            <div class="related-pages">
+                <a href="cat07-p4-content-lifecycle.html" class="related-card">
+                    <div class="related-num">Page 7.4</div>
+                    <div class="related-title">Content Lifecycle</div>
+                    <div class="related-desc">Managing wiki content over time</div>
+                </a>
+                <a href="cat07-p2-rag-search.html" class="related-card">
+                    <div class="related-num">Page 7.2</div>
+                    <div class="related-title">RAG & Semantic Search</div>
+                    <div class="related-desc">AI-powered wiki search</div>
+                </a>
+                <a href="cat07-p3-taxonomy.html" class="related-card">
+                    <div class="related-num">Page 7.3</div>
+                    <div class="related-title">Taxonomy & Ontology</div>
+                    <div class="related-desc">Organizing wiki structure</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    <div class="footer-nav">
+        <a href="cat07-p4-content-lifecycle.html" class="footer-link">
+            <span>←</span>
+            <div>
+                <div class="footer-link-label">Previous Page</div>
+                <div class="footer-link-title">7.4: Content Lifecycle</div>
+            </div>
+        </a>
+        <div class="footer-brand"><strong>STRATEGY</strong>HUB • Page 7.5 of 8</div>
+        <a href="cat07-p6-semantic-models.html" class="footer-link">
+            <div>
+                <div class="footer-link-label">Next Page</div>
+                <div class="footer-link-title">7.6: Semantic Models</div>
+            </div>
+            <span>→</span>
+        </a>
+    </div>
+</footer>
+
+</body>
+</html>
