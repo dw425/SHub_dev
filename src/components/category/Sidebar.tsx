@@ -22,7 +22,7 @@ export function Sidebar({ category, pages, accentColor }: SidebarProps) {
   return (
     <>
       <style>{`
-        .sh-sidebar { position: fixed; top: 80px; left: 0; width: 260px; height: calc(100vh - 80px); background: var(--sh-surface); border-right: 1px solid var(--sh-border); overflow-y: auto; z-index: 100; padding: 24px 0; }
+        .sh-sidebar { position: fixed; top: 80px; left: 0; width: 260px; height: calc(100vh - 80px); background: var(--sh-surface); border-right: 1px solid var(--sh-border); overflow-y: auto; z-index: 100; padding: 24px 0; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
         .sh-sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; padding: 0 24px; margin-bottom: 8px; font-weight: 600; }
         .sh-sidebar-nav { list-style: none; }
         .sh-sidebar-nav a { display: flex; align-items: center; gap: 8px; padding: 10px 24px; color: var(--sh-text-body); text-decoration: none; font-size: 12px; border-left: 3px solid transparent; transition: all 0.2s; }

@@ -98,9 +98,44 @@ export default function CategoryLayout() {
   }))
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--sh-bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--sh-bg-gradient, var(--sh-bg))', position: 'relative', overflow: 'hidden' }}>
+      {/* ══════════════ Ambient Gradient Orbs ══════════════ */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', top: '-5%', left: '10%',
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'ambientDrift 25s ease-in-out infinite',
+        }} />
+        <div style={{
+          position: 'absolute', top: '35%', right: '-5%',
+          width: '450px', height: '450px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'ambientDrift 30s ease-in-out infinite',
+          animationDelay: '-8s',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '10%', left: '25%',
+          width: '400px', height: '400px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'ambientDrift 22s ease-in-out infinite',
+          animationDelay: '-15s',
+        }} />
+        <div style={{
+          position: 'absolute', top: '60%', left: '60%',
+          width: '350px', height: '350px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(236,72,153,0.06) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          animation: 'ambientDrift 28s ease-in-out infinite',
+          animationDelay: '-20s',
+        }} />
+      </div>
+
       {/* ══════════════ Header (exact marketplace Tailwind) ══════════════ */}
-      <header className="bg-white fixed top-0 left-0 right-0 z-40 border-b shadow-md" style={{ background: 'var(--sh-surface)', borderColor: 'var(--sh-border)' }}>
+      <header className="bg-white fixed top-0 left-0 right-0 z-40 border-b shadow-md" style={{ background: 'var(--sh-surface)', borderColor: 'var(--sh-border)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Left: Logo + Divider + StrategyHub */}

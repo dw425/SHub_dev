@@ -66,35 +66,44 @@ html.dark .blue-logo-filter {
   }
 }
 
-/* === Category-page theme tokens (light default, dark override) === */
+/* === Category-page theme tokens === */
 @layer base {
   :root {
-    --sh-bg: #f8fafc;
-    --sh-surface: #ffffff;
-    --sh-surface-alt: #f8fafc;
-    --sh-surface-hover: #f1f5f9;
-    --sh-border: #e2e8f0;
-    --sh-border-light: #f1f5f9;
-    --sh-text: #1e293b;
-    --sh-text-body: #475569;
-    --sh-text-secondary: #64748b;
-    --sh-text-muted: #94a3b8;
-    --sh-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    --sh-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    /* Rich light theme — deeper backgrounds with blue-slate undertones */
+    --sh-bg: #e8ecf4;
+    --sh-bg-gradient: linear-gradient(135deg, #e8ecf4 0%, #dde3f0 30%, #e4e0f0 60%, #e8ecf4 100%);
+    --sh-surface: rgba(255, 255, 255, 0.88);
+    --sh-surface-solid: #ffffff;
+    --sh-surface-alt: rgba(241, 244, 251, 0.92);
+    --sh-surface-hover: rgba(219, 226, 243, 0.6);
+    --sh-border: rgba(100, 116, 145, 0.2);
+    --sh-border-light: rgba(100, 116, 145, 0.1);
+    --sh-text: #0f172a;
+    --sh-text-body: #1e293b;
+    --sh-text-secondary: #475569;
+    --sh-text-muted: #64748b;
+    --sh-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 4px rgba(15, 23, 42, 0.05);
+    --sh-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+    --sh-shadow-lg: 0 8px 30px rgba(15, 23, 42, 0.1), 0 2px 8px rgba(15, 23, 42, 0.06);
+    --sh-glow: 0 0 40px rgba(59, 130, 246, 0.06);
   }
   html.dark {
     --sh-bg: #0a0a0f;
-    --sh-surface: #12121a;
-    --sh-surface-alt: #1a1a2e;
+    --sh-bg-gradient: linear-gradient(135deg, #0a0a0f 0%, #0e0e1a 50%, #0a0a0f 100%);
+    --sh-surface: rgba(18, 18, 26, 0.95);
+    --sh-surface-solid: #12121a;
+    --sh-surface-alt: rgba(26, 26, 46, 0.95);
     --sh-surface-hover: #1a1a2e;
-    --sh-border: #2a2a3e;
-    --sh-border-light: #1e1e30;
+    --sh-border: rgba(42, 42, 62, 0.8);
+    --sh-border-light: rgba(30, 30, 48, 0.6);
     --sh-text: #ffffff;
     --sh-text-body: #c0c0d8;
     --sh-text-secondary: #a0a0b8;
     --sh-text-muted: #7a7a90;
-    --sh-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    --sh-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+    --sh-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --sh-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --sh-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --sh-glow: 0 0 40px rgba(59, 130, 246, 0.08);
   }
   html.dark body {
     background: #0a0a0f;
@@ -109,7 +118,7 @@ html.dark .blue-logo-filter {
   }
 }
 
-/* === ANIMATIONS (keyframes don't need layers) === */
+/* === ANIMATIONS === */
 @keyframes orbFloat {
   0%, 100% { transform: translate(0, 0) scale(1); }
   25% { transform: translate(30px, -30px) scale(1.05); }
@@ -125,4 +134,10 @@ html.dark .blue-logo-filter {
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
+}
+
+@keyframes ambientDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  33% { transform: translate(40px, -25px) scale(1.08); opacity: 0.7; }
+  66% { transform: translate(-30px, 15px) scale(0.95); opacity: 0.4; }
 }
