@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1049,5 +1048,4 @@ tooling_agent = Agent(
   },
 ]
 
-registerPages('migration-factory', pages)
 export default pages

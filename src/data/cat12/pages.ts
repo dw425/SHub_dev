@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1284,5 +1283,4 @@ crew = Crew(agents=[optimizer], tasks=[optimize_task])`,
   },
 ]
 
-registerPages('cloud-platforms', pages)
 export default pages

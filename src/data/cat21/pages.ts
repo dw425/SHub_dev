@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -655,5 +654,4 @@ const pages: PageData[] = [
   },
 ]
 
-registerPages('white-papers-research', pages)
 export default pages

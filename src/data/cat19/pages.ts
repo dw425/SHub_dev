@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -2057,5 +2056,4 @@ assessment_task = Task(
   },
 ]
 
-registerPages('emerging-technologies', pages)
 export default pages

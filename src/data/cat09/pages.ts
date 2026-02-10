@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1144,5 +1143,4 @@ domain_modeler = Agent(
   },
 ]
 
-registerPages('sdlc-devops', pages)
 export default pages

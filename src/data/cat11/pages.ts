@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1444,5 +1443,4 @@ def handle_alert(alert_data):
   },
 ]
 
-registerPages('security-compliance', pages)
 export default pages

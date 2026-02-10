@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1848,5 +1847,4 @@ result = crew.kickoff()`,
   },
 ]
 
-registerPages('analytics-bi', pages)
 export default pages

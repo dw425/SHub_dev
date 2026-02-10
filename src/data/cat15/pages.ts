@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1021,5 +1020,4 @@ spec:
   },
 ]
 
-registerPages('networking', pages)
 export default pages

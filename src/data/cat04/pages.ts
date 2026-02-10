@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1218,5 +1217,4 @@ with mlflow.start_run(run_name="rf-baseline"):
   },
 ]
 
-registerPages('data-science', pages)
 export default pages

@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -888,5 +887,4 @@ async def generate_pir_report(project_data: dict) -> dict:
   },
 ]
 
-registerPages('implementation', pages)
 export default pages

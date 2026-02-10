@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1310,5 +1309,4 @@ advisor_agent = Agent(
   },
 ]
 
-registerPages('knowledge-management', pages)
 export default pages

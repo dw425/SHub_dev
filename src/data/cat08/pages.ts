@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -905,5 +904,4 @@ class RPAArchitect:
   },
 ]
 
-registerPages('automation-rpa', pages)
 export default pages

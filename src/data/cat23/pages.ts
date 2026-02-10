@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -953,5 +952,4 @@ const pages: PageData[] = [
   },
 ]
 
-registerPages('computer-vision', pages)
 export default pages

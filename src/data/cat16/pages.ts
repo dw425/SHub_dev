@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -988,5 +987,4 @@ aiops_engineer_agent = Agent(
   },
 ]
 
-registerPages('monitoring-observability', pages)
 export default pages

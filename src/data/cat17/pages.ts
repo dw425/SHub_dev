@@ -1,4 +1,3 @@
-import { registerPages } from '../pageRegistry'
 import type { PageData } from '../pageTypes'
 
 const pages: PageData[] = [
@@ -1211,5 +1210,4 @@ resistance_radar = Agent(
   },
 ]
 
-registerPages('change-management', pages)
 export default pages
