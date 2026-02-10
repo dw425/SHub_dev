@@ -1,7 +1,7 @@
 import {
   categoryKnowledge,
-  pageKnowledge,
-  topicMap,
+  getPageKnowledge,
+  getTopicMap,
   quickAnswers,
 } from './chatKnowledge'
 import { categoryPath, detailPath } from '@/config/routes'
@@ -69,14 +69,14 @@ function detectIntent(message: string): { intent: Intent; match?: string; matchC
   }
 
   // Topic mapping (direct keyword match)
-  for (const [keyword, loc] of Object.entries(topicMap)) {
+  for (const [keyword, loc] of Object.entries(getTopicMap())) {
     if (lower.includes(keyword)) {
       return { intent: 'topic_query', match: loc.pageSlug, matchCat: loc.categorySlug }
     }
   }
 
   // Page title fuzzy match
-  for (const page of pageKnowledge) {
+  for (const page of getPageKnowledge()) {
     const titleLower = page.title.toLowerCase()
     if (lower.includes(titleLower) || fuzzyMatch(lower, titleLower)) {
       return { intent: 'page_query', match: page.slug, matchCat: page.categorySlug }
@@ -112,9 +112,10 @@ function detectIntent(message: string): { intent: Intent; match?: string; matchC
 
 /* -- Response Generation -- */
 function getPageResponse(slug: string, catSlug?: string): string {
+  const pages = getPageKnowledge()
   const page = catSlug
-    ? pageKnowledge.find((p) => p.slug === slug && p.categorySlug === catSlug)
-    : pageKnowledge.find((p) => p.slug === slug)
+    ? pages.find((p) => p.slug === slug && p.categorySlug === catSlug)
+    : pages.find((p) => p.slug === slug)
   if (!page) return "I couldn't find that page. Try asking about a specific topic or category."
 
   const path = detailPath(page.categorySlug, page.slug)
@@ -133,7 +134,7 @@ function getNavigationResponse(message: string): string {
   const lower = message.toLowerCase()
 
   // Try topic map first
-  for (const [keyword, loc] of Object.entries(topicMap)) {
+  for (const [keyword, loc] of Object.entries(getTopicMap())) {
     if (lower.includes(keyword)) {
       return getPageResponse(loc.pageSlug, loc.categorySlug)
     }

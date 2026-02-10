@@ -62,7 +62,7 @@ export function ChatMessage({ message }: Props) {
           whiteSpace: 'pre-wrap',
           ...(isUser
             ? { background: '#1d4ed8', color: '#ffffff', borderBottomRightRadius: '4px' }
-            : { background: '#f1f5f9', color: '#1e293b', borderBottomLeftRadius: '4px' }),
+            : { background: 'var(--sh-surface-alt, #f1f5f9)', color: 'var(--sh-text, #1e293b)', borderBottomLeftRadius: '4px' }),
         }}
       >
         {message.content.split('\n').map((line, i) => (
@@ -84,7 +84,7 @@ export function TypingIndicator() {
           padding: '10px 14px',
           borderRadius: '12px',
           borderBottomLeftRadius: '4px',
-          background: '#f1f5f9',
+          background: 'var(--sh-surface-alt, #f1f5f9)',
           display: 'flex',
           gap: '4px',
           alignItems: 'center',
@@ -97,7 +97,7 @@ export function TypingIndicator() {
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              background: '#94a3b8',
+              background: 'var(--sh-text-muted, #94a3b8)',
               display: 'inline-block',
               animation: `typingDot 1.4s ease-in-out ${i * 0.2}s infinite`,
             }}

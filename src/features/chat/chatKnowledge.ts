@@ -29,20 +29,21 @@ export const categoryKnowledge: CategoryInfo[] = categories.map((c) => ({
   domainId: c.domainId,
 }))
 
-/** All pages across all categories with extracted keywords */
-export const pageKnowledge: PageInfo[] = (() => {
+/** Lazy-built page knowledge (deferred until first access so the registry is fully populated) */
+let _pageKnowledge: PageInfo[] | null = null
+
+export function getPageKnowledge(): PageInfo[] {
+  if (_pageKnowledge) return _pageKnowledge
   const pages: PageInfo[] = []
   for (const cat of categories) {
     const catPages = getPages(cat.slug)
     for (const p of catPages) {
       const keywords: string[] = []
 
-      // Add concept card titles
       for (const card of p.concepts.cards) {
         keywords.push(card.title.toLowerCase())
       }
 
-      // Add algorithm/technique names
       if (p.algorithms.type === 'table') {
         for (const row of p.algorithms.rows) {
           keywords.push(row.name.toLowerCase())
@@ -53,7 +54,6 @@ export const pageKnowledge: PageInfo[] = (() => {
         }
       }
 
-      // Add tool names
       for (const tool of p.tools.items) {
         keywords.push(tool.name.toLowerCase())
       }
@@ -68,27 +68,30 @@ export const pageKnowledge: PageInfo[] = (() => {
       })
     }
   }
+  _pageKnowledge = pages
   return pages
-})()
+}
 
-/** Auto-built topic → {categorySlug, pageSlug} map from all page keywords */
-export const topicMap: Record<string, { categorySlug: string; pageSlug: string }> = (() => {
+/** Lazy-built topic map (deferred until first access) */
+let _topicMap: Record<string, { categorySlug: string; pageSlug: string }> | null = null
+
+export function getTopicMap(): Record<string, { categorySlug: string; pageSlug: string }> {
+  if (_topicMap) return _topicMap
   const map: Record<string, { categorySlug: string; pageSlug: string }> = {}
-  for (const page of pageKnowledge) {
-    // Map page title words (3+ chars) to page
+  for (const page of getPageKnowledge()) {
     const titleWords = page.title.toLowerCase().split(/\s+/).filter((w) => w.length >= 3)
     for (const word of titleWords) {
       if (!map[word]) map[word] = { categorySlug: page.categorySlug, pageSlug: page.slug }
     }
-    // Map keywords to page
     for (const kw of page.keywords) {
       if (kw.length >= 3 && !map[kw]) {
         map[kw] = { categorySlug: page.categorySlug, pageSlug: page.slug }
       }
     }
   }
+  _topicMap = map
   return map
-})()
+}
 
 const totalPages = categories.reduce((sum, c) => sum + c.pageCount, 0)
 

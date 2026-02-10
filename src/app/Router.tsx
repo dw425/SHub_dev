@@ -1,9 +1,9 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { RootLayout } from '@/layouts/RootLayout'
-import { CategoryLayout } from '@/components/category/CategoryLayout'
 
 const HomePage = lazy(() => import('@/pages/HomePage'))
+const CategoryLayout = lazy(() => import('@/components/category/CategoryLayout'))
 const CategoryOverviewPage = lazy(() => import('@/pages/CategoryOverviewPage'))
 const DetailPage = lazy(() => import('@/pages/DetailPage'))
 const QuickPulseHub = lazy(() => import('@/pages/QuickPulseHub'))
@@ -15,7 +15,7 @@ function Loading() {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '60vh',
-      color: '#7a7a90',
+      color: 'var(--sh-text-muted, #7a7a90)',
       fontSize: '14px',
       fontFamily: "'Inter', sans-serif",
     }}>

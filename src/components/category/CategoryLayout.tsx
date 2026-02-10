@@ -74,14 +74,14 @@ const COMPANY_LINKS = [
   { label: 'Terms of Service', href: 'https://bpcs.com/terms-of-service' },
 ]
 
-export function CategoryLayout() {
+export default function CategoryLayout() {
   const { categorySlug } = useParams<{ categorySlug: string; pageSlug: string }>()
   const category = categorySlug ? getCategoryBySlug(categorySlug) : undefined
   const { theme, toggle: toggleTheme } = useTheme()
 
   if (!category) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff', color: '#1e293b' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--sh-bg)', color: 'var(--sh-text)' }}>
         <div style={{ textAlign: 'center' }}>
           <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '16px' }}>Category Not Found</h1>
           <Link to="/" style={{ color: '#1d4ed8', textDecoration: 'none' }}>&#8592; Back to Home</Link>
@@ -98,7 +98,7 @@ export function CategoryLayout() {
   }))
 
   return (
-    <>
+    <div style={{ minHeight: '100vh', background: 'var(--sh-bg)' }}>
       {/* ══════════════ Header (exact marketplace Tailwind) ══════════════ */}
       <header className="bg-white fixed top-0 left-0 right-0 z-40 border-b shadow-md" style={{ background: 'var(--sh-surface)', borderColor: 'var(--sh-border)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -380,6 +380,6 @@ export function CategoryLayout() {
 
       {/* Chat Widget */}
       <ChatWidget />
-    </>
+    </div>
   )
 }

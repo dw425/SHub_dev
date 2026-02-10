@@ -17,7 +17,7 @@ export const domains: Domain[] = [
     id: 'cloud-infra',
     name: 'Cloud & Infrastructure',
     emoji: '☁️',
-    categoryIds: [12, 15, 16, 14, 9],
+    categoryIds: [12, 15, 16, 14, 9, 27],
   },
   {
     id: 'security-governance',
@@ -29,12 +29,12 @@ export const domains: Domain[] = [
     id: 'delivery-ops',
     name: 'Delivery & Operations',
     emoji: '🚀',
-    categoryIds: [8, 10, 13, 18],
+    categoryIds: [8, 10, 13, 18, 29],
   },
   {
     id: 'strategy-transformation',
     name: 'Strategy & Transformation',
     emoji: '🎯',
-    categoryIds: [17, 20, 21, 22],
+    categoryIds: [17, 20, 21, 22, 28],
   },
 ]

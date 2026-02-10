@@ -66,9 +66,19 @@ export function SearchBar() {
   }, [])
 
   return (
-    <div ref={containerRef} className="relative">
-      <div className="flex items-center border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 rounded-sm px-3.5 py-2 w-48">
-        <svg className="w-4 h-4 text-gray-400 shrink-0 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          border: '1px solid var(--sh-border)',
+          background: 'var(--sh-surface-alt)',
+          borderRadius: '2px',
+          padding: '8px 14px',
+          width: '192px',
+        }}
+      >
+        <svg style={{ width: '16px', height: '16px', color: 'var(--sh-text-muted)', flexShrink: 0, marginRight: '8px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -80,25 +90,62 @@ export function SearchBar() {
           placeholder="Search..."
           aria-label="Search categories and pages"
           aria-expanded={isOpen}
-          className="w-full text-sm text-gray-700 dark:text-gray-200 bg-transparent border-none focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+          style={{
+            width: '100%',
+            fontSize: '14px',
+            color: 'var(--sh-text)',
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+          }}
         />
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 shadow-lg z-50 max-h-80 overflow-y-auto rounded-sm">
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            marginTop: '4px',
+            background: 'var(--sh-surface)',
+            border: '1px solid var(--sh-border)',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            zIndex: 50,
+            maxHeight: '320px',
+            overflowY: 'auto',
+            borderRadius: '2px',
+          }}
+        >
           {results.map((result, i) => (
             <button
               key={`${result.type}-${result.title}-${i}`}
               onClick={() => handleSelect(result)}
-              className={`w-full text-left px-4 py-3 border-b border-gray-100 dark:border-slate-700 last:border-0 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${
-                i === selectedIndex ? 'bg-blue-50 dark:bg-slate-700' : ''
-              }`}
+              onMouseEnter={() => setSelectedIndex(i)}
+              style={{
+                width: '100%',
+                textAlign: 'left',
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--sh-border-light)',
+                background: i === selectedIndex ? 'var(--sh-surface-hover)' : 'transparent',
+                cursor: 'pointer',
+                display: 'block',
+                border: 'none',
+                borderBottomWidth: '1px',
+                borderBottomStyle: 'solid',
+                borderBottomColor: 'var(--sh-border-light)',
+              }}
             >
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{result.title}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 500, fontSize: '14px', color: 'var(--sh-text)' }}>{result.title}</span>
                 <span
-                  className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-sm"
                   style={{
+                    fontSize: '9px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    padding: '2px 6px',
+                    borderRadius: '2px',
                     color: TYPE_COLORS[result.type] ?? '#64748b',
                     background: `${TYPE_COLORS[result.type] ?? '#64748b'}18`,
                   }}
@@ -106,15 +153,32 @@ export function SearchBar() {
                   {result.type}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{result.description}</p>
+              <p style={{ fontSize: '12px', color: 'var(--sh-text-secondary)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {result.description}
+              </p>
             </button>
           ))}
         </div>
       )}
 
       {isOpen && query.length >= 2 && results.length === 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 shadow-lg z-50 p-4 text-center rounded-sm">
-          <p className="text-sm text-gray-500 dark:text-gray-400">No results for &ldquo;{query}&rdquo;</p>
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            marginTop: '4px',
+            background: 'var(--sh-surface)',
+            border: '1px solid var(--sh-border)',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+            zIndex: 50,
+            padding: '16px',
+            textAlign: 'center',
+            borderRadius: '2px',
+          }}
+        >
+          <p style={{ fontSize: '14px', color: 'var(--sh-text-secondary)' }}>No results for &ldquo;{query}&rdquo;</p>
         </div>
       )}
     </div>

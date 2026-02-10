@@ -1,17 +1,27 @@
 /**
  * Central registry mapping category slugs to their page arrays.
  * Each category module registers itself on import.
+ *
+ * NOTE: The registry Map is lazily initialised inside getRegistry()
+ * so that it is always created before any cat module calls registerPages().
+ * This prevents a temporal-dead-zone crash when the bundler (Rollup)
+ * reorders the const declaration after the side-effect imports.
  */
 import type { PageData } from './pageTypes'
 
-const registry = new Map<string, PageData[]>()
+let registry: Map<string, PageData[]> | null = null
+
+function getRegistry(): Map<string, PageData[]> {
+  if (!registry) registry = new Map()
+  return registry
+}
 
 export function registerPages(categorySlug: string, pages: PageData[]) {
-  registry.set(categorySlug, pages)
+  getRegistry().set(categorySlug, pages)
 }
 
 export function getPages(categorySlug: string): PageData[] {
-  return registry.get(categorySlug) ?? []
+  return getRegistry().get(categorySlug) ?? []
 }
 
 export function getPage(categorySlug: string, pageSlug: string): PageData | undefined {
