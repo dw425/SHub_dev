@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
-  base: '/StrategyHub_test/',
+  base: '/SHub_dev/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

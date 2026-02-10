@@ -6,7 +6,7 @@ import '@/styles/globals.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename="/StrategyHub_test">
+    <BrowserRouter basename="/SHub_dev">
       <App />
     </BrowserRouter>
   </StrictMode>,
