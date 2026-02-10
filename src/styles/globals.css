@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-blueprint-blue: #1d4ed8;
+}
+
+/* === Blueprint utility classes (from marketplace) === */
+.blue-logo-filter {
+  filter: brightness(0) saturate(100%) invert(25%) sepia(98%) saturate(1600%) hue-rotate(219deg)
+    brightness(96%) contrast(95%);
+}
+html.dark .blue-logo-filter {
+  filter: brightness(0) invert(1);
+}
+.btn-rounded {
+  border-radius: 4px !important;
+}
+
+/*
+ * All custom base styles MUST go inside @layer base so they
+ * don't override Tailwind utility classes (margin, padding, etc.).
+ * Unlayered CSS always wins over @layer utilities in the cascade.
+ */
+@layer base {
+  /* === Homepage dark theme variables === */
+  :root {
+    --orange: #FF9900;
+    --orange-bright: #FFB800;
+    --purple: #8B5CF6;
+    --pink: #EC4899;
+    --cyan: #06B6D4;
+    --blue: #3B82F6;
+    --green: #10B981;
+    --red: #EF4444;
+    --yellow: #F59E0B;
+    --teal: #14B8A6;
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-light: #1a1a2e;
+    --border: #2a2a3e;
+    --text: #ffffff;
+    --text-dim: #7a7a90;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a4e; }
+
+  /* === SELECTION === */
+  ::selection {
+    background: rgba(255, 153, 0, 0.3);
+    color: var(--text);
+  }
+}
+
+/* === Category-page theme tokens (light default, dark override) === */
+@layer base {
+  :root {
+    --sh-bg: #f8fafc;
+    --sh-surface: #ffffff;
+    --sh-surface-alt: #f8fafc;
+    --sh-surface-hover: #f1f5f9;
+    --sh-border: #e2e8f0;
+    --sh-border-light: #f1f5f9;
+    --sh-text: #1e293b;
+    --sh-text-body: #475569;
+    --sh-text-secondary: #64748b;
+    --sh-text-muted: #94a3b8;
+    --sh-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --sh-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  html.dark {
+    --sh-bg: #0a0a0f;
+    --sh-surface: #12121a;
+    --sh-surface-alt: #1a1a2e;
+    --sh-surface-hover: #1a1a2e;
+    --sh-border: #2a2a3e;
+    --sh-border-light: #1e1e30;
+    --sh-text: #ffffff;
+    --sh-text-body: #c0c0d8;
+    --sh-text-secondary: #a0a0b8;
+    --sh-text-muted: #7a7a90;
+    --sh-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --sh-shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  html.dark body {
+    background: #0a0a0f;
+    color: #ffffff;
+  }
+  html.dark ::-webkit-scrollbar-track { background: #0a0a0f; }
+  html.dark ::-webkit-scrollbar-thumb { background: #2a2a3e; }
+  html.dark ::-webkit-scrollbar-thumb:hover { background: #3a3a4e; }
+  html.dark ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: #f1f5f9;
+  }
+}
+
+/* === ANIMATIONS (keyframes don't need layers) === */
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -30px) scale(1.05); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(20px, 10px) scale(1.02); }
+}
+
+@keyframes rippleExpand {
+  0% { width: 20px; height: 20px; opacity: 0.5; }
+  100% { width: 600px; height: 600px; opacity: 0; }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
